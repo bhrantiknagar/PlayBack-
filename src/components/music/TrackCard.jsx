@@ -1,9 +1,11 @@
 import React from 'react';
-import { Play, Pause, Heart } from 'lucide-react';
+import { Heart, Plus } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
+import { PlayPauseButton } from '../player/PlayPauseButton';
+import { IconButton } from '../ui/IconButton';
 
 export function TrackCard({ track, trackList }) {
-  const { currentTrack, isPlaying, togglePlay, playTrack, favorites, toggleFavorite } = usePlayer();
+  const { currentTrack, isPlaying, togglePlay, playTrack, favorites, toggleFavorite, addToQueue } = usePlayer();
   const isCurrent = currentTrack?.id === track.id;
   const isLiked = favorites.includes(track.id);
 
@@ -16,58 +18,62 @@ export function TrackCard({ track, trackList }) {
     }
   };
 
+  const handleAddToQueue = (e) => {
+    e.stopPropagation();
+    addToQueue(track);
+  };
+
   return (
     <div
       onClick={() => playTrack(track, trackList)}
+      className="music-card-root"
       style={{
-        background: isCurrent ? 'var(--bg-card-hover)' : 'var(--bg-card)',
-        borderRadius: 'var(--radius-md)',
-        padding: '16px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        border: isCurrent ? '1px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
-        boxShadow: isCurrent ? '0 0 20px var(--accent-glow)' : 'var(--shadow-sm)',
-        transition: 'all var(--transition-normal)',
-        cursor: 'pointer',
-        position: 'relative'
+        border: isCurrent ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid var(--border-subtle)'
       }}
-      className="track-card-hover"
     >
-      <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+      {/* Artwork Box */}
+      <div className="music-card-cover-box">
         <img
           src={track.coverUrl}
           alt={track.title}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          className="music-card-cover"
+          loading="lazy"
         />
-        <button
-          onClick={handlePlayClick}
-          style={{
-            position: 'absolute',
-            bottom: '12px',
-            right: '12px',
-            width: '44px',
-            height: '44px',
-            borderRadius: '50%',
-            background: 'var(--accent-gradient)',
-            color: '#ffffff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.4)',
-            transform: isCurrent && isPlaying ? 'scale(1)' : 'translateY(8px)',
-            opacity: isCurrent && isPlaying ? 1 : 0.9,
-            transition: 'all var(--transition-fast)'
-          }}
-        >
-          {isCurrent && isPlaying ? <Pause size={20} fill="#fff" /> : <Play size={20} fill="#fff" style={{ marginLeft: '2px' }} />}
-        </button>
+
+        {/* Hover Action Overlay */}
+        <div className={`music-card-play-overlay ${isCurrent && isPlaying ? 'is-playing' : ''}`}>
+          <IconButton
+            icon={Plus}
+            onClick={handleAddToQueue}
+            size="sm"
+            aria-label="Add to playback queue"
+            title="Add to queue"
+            style={{
+              background: 'rgba(10, 13, 20, 0.85)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              color: '#ffffff'
+            }}
+          />
+
+          <PlayPauseButton
+            isPlaying={isCurrent && isPlaying}
+            onClick={handlePlayClick}
+            size={40}
+          />
+        </div>
+
+        {/* Technical Energy Badge (Level 3 Hierarchy) */}
+        <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '6px', zIndex: 2 }}>
+          <span className="flac-hi-res-tag">{track.energy || 'STUDIO'}</span>
+        </div>
       </div>
 
+      {/* Metadata & Controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ overflow: 'hidden' }}>
+        <div style={{ overflow: 'hidden', paddingRight: '8px' }}>
+          {/* Level 1 Hierarchy: Title */}
           <h4 style={{
-            fontSize: '15px',
+            fontSize: '14px',
             fontWeight: '600',
             color: isCurrent ? '#a5b4fc' : 'var(--text-primary)',
             whiteSpace: 'nowrap',
@@ -76,8 +82,9 @@ export function TrackCard({ track, trackList }) {
           }}>
             {track.title}
           </h4>
+          {/* Level 2 Hierarchy: Artist */}
           <p style={{
-            fontSize: '13px',
+            fontSize: '12.5px',
             color: 'var(--text-secondary)',
             marginTop: '2px',
             whiteSpace: 'nowrap',
@@ -88,18 +95,18 @@ export function TrackCard({ track, trackList }) {
           </p>
         </div>
 
-        <button
+        <IconButton
+          icon={Heart}
           onClick={(e) => {
             e.stopPropagation();
             toggleFavorite(track.id);
           }}
-          style={{
-            color: isLiked ? '#ec4899' : 'var(--text-muted)',
-            padding: '4px'
-          }}
-        >
-          <Heart size={18} fill={isLiked ? '#ec4899' : 'none'} />
-        </button>
+          variant={isLiked ? 'danger' : 'default'}
+          className={isLiked ? 'animate-heart-pop' : ''}
+          size="sm"
+          aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
+          style={{ color: isLiked ? '#ec4899' : 'var(--text-muted)' }}
+        />
       </div>
     </div>
   );

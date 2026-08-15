@@ -1,10 +1,11 @@
 import React from 'react';
-import { X, Heart, Maximize2, Minimize2, Sliders, Activity, Disc, Sparkles } from 'lucide-react';
+import { Heart, Minimize2, Sliders } from 'lucide-react';
 import { usePlayer, EQ_PRESETS } from '../../context/PlayerContext';
 import { TrackControls } from './TrackControls';
 import { ProgressBar } from './ProgressBar';
 import { VolumeControl } from './VolumeControl';
 import { Visualizer } from '../music/Visualizer';
+import { IconButton } from '../ui/IconButton';
 
 export function NowPlayingModal() {
   const {
@@ -14,8 +15,6 @@ export function NowPlayingModal() {
     isPlaying,
     favorites,
     toggleFavorite,
-    visualizerMode,
-    setVisualizerMode,
     eqPreset,
     setEqPreset,
     currentTime
@@ -25,99 +24,67 @@ export function NowPlayingModal() {
 
   const isLiked = favorites.includes(currentTrack.id);
 
-  // Find active lyric if any
+  // Active lyric text simulation
   const currentLyric = currentTrack.lyrics?.slice().reverse().find(l => currentTime >= l.time)?.text ||
-    "Immerse yourself in high-definition audio space.";
+    "Immerse yourself in high-definition acoustic space.";
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      background: 'radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.18) 0%, rgba(14, 17, 26, 0.98) 70%, #06070a 100%)',
-      backdropFilter: 'blur(32px)',
-      zIndex: 1000,
-      display: 'flex',
-      flexDirection: 'column',
-      padding: '32px 48px',
-      color: '#fff',
-      animation: 'fadeInScale 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
-    }}>
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.16) 0%, rgba(14, 18, 26, 0.98) 70%, #06070a 100%)',
+        backdropFilter: 'blur(32px)',
+        zIndex: 1000,
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '32px 48px',
+        color: '#fff',
+        animation: 'fadeInScale 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+      }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Fullscreen listening space"
+    >
       {/* Top Bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span className="flac-hi-res-tag">STUDIO MASTER</span>
-          <span style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+          <span style={{ fontSize: '11.5px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
             {currentTrack.format || 'FLAC 24-bit / 96kHz'}
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{
-            display: 'flex',
-            background: 'rgba(255, 255, 255, 0.08)',
-            borderRadius: 'var(--radius-full)',
-            padding: '3px'
-          }}>
-            {['spectrum', 'wave', 'particles'].map((mode) => (
-              <button
-                key={mode}
-                onClick={() => setVisualizerMode(mode)}
-                style={{
-                  padding: '4px 12px',
-                  borderRadius: 'var(--radius-full)',
-                  fontSize: '11px',
-                  fontWeight: '600',
-                  textTransform: 'capitalize',
-                  color: visualizerMode === mode ? '#fff' : 'var(--text-muted)',
-                  background: visualizerMode === mode ? 'var(--accent-gradient)' : 'transparent',
-                  transition: 'all var(--transition-fast)'
-                }}
-              >
-                {mode}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={() => setIsNowPlayingOpen(false)}
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.08)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              marginLeft: '12px'
-            }}
-          >
-            <Minimize2 size={20} />
-          </button>
-        </div>
+        <IconButton
+          icon={Minimize2}
+          onClick={() => setIsNowPlayingOpen(false)}
+          size="md"
+          aria-label="Exit fullscreen listening space"
+          title="Exit Fullscreen"
+          style={{ background: 'rgba(255, 255, 255, 0.08)', color: '#ffffff' }}
+        />
       </div>
 
       {/* Main Listening Space Area */}
       <div style={{
         flex: 1,
         display: 'grid',
-        gridTemplateColumns: '1.2fr 1fr',
+        gridTemplateColumns: '1.1fr 1fr',
         alignItems: 'center',
-        gap: '64px',
-        maxWidth: '1200px',
+        gap: '56px',
+        maxWidth: '1100px',
         margin: '0 auto',
         width: '100%',
-        padding: '24px 0'
+        padding: '20px 0'
       }}>
-        {/* Left: 3D Vinyl Sleeve Showcase */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+        {/* Left: 3D Artwork Showcase */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{
             position: 'relative',
-            width: '340px',
-            height: '340px',
+            width: '320px',
+            height: '320px',
             borderRadius: 'var(--radius-md)',
-            boxShadow: '0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px var(--accent-glow)',
-            perspective: '1000px'
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.85), 0 0 35px var(--accent-glow-primary)'
           }}>
             {/* Vinyl Disc Sticking Out */}
             <div
@@ -125,13 +92,13 @@ export function NowPlayingModal() {
               style={{
                 position: 'absolute',
                 top: 0,
-                right: '-28%',
-                width: '340px',
-                height: '340px',
+                right: '-25%',
+                width: '320px',
+                height: '320px',
                 borderRadius: '50%',
                 background: 'radial-gradient(circle, #2a2a2a 12%, #111 30%, #000 65%)',
-                border: '2px solid rgba(255, 255, 255, 0.15)',
-                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.8)',
+                border: '2px solid rgba(255, 255, 255, 0.12)',
+                boxShadow: '0 10px 35px rgba(0, 0, 0, 0.8)',
                 zIndex: 1
               }}
             >
@@ -139,7 +106,7 @@ export function NowPlayingModal() {
                 position: 'absolute',
                 inset: '35%',
                 borderRadius: '50%',
-                background: 'var(--accent-gradient)',
+                background: 'var(--play-gradient)',
                 border: '4px solid #111'
               }} />
             </div>
@@ -160,18 +127,18 @@ export function NowPlayingModal() {
             />
           </div>
 
-          {/* Synchronized Real-time Lyric or Sound Quote */}
+          {/* Synchronized Real-time Lyric */}
           <div style={{
-            marginTop: '36px',
+            marginTop: '32px',
             textAlign: 'center',
-            maxWidth: '480px',
-            padding: '12px 24px',
+            maxWidth: '460px',
+            padding: '10px 20px',
             background: 'rgba(255, 255, 255, 0.04)',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-subtle)'
           }}>
             <p style={{
-              fontSize: '16px',
+              fontSize: '15px',
               fontStyle: 'italic',
               color: '#f1f5f9',
               lineHeight: '1.4',
@@ -182,66 +149,72 @@ export function NowPlayingModal() {
           </div>
         </div>
 
-        {/* Right: Audiophile Metrics, Equalizer & Live Visualizer */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {/* Right: Metadata, Soft Wave Visualizer & Equalizer Presets */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '13px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#a5b4fc' }}>
-                {currentTrack.genre || 'Electronic Workstation'}
+              <span style={{ fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.2px', color: '#a5b4fc', fontFamily: 'var(--font-mono)' }}>
+                {currentTrack.genre || 'Acoustic Master'}
               </span>
-              <button
+              <IconButton
+                icon={Heart}
                 onClick={() => toggleFavorite(currentTrack.id)}
+                variant={isLiked ? 'danger' : 'default'}
+                className={isLiked ? 'animate-heart-pop' : ''}
+                size="md"
+                aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
                 style={{ color: isLiked ? '#ec4899' : 'var(--text-muted)' }}
-              >
-                <Heart size={22} fill={isLiked ? '#ec4899' : 'none'} />
-              </button>
+              />
             </div>
-            <h1 style={{ fontSize: '36px', fontWeight: '800', marginTop: '6px', letterSpacing: '-1px' }}>
+
+            {/* Level 1 Hierarchy: Song Title */}
+            <h1 style={{ fontSize: '32px', fontWeight: '800', marginTop: '6px', letterSpacing: '-0.8px' }}>
               {currentTrack.title}
             </h1>
-            <h3 style={{ fontSize: '18px', color: 'var(--text-secondary)', fontWeight: '500', marginTop: '2px' }}>
+            {/* Level 2 Hierarchy: Artist & Album */}
+            <h3 style={{ fontSize: '16px', color: 'var(--text-secondary)', fontWeight: '500', marginTop: '3px' }}>
               {currentTrack.artist} — <span style={{ color: 'var(--text-muted)' }}>{currentTrack.album}</span>
             </h3>
           </div>
 
-          {/* Wide Visualizer Canvas */}
+          {/* Soft Waveform Canvas Visualizer */}
           <div style={{
-            padding: '20px',
-            background: 'rgba(0, 0, 0, 0.4)',
+            padding: '18px',
+            background: 'rgba(0, 0, 0, 0.35)',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-subtle)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <Visualizer width={360} height={70} isFull={true} />
+            <Visualizer width={360} height={56} isFull={true} />
           </div>
 
-          {/* Audio Specs Matrix */}
+          {/* Level 3 Hierarchy: Audio Specs Matrix */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '12px',
+            gap: '10px',
             fontFamily: 'var(--font-mono)'
           }}>
-            <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>BPM TEMPO</div>
-              <div style={{ fontSize: '14px', fontWeight: '700', color: '#38bdf8', marginTop: '2px' }}>{currentTrack.bpm || 120} BPM</div>
+            <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '8px 12px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ fontSize: '9.5px', color: 'var(--text-muted)' }}>TEMPO</div>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: '#38bdf8', marginTop: '2px' }}>{currentTrack.bpm || 120} BPM</div>
             </div>
-            <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>MUSICAL KEY</div>
-              <div style={{ fontSize: '14px', fontWeight: '700', color: '#a855f7', marginTop: '2px' }}>{currentTrack.key || 'C Maj'}</div>
+            <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '8px 12px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ fontSize: '9.5px', color: 'var(--text-muted)' }}>KEY</div>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: '#a855f7', marginTop: '2px' }}>{currentTrack.key || 'C Maj'}</div>
             </div>
-            <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>ENERGY VIBE</div>
-              <div style={{ fontSize: '14px', fontWeight: '700', color: '#ec4899', marginTop: '2px' }}>{currentTrack.energy || 'Drive'}</div>
+            <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '8px 12px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ fontSize: '9.5px', color: 'var(--text-muted)' }}>ENERGY</div>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: '#ec4899', marginTop: '2px' }}>{currentTrack.energy || 'Drive'}</div>
             </div>
           </div>
 
           {/* DSP Equalizer Presets */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600' }}>
-              <Sliders size={14} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600', fontFamily: 'var(--font-mono)' }}>
+              <Sliders size={13} />
               <span>DSP EQUALIZER PRESET</span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -250,11 +223,11 @@ export function NowPlayingModal() {
                   key={preset}
                   onClick={() => setEqPreset(preset)}
                   style={{
-                    padding: '6px 14px',
+                    padding: '5px 12px',
                     borderRadius: 'var(--radius-sm)',
-                    fontSize: '12px',
+                    fontSize: '11.5px',
                     fontWeight: '600',
-                    background: eqPreset === preset ? 'rgba(99, 102, 241, 0.25)' : 'rgba(255, 255, 255, 0.04)',
+                    background: eqPreset === preset ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255, 255, 255, 0.04)',
                     color: eqPreset === preset ? '#a5b4fc' : 'var(--text-secondary)',
                     border: eqPreset === preset ? '1px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
                     transition: 'all var(--transition-fast)'
@@ -268,20 +241,19 @@ export function NowPlayingModal() {
         </div>
       </div>
 
-      {/* Bottom Transport Controls in Fullscreen */}
+      {/* Bottom Transport Controls */}
       <div style={{
-        maxWidth: '800px',
+        maxWidth: '750px',
         margin: '0 auto',
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '16px',
-        paddingTop: '16px'
+        gap: '12px'
       }}>
         <ProgressBar />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-          <div style={{ width: '130px' }} />
+          <div style={{ width: '120px' }} />
           <TrackControls />
           <VolumeControl />
         </div>

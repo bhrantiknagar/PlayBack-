@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Play } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
 import { sampleTracks } from '../../data/sampleTracks';
+import { PlayPauseButton } from '../player/PlayPauseButton';
 
 export function PlaylistCard({ playlist }) {
   const navigate = useNavigate();
-  const { playTrack } = usePlayer();
+  const { playTrack, currentTrack, isPlaying } = usePlayer();
 
   const handlePlay = (e) => {
     e.stopPropagation();
@@ -18,50 +19,29 @@ export function PlaylistCard({ playlist }) {
   return (
     <div
       onClick={() => navigate(`/playlist/${playlist.id}`)}
-      style={{
-        background: 'var(--bg-card)',
-        borderRadius: 'var(--radius-md)',
-        padding: '16px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        border: '1px solid var(--border-subtle)',
-        cursor: 'pointer',
-        transition: 'all var(--transition-normal)'
-      }}
-      className="playlist-card-hover"
+      className="music-card-root"
     >
-      <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+      <div className="music-card-cover-box">
         <img
           src={playlist.coverUrl}
           alt={playlist.title}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          className="music-card-cover"
+          loading="lazy"
         />
-        <button
-          onClick={handlePlay}
-          style={{
-            position: 'absolute',
-            bottom: '12px',
-            right: '12px',
-            width: '44px',
-            height: '44px',
-            borderRadius: '50%',
-            background: 'var(--accent-gradient)',
-            color: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 6px 16px rgba(0, 0, 0, 0.4)',
-            transition: 'transform var(--transition-fast)'
-          }}
-        >
-          <Play size={20} fill="#fff" style={{ marginLeft: '2px' }} />
-        </button>
+
+        {/* Hover Play Button */}
+        <div className="music-card-play-overlay">
+          <PlayPauseButton
+            isPlaying={isPlaying && currentTrack?.album === playlist.title}
+            onClick={handlePlay}
+            size={42}
+          />
+        </div>
       </div>
 
       <div>
         <h4 style={{
-          fontSize: '15px',
+          fontSize: '14.5px',
           fontWeight: '600',
           color: 'var(--text-primary)',
           whiteSpace: 'nowrap',
@@ -71,9 +51,9 @@ export function PlaylistCard({ playlist }) {
           {playlist.title}
         </h4>
         <p style={{
-          fontSize: '13px',
+          fontSize: '12.5px',
           color: 'var(--text-muted)',
-          marginTop: '4px',
+          marginTop: '3px',
           display: '-webkit-box',
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',

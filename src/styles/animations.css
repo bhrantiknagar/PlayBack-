@@ -1,7 +1,58 @@
+/* Tactile Button Press Physics */
+@keyframes buttonPress {
+  0% { transform: scale(1); }
+  35% { transform: scale(0.94); }
+  75% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* Favorite Heart Pop Animation */
+@keyframes heartPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.28); }
+  70% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+
+/* Smooth Soft Mini-Wave for Active Track List Rows */
+@keyframes softWave1 {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+
+@keyframes softWave2 {
+  0%, 100% { height: 14px; }
+  50% { height: 6px; }
+}
+
+@keyframes softWave3 {
+  0%, 100% { height: 8px; }
+  50% { height: 18px; }
+}
+
+/* Atmospheric Ambient Pulse */
+@keyframes ambientPulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.08) translate(-15px, 10px);
+  }
+}
+
+/* Vinyl Rotate */
+@keyframes rotateVinyl {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Smooth Fade In / Scale */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -12,7 +63,7 @@
 @keyframes fadeInScale {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.97);
   }
   to {
     opacity: 1;
@@ -20,57 +71,65 @@
   }
 }
 
-@keyframes pulseAurora {
-  0%, 100% {
-    transform: scale(1) translate(0, 0);
-    opacity: 0.45;
-  }
-  50% {
-    transform: scale(1.12) translate(-20px, 15px);
-    opacity: 0.7;
-  }
-}
-
-@keyframes rotateVinyl {
+/* Queue Slide In */
+@keyframes queueSlideIn {
   from {
-    transform: rotate(0deg);
+    transform: translateX(100%);
   }
   to {
-    transform: rotate(360deg);
+    transform: translateX(0);
   }
 }
 
-@keyframes barBounce1 { 0%, 100% { height: 6px; } 50% { height: 26px; } }
-@keyframes barBounce2 { 0%, 100% { height: 18px; } 50% { height: 8px; } }
-@keyframes barBounce3 { 0%, 100% { height: 10px; } 50% { height: 28px; } }
-@keyframes barBounce4 { 0%, 100% { height: 24px; } 50% { height: 12px; } }
-
-@keyframes floatGentle {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
+@keyframes queueItemRemove {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+    max-height: 50px;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(30px);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin: 0;
+  }
 }
 
-@keyframes shimmerEffect {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
+/* Utility Animation Classes */
 .animate-fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-scale-in {
-  animation: fadeInScale 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInScale 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-press {
+  animation: buttonPress 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-heart-pop {
+  animation: heartPop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .animate-spin-slow {
-  animation: rotateVinyl 10s linear infinite;
+  animation: rotateVinyl 12s linear infinite;
 }
 
 .animate-spin-paused {
   animation-play-state: paused !important;
 }
 
-.animate-float {
-  animation: floatGentle 4s ease-in-out infinite;
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

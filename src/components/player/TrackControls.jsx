@@ -1,6 +1,8 @@
 import React from 'react';
-import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat } from 'lucide-react';
+import { SkipBack, SkipForward, Shuffle, Repeat } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
+import { PlayPauseButton } from './PlayPauseButton';
+import { IconButton } from '../ui/IconButton';
 
 export function TrackControls() {
   const {
@@ -15,58 +17,53 @@ export function TrackControls() {
   } = usePlayer();
 
   return (
-    <div className="control-buttons-row">
-      <button
+    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <IconButton
+        icon={Shuffle}
         onClick={() => setIsShuffle(!isShuffle)}
-        style={{
-          color: isShuffle ? 'var(--accent-primary)' : 'var(--text-muted)',
-          transition: 'color var(--transition-fast)'
-        }}
+        variant={isShuffle ? 'active' : 'default'}
+        aria-label={isShuffle ? 'Disable shuffle' : 'Enable shuffle'}
         title="Shuffle"
-      >
-        <Shuffle size={18} />
-      </button>
+        size="sm"
+      />
 
-      <button
+      <IconButton
+        icon={SkipBack}
         onClick={handlePrevTrack}
-        style={{ color: 'var(--text-secondary)' }}
-        title="Previous Track"
-      >
-        <SkipBack size={20} fill="currentColor" />
-      </button>
+        aria-label="Previous track"
+        title="Previous"
+        size="md"
+      />
 
-      <button
+      <PlayPauseButton
+        isPlaying={isPlaying}
         onClick={togglePlay}
-        className="play-pause-circle"
-        title={isPlaying ? 'Pause' : 'Play'}
-      >
-        {isPlaying ? <Pause size={20} fill="#0b0d13" /> : <Play size={20} fill="#0b0d13" style={{ marginLeft: '2px' }} />}
-      </button>
+        size={44}
+      />
 
-      <button
+      <IconButton
+        icon={SkipForward}
         onClick={handleNextTrack}
-        style={{ color: 'var(--text-secondary)' }}
-        title="Next Track"
-      >
-        <SkipForward size={20} fill="currentColor" />
-      </button>
+        aria-label="Next track"
+        title="Next"
+        size="md"
+      />
 
-      <button
-        onClick={toggleRepeat}
-        style={{
-          color: repeatMode !== 'off' ? 'var(--accent-primary)' : 'var(--text-muted)',
-          position: 'relative',
-          transition: 'color var(--transition-fast)'
-        }}
-        title={`Repeat: ${repeatMode}`}
-      >
-        <Repeat size={18} />
+      <div style={{ position: 'relative' }}>
+        <IconButton
+          icon={Repeat}
+          onClick={toggleRepeat}
+          variant={repeatMode !== 'off' ? 'active' : 'default'}
+          aria-label={`Repeat mode: ${repeatMode}`}
+          title={`Repeat: ${repeatMode}`}
+          size="sm"
+        />
         {repeatMode === 'one' && (
           <span style={{
             position: 'absolute',
-            top: '-4px',
-            right: '-6px',
-            fontSize: '9px',
+            top: '4px',
+            right: '4px',
+            fontSize: '8.5px',
             fontWeight: 'bold',
             background: 'var(--accent-primary)',
             color: '#fff',
@@ -75,12 +72,13 @@ export function TrackControls() {
             height: '12px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            pointerEvents: 'none'
           }}>
             1
           </span>
         )}
-      </button>
+      </div>
     </div>
   );
 }
