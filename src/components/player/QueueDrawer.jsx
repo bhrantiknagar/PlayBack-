@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, ListMusic } from 'lucide-react';
+import { X, Trash2, ListMusic, Play } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
 import { formatTime } from '../../utils/formatTime';
 import { IconButton } from '../ui/IconButton';
@@ -24,65 +24,70 @@ export function QueueDrawer() {
 
   const upNextInPlaylist = playlist.filter(t => t.id !== currentTrack?.id);
 
-  const handleRemoveTrack = (index) => {
+  const handleRemoveTrack = (e, index) => {
+    e.stopPropagation();
     setRemovingIndex(index);
     setTimeout(() => {
       removeFromQueue(index);
       setRemovingIndex(null);
-    }, 250);
+    }, 200);
+  };
+
+  const handlePlayQueueTrack = (track, index) => {
+    removeFromQueue(index);
+    playTrack(track);
   };
 
   return (
     <div
       style={{
         position: 'fixed',
-        inset: 0,
-        background: 'rgba(0, 0, 0, 0.65)',
-        backdropFilter: 'blur(10px)',
-        zIndex: 200,
+        top: 0,
+        right: 0,
+        bottom: 'var(--player-height)',
+        width: '380px',
+        maxWidth: '100vw',
+        background: 'rgba(10, 13, 20, 0.96)',
+        backdropFilter: 'blur(30px)',
+        borderLeft: '1px solid var(--border-subtle)',
+        zIndex: 900,
         display: 'flex',
-        justifyContent: 'flex-end',
-        animation: 'fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
+        flexDirection: 'column',
+        boxShadow: '-8px 0 32px rgba(0, 0, 0, 0.7)',
+        animation: 'slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
       }}
-      onClick={() => setIsQueueOpen(false)}
+      role="dialog"
+      aria-label="Playback Queue"
     >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '400px',
-          height: '100%',
-          background: 'var(--bg-surface)',
-          borderLeft: '1px solid var(--border-subtle)',
-          padding: '24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-          boxShadow: 'var(--shadow-lg)',
-          overflowY: 'auto',
-          animation: 'queueSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1)'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <ListMusic size={20} color="var(--accent-primary)" />
-            <h3 style={{ fontSize: '17px', fontWeight: '700' }}>Playback Queue</h3>
-          </div>
-          <IconButton
-            icon={X}
-            onClick={() => setIsQueueOpen(false)}
-            size="sm"
-            aria-label="Close queue drawer"
-            title="Close"
-          />
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '20px 24px',
+        borderBottom: '1px solid var(--border-subtle)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <ListMusic size={18} color="var(--accent-primary)" />
+          <h3 style={{ fontSize: '16px', fontWeight: '700', letterSpacing: '-0.3px' }}>PlayBack Queue</h3>
         </div>
 
-        {/* Currently Active Track */}
+        <IconButton
+          icon={X}
+          onClick={() => setIsQueueOpen(false)}
+          size="sm"
+          aria-label="Close queue drawer"
+          title="Close Queue"
+        />
+      </div>
+
+      {/* Content */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {/* Currently Playing Track */}
         {currentTrack && (
           <div style={{
-            background: 'rgba(99, 102, 241, 0.08)',
-            border: '1px solid rgba(99, 102, 241, 0.25)',
+            background: 'rgba(99, 102, 241, 0.1)',
+            border: '1px solid rgba(99, 102, 241, 0.3)',
             borderRadius: 'var(--radius-sm)',
             padding: '12px'
           }}>
@@ -91,17 +96,21 @@ export function QueueDrawer() {
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
               <img
-                src={currentTrack.artwork || currentTrack.coverUrl}
-                alt={currentTrack.title}
+                src={currentTrack.artwork || currentTrack.coverUrl || DEFAULT_ARTWORK}
+                alt={currentTrack.title || 'Untitled Track'}
                 style={{ width: '42px', height: '42px', borderRadius: 'var(--radius-xs)', objectFit: 'cover' }}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = DEFAULT_ARTWORK;
+                }}
               />
               <div style={{ minWidth: 0, overflow: 'hidden', flex: 1 }}>
                 <h4 style={{ fontSize: '13.5px', fontWeight: '600', color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {currentTrack.title}
+                  {currentTrack.title || 'Untitled Track'}
                 </h4>
-                <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{currentTrack.artist}</p>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{currentTrack.artist || 'Unknown Artist'}</p>
               </div>
-              <span className="flac-hi-res-tag">HI-RES</span>
+              <span className="flac-hi-res-tag">{currentTrack.quality || 'Standard'}</span>
             </div>
           </div>
         )}
@@ -115,7 +124,7 @@ export function QueueDrawer() {
             {queue.length > 0 && (
               <button
                 onClick={clearQueue}
-                style={{ color: 'var(--text-muted)', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                style={{ color: 'var(--text-muted)', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', background: 'transparent', border: 'none', cursor: 'pointer' }}
               >
                 <Trash2 size={13} />
                 <span>Clear All</span>
@@ -132,6 +141,7 @@ export function QueueDrawer() {
               {queue.map((track, i) => (
                 <div
                   key={`${track.id}-${i}`}
+                  onClick={() => handlePlayQueueTrack(track, i)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -140,11 +150,21 @@ export function QueueDrawer() {
                     borderRadius: 'var(--radius-sm)',
                     background: 'var(--bg-card)',
                     border: '1px solid var(--border-subtle)',
+                    cursor: 'pointer',
                     animation: removingIndex === i ? 'queueItemRemove 0.25s forwards' : 'none'
                   }}
+                  className="track-row-hover"
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                    <img src={track.artwork || track.coverUrl} alt="" style={{ width: '32px', height: '32px', borderRadius: '4px' }} />
+                    <img
+                      src={track.artwork || track.coverUrl || DEFAULT_ARTWORK}
+                      alt=""
+                      style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'cover' }}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = DEFAULT_ARTWORK;
+                      }}
+                    />
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {track.title}
@@ -154,7 +174,7 @@ export function QueueDrawer() {
                   </div>
                   <IconButton
                     icon={X}
-                    onClick={() => handleRemoveTrack(i)}
+                    onClick={(e) => handleRemoveTrack(e, i)}
                     size="sm"
                     aria-label={`Remove ${track.title} from queue`}
                     title="Remove"
@@ -174,7 +194,7 @@ export function QueueDrawer() {
             {upNextInPlaylist.slice(0, 7).map((track) => (
               <div
                 key={track.id}
-                onClick={() => playTrack(track)}
+                onClick={() => playTrack(track, playlist)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -187,7 +207,15 @@ export function QueueDrawer() {
                 className="track-row-hover"
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                  <img src={track.artwork || track.coverUrl} alt="" style={{ width: '32px', height: '32px', borderRadius: '4px' }} />
+                  <img
+                    src={track.artwork || track.coverUrl || DEFAULT_ARTWORK}
+                    alt=""
+                    style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'cover' }}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = DEFAULT_ARTWORK;
+                    }}
+                  />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {track.title}
@@ -196,7 +224,7 @@ export function QueueDrawer() {
                   </div>
                 </div>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-                  {formatTime(track.duration)}
+                  {track.duration > 0 ? formatTime(track.duration) : '--:--'}
                 </span>
               </div>
             ))}

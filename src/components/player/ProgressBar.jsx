@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { usePlayer } from '../../context/PlayerContext';
 import { formatTime } from '../../utils/formatTime';
 
@@ -7,9 +7,28 @@ export function ProgressBar() {
   const [hoverTime, setHoverTime] = useState(null);
   const [hoverPos, setHoverPos] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragTime, setDragTime] = useState(null);
   const barRef = useRef(null);
 
-  const percentage = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const displayTime = isDragging && dragTime !== null ? dragTime : currentTime;
+  const percentage = duration > 0 ? Math.min(100, Math.max(0, (displayTime / duration) * 100)) : 0;
+
+  const calculateTimeFromPointer = useCallback((e) => {
+    if (!barRef.current || !duration) return 0;
+    const rect = barRef.current.getBoundingClientRect();
+    const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    return pos * duration;
+  }, [duration]);
+
+  const handlePointerDown = (e) => {
+    if (!duration) return;
+    setIsDragging(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const targetTime = calculateTimeFromPointer(e);
+    setDragTime(targetTime);
+    seek(targetTime);
+  };
 
   const handlePointerMove = (e) => {
     if (!barRef.current || !duration) return;
@@ -17,17 +36,28 @@ export function ProgressBar() {
     const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     setHoverPos(pos * 100);
     setHoverTime(pos * duration);
+
+    if (isDragging) {
+      const targetTime = pos * duration;
+      setDragTime(targetTime);
+      seek(targetTime);
+    }
   };
 
-  const handlePointerDown = (e) => {
-    if (!barRef.current || !duration) return;
-    const rect = barRef.current.getBoundingClientRect();
-    const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    seek(pos * duration);
+  const handlePointerUp = (e) => {
+    if (isDragging) {
+      setIsDragging(false);
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch (_) {}
+      const targetTime = calculateTimeFromPointer(e);
+      seek(targetTime);
+      setDragTime(null);
+    }
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', userSelect: 'none' }}>
       {/* Current Time Monospace Display */}
       <span style={{
         fontFamily: 'var(--font-mono)',
@@ -38,38 +68,43 @@ export function ProgressBar() {
         textAlign: 'right',
         fontVariantNumeric: 'tabular-nums'
       }}>
-        {formatTime(currentTime)}
+        {formatTime(displayTime)}
       </span>
 
       {/* Scrub Track Area */}
       <div
         ref={barRef}
         onPointerEnter={() => setIsHovering(true)}
-        onPointerLeave={() => setIsHovering(false)}
+        onPointerLeave={() => {
+          if (!isDragging) setIsHovering(false);
+        }}
         onPointerMove={handlePointerMove}
         onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
         style={{
           flex: 1,
           position: 'relative',
           height: '24px',
           display: 'flex',
           alignItems: 'center',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          touchAction: 'none'
         }}
         role="slider"
         aria-label="Track playback timeline"
-        aria-valuenow={currentTime}
+        aria-valuenow={displayTime}
         aria-valuemin={0}
         aria-valuemax={duration || 100}
         tabIndex={0}
       >
         {/* Hover Timestamp Preview Tooltip */}
-        {isHovering && hoverTime !== null && (
+        {(isHovering || isDragging) && hoverTime !== null && (
           <div
             style={{
               position: 'absolute',
               bottom: '18px',
-              left: `${hoverPos}%`,
+              left: `${isDragging ? percentage : hoverPos}%`,
               transform: 'translateX(-50%)',
               background: 'var(--bg-surface-elevated)',
               border: '1px solid var(--border-medium)',
@@ -80,22 +115,22 @@ export function ProgressBar() {
               color: '#ffffff',
               pointerEvents: 'none',
               boxShadow: 'var(--shadow-md)',
+              zIndex: 10,
               whiteSpace: 'nowrap'
             }}
           >
-            {formatTime(hoverTime)}
+            {formatTime(isDragging ? displayTime : hoverTime)}
           </div>
         )}
 
-        {/* Background Track */}
+        {/* Outer Inactive Rail */}
         <div
           style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            height: isHovering ? '6px' : '4px',
+            width: '100%',
+            height: isHovering || isDragging ? '5px' : '4px',
             borderRadius: 'var(--radius-full)',
-            background: 'rgba(255, 255, 255, 0.08)',
+            background: 'rgba(255, 255, 255, 0.1)',
+            position: 'relative',
             transition: 'height var(--transition-fast)'
           }}
         >
@@ -105,9 +140,9 @@ export function ProgressBar() {
               width: `${percentage}%`,
               height: '100%',
               borderRadius: 'var(--radius-full)',
-              background: isHovering ? '#6366f1' : '#e2e8f0',
+              background: isHovering || isDragging ? '#6366f1' : '#e2e8f0',
               position: 'relative',
-              transition: 'background var(--transition-fast)'
+              transition: isDragging ? 'none' : 'background var(--transition-fast)'
             }}
           >
             {/* Draggable Progress Thumb */}
@@ -117,13 +152,13 @@ export function ProgressBar() {
                 right: '-5px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                width: isHovering ? '12px' : '10px',
-                height: isHovering ? '12px' : '10px',
+                width: isHovering || isDragging ? '12px' : '10px',
+                height: isHovering || isDragging ? '12px' : '10px',
                 borderRadius: '50%',
                 background: '#ffffff',
                 boxShadow: '0 1px 4px rgba(0, 0, 0, 0.5)',
-                opacity: isHovering ? 1 : 0.85,
-                transition: 'width 0.15s ease, height 0.15s ease, opacity 0.15s ease'
+                opacity: isHovering || isDragging ? 1 : 0.85,
+                transition: isDragging ? 'none' : 'width 0.15s ease, height 0.15s ease, opacity 0.15s ease'
               }}
             />
           </div>
@@ -139,7 +174,7 @@ export function ProgressBar() {
         width: '36px',
         fontVariantNumeric: 'tabular-nums'
       }}>
-        {formatTime(duration)}
+        {duration > 0 ? formatTime(duration) : '--:--'}
       </span>
     </div>
   );
