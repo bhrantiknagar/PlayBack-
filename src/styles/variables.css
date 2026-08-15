@@ -1,0 +1,78 @@
+:root {
+  /* Surface Colors - Deep Obsidian & Titanium Workstation */
+  --bg-space: #06070a;
+  --bg-main: #0b0d13;
+  --bg-sidebar: #0e1118;
+  --bg-card: rgba(18, 22, 32, 0.65);
+  --bg-card-hover: rgba(26, 32, 48, 0.85);
+  --bg-surface: #131722;
+  --bg-surface-elevated: #1a2030;
+  --bg-glass: rgba(15, 19, 29, 0.72);
+  --bg-glass-heavy: rgba(10, 13, 20, 0.94);
+  --bg-glass-subtle: rgba(255, 255, 255, 0.03);
+
+  /* Accents & Neon Aurora Palette */
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #4f46e5;
+  --accent-cyan: #06b6d4;
+  --accent-pink: #ec4899;
+  --accent-purple: #a855f7;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+
+  /* Gradients */
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+  --cyber-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #6366f1 100%);
+  --aura-gradient: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%);
+  --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --surface-border-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.02) 100%);
+
+  /* Dynamic Ambient Glow */
+  --accent-glow: rgba(99, 102, 241, 0.4);
+  --accent-glow-subtle: rgba(99, 102, 241, 0.15);
+  --pink-glow: rgba(236, 72, 153, 0.35);
+  --cyan-glow: rgba(6, 182, 212, 0.35);
+
+  /* Typography Colors */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-subtle: #475569;
+  --text-accent: #a5b4fc;
+  --text-inverse: #08090d;
+
+  /* Typography Fonts */
+  --font-display: 'Outfit', -apple-system, sans-serif;
+  --font-heading: 'Space Grotesk', -apple-system, sans-serif;
+  --font-body: 'Inter', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Borders & Specular Lines */
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-medium: rgba(255, 255, 255, 0.12);
+  --border-focus: rgba(99, 102, 241, 0.6);
+  --border-glass: 1px solid rgba(255, 255, 255, 0.08);
+
+  /* Shadows */
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.25);
+  --shadow-vinyl: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 255, 255, 0.05);
+
+  /* Dimensions */
+  --sidebar-width: 270px;
+  --header-height: 74px;
+  --player-height: 94px;
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  /* Motion & Transitions */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-spring: 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-smooth: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
