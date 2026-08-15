@@ -22,7 +22,7 @@ export function PlayerProvider({ children }) {
   const [isMuted, setIsMuted] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState('off'); // 'off' | 'all' | 'one'
-  const [visualizerMode, setVisualizerMode] = useState('spectrum'); // 'spectrum' | 'wave' | 'particles' | 'bars'
+  const [visualizerMode, setVisualizerMode] = useState('wave'); // 'wave' | 'spectrum' | 'particles'
   const [eqPreset, setEqPreset] = useState('Cyber Club');
   const [isNowPlayingOpen, setIsNowPlayingOpen] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
@@ -45,13 +45,14 @@ export function PlayerProvider({ children }) {
     if (isPlaying) {
       audio.play().catch(err => {
         console.warn('Autoplay prevented or failed:', err);
-        setIsPlaying(false);
       });
     }
 
     const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
     const handleLoadedMetadata = () => setDuration(audio.duration || currentTrack.duration);
-    const handleEnded = () => handleNextTrack();
+    const handleEnded = () => {
+      handleNextTrack(true);
+    };
 
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
@@ -62,7 +63,7 @@ export function PlayerProvider({ children }) {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('ended', handleEnded);
     };
-  }, [currentTrackIndex]);
+  }, [currentTrackIndex, playlist]);
 
   useEffect(() => {
     audioRef.current.volume = isMuted ? 0 : volume;
@@ -95,17 +96,20 @@ export function PlayerProvider({ children }) {
     setIsPlaying(true);
     setTimeout(() => {
       audioRef.current.play().catch(console.warn);
-    }, 60);
+    }, 50);
   };
 
-  const handleNextTrack = () => {
+  const handleNextTrack = (autoPlayNext = isPlaying) => {
     if (repeatMode === 'one') {
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(console.warn);
+      if (autoPlayNext) {
+        audioRef.current.play().catch(console.warn);
+        setIsPlaying(true);
+      }
       return;
     }
 
-    // Check custom queue first
+    // Check custom user queue first
     if (queue.length > 0) {
       const nextTrack = queue[0];
       setQueue(prev => prev.slice(1));
@@ -116,11 +120,14 @@ export function PlayerProvider({ children }) {
     if (isShuffle) {
       const randomIndex = Math.floor(Math.random() * playlist.length);
       setCurrentTrackIndex(randomIndex);
+      if (autoPlayNext) setIsPlaying(true);
     } else {
       if (currentTrackIndex < playlist.length - 1) {
         setCurrentTrackIndex(prev => prev + 1);
+        if (autoPlayNext) setIsPlaying(true);
       } else if (repeatMode === 'all') {
         setCurrentTrackIndex(0);
+        if (autoPlayNext) setIsPlaying(true);
       } else {
         setIsPlaying(false);
       }

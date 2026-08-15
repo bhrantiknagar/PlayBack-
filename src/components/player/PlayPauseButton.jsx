@@ -34,9 +34,9 @@ export function PlayPauseButton({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: '0 4px 16px var(--accent-glow-primary)',
-        transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease',
-        transform: isPressing ? 'scale(0.92)' : 'scale(1)',
+        boxShadow: '0 4px 14px var(--accent-glow-subtle)',
+        transition: 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease',
+        transform: isPressing ? 'scale(0.94)' : 'scale(1)',
         border: 'none',
         outline: 'none',
         flexShrink: 0,
@@ -51,21 +51,19 @@ export function PlayPauseButton({
         fill="currentColor"
         style={{
           color: '#ffffff',
-          transition: 'transform 0.2s ease',
-          transform: isPlaying ? 'rotate(90deg)' : 'rotate(0deg)'
+          transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease'
         }}
       >
         {isPlaying ? (
-          // Pause Bars (▮ ▮)
+          // Two clean, vertical, centered pause bars (▮ ▮)
           <g>
-            <rect x="5" y="4" width="4.5" height="16" rx="1.5" />
-            <rect x="14.5" y="4" width="4.5" height="16" rx="1.5" />
+            <rect x="6" y="4.5" width="3.5" height="15" rx="1.2" />
+            <rect x="14.5" y="4.5" width="3.5" height="15" rx="1.2" />
           </g>
         ) : (
-          // Play Triangle (▶)
+          // Centered Play Triangle (▶)
           <path
-            d="M7 4.5V19.5C7 20.3 7.9 20.8 8.6 20.4L20.2 12.9C20.8 12.5 20.8 11.5 20.2 11.1L8.6 3.6C7.9 3.2 7 3.7 7 4.5Z"
-            style={{ transform: 'translateX(1px)' }}
+            d="M8 5.14v13.72c0 .8.88 1.3 1.58.88l11.02-6.86c.68-.42.68-1.4 0-1.82L9.58 4.26C8.88 3.84 8 4.34 8 5.14Z"
           />
         )}
       </svg>

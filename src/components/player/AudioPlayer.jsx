@@ -82,7 +82,9 @@ export function AudioPlayer() {
             >
               {currentTrack.title}
             </span>
-            <span className="flac-hi-res-tag">HI-RES</span>
+            {(currentTrack.quality === 'Hi-Res' || currentTrack.quality === 'Lossless') && (
+              <span className="flac-hi-res-tag">{currentTrack.quality}</span>
+            )}
           </div>
 
           <div style={{

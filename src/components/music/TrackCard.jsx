@@ -62,10 +62,12 @@ export function TrackCard({ track, trackList }) {
           />
         </div>
 
-        {/* Technical Energy Badge (Level 3 Hierarchy) */}
-        <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '6px', zIndex: 2 }}>
-          <span className="flac-hi-res-tag">{track.energy || 'STUDIO'}</span>
-        </div>
+        {/* Quality Badge (Level 3 Hierarchy) */}
+        {(track.quality === 'Hi-Res' || track.quality === 'Lossless') && (
+          <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '6px', zIndex: 2 }}>
+            <span className="flac-hi-res-tag">{track.quality}</span>
+          </div>
+        )}
       </div>
 
       {/* Metadata & Controls */}

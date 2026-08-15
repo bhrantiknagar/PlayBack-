@@ -12,7 +12,7 @@ export function TrackList({ tracks = [], showHeader = true }) {
       {showHeader && (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '44px 2fr 1.5fr 1fr 70px 76px',
+          gridTemplateColumns: '44px 2.5fr 1.8fr 70px 76px',
           padding: '8px 16px',
           color: 'var(--text-muted)',
           fontSize: '11px',
@@ -26,7 +26,6 @@ export function TrackList({ tracks = [], showHeader = true }) {
           <span>#</span>
           <span>Title / Artist</span>
           <span>Album</span>
-          <span>Spec</span>
           <span style={{ textAlign: 'right' }}><Clock size={12} /></span>
           <span style={{ textAlign: 'right' }}>Actions</span>
         </div>
@@ -36,6 +35,7 @@ export function TrackList({ tracks = [], showHeader = true }) {
         {tracks.map((track, idx) => {
           const isCurrent = currentTrack?.id === track.id;
           const isLiked = favorites.includes(track.id);
+          const isHighQuality = track.quality === 'Hi-Res' || track.quality === 'Lossless';
 
           return (
             <div
@@ -43,7 +43,7 @@ export function TrackList({ tracks = [], showHeader = true }) {
               onClick={() => playTrack(track, tracks)}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '44px 2fr 1.5fr 1fr 70px 76px',
+                gridTemplateColumns: '44px 2.5fr 1.8fr 70px 76px',
                 alignItems: 'center',
                 padding: '9px 16px',
                 borderRadius: 'var(--radius-sm)',
@@ -82,15 +82,22 @@ export function TrackList({ tracks = [], showHeader = true }) {
                   style={{ width: '38px', height: '38px', borderRadius: 'var(--radius-xs)', objectFit: 'cover', flexShrink: 0 }}
                 />
                 <div style={{ minWidth: 0, overflow: 'hidden' }}>
-                  <div style={{
-                    fontSize: '13.5px',
-                    fontWeight: isCurrent ? '600' : '500',
-                    color: isCurrent ? '#ffffff' : 'var(--text-primary)',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                  }}>
-                    {track.title}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{
+                      fontSize: '13.5px',
+                      fontWeight: isCurrent ? '600' : '500',
+                      color: isCurrent ? '#ffffff' : 'var(--text-primary)',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
+                      {track.title}
+                    </span>
+                    {isHighQuality && (
+                      <span className="flac-hi-res-tag" style={{ fontSize: '8.5px', padding: '1px 4px' }}>
+                        {track.quality}
+                      </span>
+                    )}
                   </div>
                   <div style={{
                     fontSize: '12px',
@@ -105,25 +112,10 @@ export function TrackList({ tracks = [], showHeader = true }) {
                 </div>
               </div>
 
-              {/* Album (Level 2 Hierarchy) */}
+              {/* Album */}
               <span style={{ fontSize: '13px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: '12px' }}>
                 {track.album || 'Single'}
               </span>
-
-              {/* Technical Spec (Level 3 Hierarchy - Quieter) */}
-              <div>
-                <span style={{
-                  fontSize: '10.5px',
-                  fontFamily: 'var(--font-mono)',
-                  color: 'var(--text-muted)',
-                  padding: '2px 6px',
-                  borderRadius: '3px',
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid var(--border-subtle)'
-                }}>
-                  {track.bpm ? `${track.bpm} BPM` : 'FLAC'}
-                </span>
-              </div>
 
               {/* Duration */}
               <span style={{ fontSize: '12px', color: 'var(--text-muted)', textAlign: 'right', fontFamily: 'var(--font-mono)' }}>

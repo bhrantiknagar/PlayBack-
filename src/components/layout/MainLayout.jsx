@@ -11,28 +11,18 @@ import { usePlayer } from '../../context/PlayerContext';
 export function MainLayout() {
   const { currentTrack, isPlaying } = usePlayer();
 
-  // Dynamic ambient glow mapping based on track energy/mood
-  const getAmbientGlowStyle = () => {
-    if (!currentTrack) return {};
-    const moodColors = {
-      'Drive': 'radial-gradient(circle, rgba(99, 102, 241, 0.16) 0%, rgba(236, 72, 153, 0.08) 45%, transparent 70%)',
-      'Euphoria': 'radial-gradient(circle, rgba(236, 72, 153, 0.16) 0%, rgba(139, 92, 246, 0.08) 45%, transparent 70%)',
-      'Focus': 'radial-gradient(circle, rgba(6, 182, 212, 0.14) 0%, rgba(99, 102, 241, 0.06) 45%, transparent 70%)',
-      'Chill': 'radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(6, 182, 212, 0.06) 45%, transparent 70%)',
-      'Late Night': 'radial-gradient(circle, rgba(139, 92, 246, 0.16) 0%, rgba(245, 158, 11, 0.06) 45%, transparent 70%)'
-    };
-    return {
-      background: moodColors[currentTrack.energy] || moodColors['Drive'],
-      opacity: isPlaying ? 0.55 : 0.25
-    };
-  };
+  const activeColor = currentTrack?.ambientColor || '#6366f1';
 
   return (
     <div className="app-container">
-      {/* Reactive Ambient Artwork Glow */}
+      {/* Reactive Ambient Artwork Glow synced to current track dominant color */}
       <div
         className="ambient-glow-layer"
-        style={getAmbientGlowStyle()}
+        style={{
+          background: `radial-gradient(circle, ${activeColor} 0%, rgba(14, 18, 26, 0.08) 55%, transparent 75%)`,
+          opacity: isPlaying ? 0.38 : 0.16,
+          transition: 'background 1.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease'
+        }}
         aria-hidden="true"
       />
 
@@ -45,7 +35,7 @@ export function MainLayout() {
         <AudioPlayer />
       </div>
 
-      {/* Mobile Navigation Bar (<850px) */}
+      {/* Mobile Navigation Bar */}
       <MobileNav />
 
       {/* Fullscreen Listening Space & Queue Drawer */}

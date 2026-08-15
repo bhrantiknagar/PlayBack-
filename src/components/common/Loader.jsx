@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function Loader({ text = 'Loading vibes...' }) {
+export function Loader({ text = 'Loading music...' }) {
   return (
     <div style={{
       display: 'flex',
@@ -8,17 +8,17 @@ export function Loader({ text = 'Loading vibes...' }) {
       alignItems: 'center',
       justifyContent: 'center',
       padding: '48px',
-      gap: '16px'
+      gap: '14px'
     }}>
       <div style={{
-        width: '40px',
-        height: '40px',
-        border: '3px solid rgba(255, 255, 255, 0.1)',
+        width: '32px',
+        height: '32px',
+        border: '2.5px solid rgba(255, 255, 255, 0.08)',
         borderTopColor: 'var(--accent-primary)',
         borderRadius: '50%',
-        animation: 'rotateVinyl 1s linear infinite'
+        animation: 'rotateVinyl 0.9s linear infinite'
       }} />
-      <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>{text}</span>
+      <span style={{ color: 'var(--text-muted)', fontSize: '13px', fontFamily: 'var(--font-primary)' }}>{text}</span>
     </div>
   );
 }
