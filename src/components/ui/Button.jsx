@@ -9,6 +9,7 @@ export function Button({
   onClick, 
   disabled = false,
   'aria-label': ariaLabel,
+  style = {},
   ...props 
 }) {
   const [isPressed, setIsPressed] = useState(false);
@@ -25,32 +26,34 @@ export function Button({
     outline: 'none',
     opacity: disabled ? 0.5 : 1,
     transition: 'all var(--transition-fast), transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)',
-    transform: isPressed ? 'scale(0.95)' : 'scale(1)',
+    transform: isPressed ? 'scale(0.96)' : 'scale(1)',
     fontFamily: 'var(--font-primary)'
   };
 
   const sizes = {
     sm: { padding: '6px 14px', fontSize: '12px' },
     md: { padding: '9px 20px', fontSize: '13.5px' },
-    lg: { padding: '12px 26px', fontSize: '15px' }
+    lg: { padding: '12px 26px', fontSize: '14.5px' }
   };
 
   const variants = {
     primary: {
-      background: 'var(--accent-gradient)',
+      background: '#6366f1',
       color: '#ffffff',
-      boxShadow: '0 4px 14px var(--accent-glow-subtle)'
+      fontWeight: '600',
+      boxShadow: 'none',
+      border: '1px solid #6366f1'
     },
     secondary: {
-      background: 'var(--bg-surface-elevated)',
-      color: 'var(--text-primary)',
-      border: '1px solid var(--border-medium)',
+      background: 'rgba(255, 255, 255, 0.08)',
+      color: '#ffffff',
+      border: '1px solid rgba(255, 255, 255, 0.14)',
       boxShadow: 'var(--shadow-sm)'
     },
     outline: {
       background: 'transparent',
-      border: '1px solid var(--border-medium)',
-      color: 'var(--text-primary)'
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      color: '#ffffff'
     },
     ghost: {
       background: 'transparent',
@@ -65,7 +68,7 @@ export function Button({
       onPointerDown={() => setIsPressed(true)}
       onPointerUp={() => setIsPressed(false)}
       onPointerLeave={() => setIsPressed(false)}
-      style={{ ...baseStyles, ...sizes[size], ...variants[variant] }}
+      style={{ ...baseStyles, ...sizes[size], ...variants[variant], ...style }}
       className={`playback-btn ${className}`}
       onClick={onClick}
       {...props}

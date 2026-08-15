@@ -99,14 +99,15 @@ export function ProgressBar() {
             transition: 'height var(--transition-fast)'
           }}
         >
-          {/* Active Gradient Progress Fill */}
+          {/* Active Solid Progress Fill */}
           <div
             style={{
               width: `${percentage}%`,
               height: '100%',
               borderRadius: 'var(--radius-full)',
-              background: 'var(--progress-gradient)',
-              position: 'relative'
+              background: isHovering ? '#6366f1' : '#e2e8f0',
+              position: 'relative',
+              transition: 'background var(--transition-fast)'
             }}
           >
             {/* Draggable Progress Thumb */}
@@ -120,7 +121,7 @@ export function ProgressBar() {
                 height: isHovering ? '12px' : '10px',
                 borderRadius: '50%',
                 background: '#ffffff',
-                boxShadow: '0 0 8px rgba(0, 0, 0, 0.5), 0 0 6px var(--accent-primary)',
+                boxShadow: '0 1px 4px rgba(0, 0, 0, 0.5)',
                 opacity: isHovering ? 1 : 0.85,
                 transition: 'width 0.15s ease, height 0.15s ease, opacity 0.15s ease'
               }}

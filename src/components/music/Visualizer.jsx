@@ -32,23 +32,18 @@ export function Visualizer({ height = 28, width = 120, isFull = false }) {
       const h = canvas.height;
       ctx.clearRect(0, 0, w, h);
 
-      const targetAmp = isPlaying ? 1 : 0.08;
+      const targetAmp = isPlaying ? 1 : 0.06;
       // Smooth interpolation for gentle settling
       animState.current.currentAmp += (targetAmp - animState.current.currentAmp) * 0.05;
       const amp = animState.current.currentAmp;
 
-      // Soft sinusoidal curve
+      // Clean, solid audio waveform
       ctx.save();
       ctx.globalAlpha = animState.current.opacity;
       ctx.beginPath();
-      ctx.lineWidth = isFull ? 2.5 : 1.75;
+      ctx.lineWidth = isFull ? 2 : 1.5;
       ctx.lineCap = 'round';
-
-      const gradient = ctx.createLinearGradient(0, 0, w, 0);
-      gradient.addColorStop(0, '#06b6d4');
-      gradient.addColorStop(0.5, '#6366f1');
-      gradient.addColorStop(1, '#ec4899');
-      ctx.strokeStyle = gradient;
+      ctx.strokeStyle = '#6366f1';
 
       const points = 32;
       const sliceWidth = w / points;
@@ -56,12 +51,12 @@ export function Visualizer({ height = 28, width = 120, isFull = false }) {
       for (let i = 0; i <= points; i++) {
         const x = i * sliceWidth;
         const norm = i / points;
-        // Envelope so edges stay near baseline
+        // Envelope so edges stay pinned to baseline
         const envelope = Math.sin(norm * Math.PI);
         
         // Multi-frequency gentle undulating wave
         const wave1 = Math.sin(animState.current.phase + norm * Math.PI * 2.5);
-        const wave2 = Math.sin(animState.current.phase * 1.3 + norm * Math.PI * 4) * 0.4;
+        const wave2 = Math.sin(animState.current.phase * 1.3 + norm * Math.PI * 4) * 0.35;
         const totalWave = (wave1 + wave2) * envelope * amp * (h * 0.38);
 
         const y = h / 2 + totalWave;
@@ -80,7 +75,7 @@ export function Visualizer({ height = 28, width = 120, isFull = false }) {
       ctx.restore();
 
       // Slow down phase increment when paused
-      animState.current.phase += isPlaying ? 0.035 : 0.005;
+      animState.current.phase += isPlaying ? 0.035 : 0.004;
       animationFrameId = requestAnimationFrame(render);
     };
 

@@ -11,20 +11,30 @@ export function TrackControls() {
     handleNextTrack,
     handlePrevTrack,
     isShuffle,
-    setIsShuffle,
+    toggleShuffle,
     repeatMode,
     toggleRepeat
   } = usePlayer();
 
+  const getRepeatTitle = () => {
+    if (repeatMode === 'one') return 'Repeat: One Track';
+    if (repeatMode === 'all') return 'Repeat: All Tracks';
+    return 'Repeat: Off';
+  };
+
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+      {/* Shuffle Button (Subtle accent only when active) */}
       <IconButton
         icon={Shuffle}
-        onClick={() => setIsShuffle(!isShuffle)}
+        onClick={toggleShuffle}
         variant={isShuffle ? 'active' : 'default'}
-        aria-label={isShuffle ? 'Disable shuffle' : 'Enable shuffle'}
-        title="Shuffle"
+        aria-label={isShuffle ? 'Shuffle is on. Click to turn off.' : 'Shuffle is off. Click to turn on.'}
+        title={isShuffle ? 'Shuffle: On' : 'Shuffle: Off'}
         size="sm"
+        style={{
+          color: isShuffle ? 'var(--accent-primary)' : 'var(--text-secondary)'
+        }}
       />
 
       <IconButton
@@ -43,20 +53,24 @@ export function TrackControls() {
 
       <IconButton
         icon={SkipForward}
-        onClick={handleNextTrack}
+        onClick={() => handleNextTrack(true)}
         aria-label="Next track"
         title="Next"
         size="md"
       />
 
+      {/* Repeat Button (OFF / ALL / ONE with subtle badge) */}
       <div style={{ position: 'relative' }}>
         <IconButton
           icon={Repeat}
           onClick={toggleRepeat}
           variant={repeatMode !== 'off' ? 'active' : 'default'}
-          aria-label={`Repeat mode: ${repeatMode}`}
-          title={`Repeat: ${repeatMode}`}
+          aria-label={getRepeatTitle()}
+          title={getRepeatTitle()}
           size="sm"
+          style={{
+            color: repeatMode !== 'off' ? 'var(--accent-primary)' : 'var(--text-secondary)'
+          }}
         />
         {repeatMode === 'one' && (
           <span style={{

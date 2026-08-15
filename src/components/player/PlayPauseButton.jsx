@@ -30,19 +30,21 @@ export function PlayPauseButton({
         width: `${size}px`,
         height: `${size}px`,
         borderRadius: '50%',
-        background: 'var(--play-gradient)',
+        background: '#6366f1',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: '0 4px 14px var(--accent-glow-subtle)',
-        transition: 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease',
-        transform: isPressing ? 'scale(0.94)' : 'scale(1)',
+        boxShadow: 'none',
+        transition: 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s ease',
+        transform: isPressing ? 'scale(0.92)' : 'scale(1)',
         border: 'none',
         outline: 'none',
         flexShrink: 0,
         cursor: 'pointer'
       }}
       className={`play-pause-morph-btn ${className}`}
+      onMouseEnter={(e) => (e.currentTarget.style.background = '#4f46e5')}
+      onMouseLeave={(e) => (e.currentTarget.style.background = '#6366f1')}
     >
       <svg
         width={size * 0.44}
@@ -51,7 +53,7 @@ export function PlayPauseButton({
         fill="currentColor"
         style={{
           color: '#ffffff',
-          transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease'
+          transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.12s ease'
         }}
       >
         {isPlaying ? (
@@ -63,7 +65,7 @@ export function PlayPauseButton({
         ) : (
           // Centered Play Triangle (▶)
           <path
-            d="M8 5.14v13.72c0 .8.88 1.3 1.58.88l11.02-6.86c.68-.42.68-1.4 0-1.82L9.58 4.26C8.88 3.84 8 4.34 8 5.14Z"
+            d="M8.5 5.14v13.72c0 .8.88 1.3 1.58.88l10.5-6.86c.68-.42.68-1.4 0-1.82L10.08 4.26C9.38 3.84 8.5 4.34 8.5 5.14Z"
           />
         )}
       </svg>

@@ -1,13 +1,13 @@
 :root {
-  /* Surface Colors - Refined Deep Obsidian & Studio Space */
+  /* Surface Colors - Deep Obsidian & Dark Studio Space */
   --bg-base: #08090d;
   --bg-surface: #0e121a;
   --bg-surface-elevated: #151b27;
   --bg-card: rgba(17, 22, 33, 0.65);
-  --bg-card-hover: rgba(24, 31, 46, 0.85);
+  --bg-card-hover: rgba(23, 29, 44, 0.85);
   --bg-sidebar: #0b0e14;
-  --bg-glass: rgba(14, 18, 26, 0.78);
-  --bg-glass-heavy: rgba(10, 13, 19, 0.92);
+  --bg-glass: rgba(14, 18, 26, 0.82);
+  --bg-glass-heavy: rgba(10, 13, 19, 0.94);
   --bg-glass-subtle: rgba(255, 255, 255, 0.03);
 
   /* PlayBack Accent Direction: Purple -> Blue -> Cyan -> Magenta */
@@ -22,13 +22,10 @@
   --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
   --play-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
   --progress-gradient: linear-gradient(90deg, #6366f1 0%, #06b6d4 100%);
-  --wave-gradient: linear-gradient(90deg, #06b6d4 0%, #6366f1 50%, #ec4899 100%);
 
   /* Ambient Glows */
-  --accent-glow-subtle: rgba(99, 102, 241, 0.25);
-  --accent-glow-primary: rgba(99, 102, 241, 0.45);
-  --magenta-glow-subtle: rgba(236, 72, 153, 0.25);
-  --cyan-glow-subtle: rgba(6, 182, 212, 0.25);
+  --accent-glow-subtle: rgba(99, 102, 241, 0.22);
+  --accent-glow-primary: rgba(99, 102, 241, 0.4);
 
   /* Typography Colors */
   --text-primary: #f8fafc;
@@ -38,38 +35,45 @@
   --text-accent: #a5b4fc;
   --text-inverse: #08090d;
 
-  /* Typography Fonts */
+  /* Unified Typography - Inter */
   --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-heading: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
-  --font-display: 'Outfit', 'Inter', -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Inter', monospace;
+
+  /* Hierarchy Font Sizing Tokens */
+  --text-page-title: 32px;
+  --text-section-title: 20px;
+  --text-card-title: 14.5px;
+  --text-body: 13.5px;
+  --text-supporting: 12.5px;
+  --text-metadata: 11px;
 
   /* Borders & Dividers */
   --border-subtle: rgba(255, 255, 255, 0.07);
   --border-medium: rgba(255, 255, 255, 0.12);
   --border-focus: #6366f1;
-  --focus-ring: 0 0 0 2px rgba(99, 102, 241, 0.5);
+  --focus-ring: 0 0 0 2px rgba(99, 102, 241, 0.45);
 
   /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6);
-  --shadow-card-hover: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 20px rgba(99, 102, 241, 0.15);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
+  --shadow-card-hover: 0 10px 28px rgba(0, 0, 0, 0.5), 0 0 16px rgba(99, 102, 241, 0.12);
 
   /* Layout Dimensions */
-  --sidebar-width: 260px;
+  --sidebar-width: 250px;
   --header-height: 72px;
-  --player-height: 90px;
+  --player-height: 88px;
   --mobile-nav-height: 64px;
   --radius-xs: 6px;
   --radius-sm: 10px;
   --radius-md: 14px;
-  --radius-lg: 20px;
+  --radius-lg: 18px;
   --radius-full: 9999px;
 
   /* Motion & Spring Transitions */
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-spring: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  --transition-smooth: 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }

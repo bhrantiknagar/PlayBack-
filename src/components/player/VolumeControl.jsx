@@ -1,10 +1,11 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Volume2, VolumeX, Volume1 } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
 import { IconButton } from '../ui/IconButton';
 
 export function VolumeControl() {
   const { volume, setVolume, isMuted, setIsMuted } = usePlayer();
+  const [isHovering, setIsHovering] = useState(false);
   const trackRef = useRef(null);
 
   const effectiveVolume = isMuted ? 0 : volume;
@@ -24,13 +25,18 @@ export function VolumeControl() {
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', width: '130px' }}>
+    <div
+      style={{ display: 'flex', alignItems: 'center', gap: '6px', width: '130px' }}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
       <IconButton
         icon={getVolumeIcon()}
         onClick={() => setIsMuted(!isMuted)}
         size="sm"
         aria-label={isMuted ? 'Unmute volume' : 'Mute volume'}
         title={isMuted ? 'Unmute' : 'Mute'}
+        style={{ color: isMuted ? '#f43f5e' : 'var(--text-secondary)' }}
       />
 
       <div
@@ -54,32 +60,38 @@ export function VolumeControl() {
         <div
           style={{
             width: '100%',
-            height: '4px',
+            height: isHovering ? '5px' : '4px',
             borderRadius: 'var(--radius-full)',
             background: 'rgba(255, 255, 255, 0.1)',
-            position: 'relative'
+            position: 'relative',
+            transition: 'height var(--transition-fast)'
           }}
         >
+          {/* Solid Volume Level Bar */}
           <div
             style={{
               width: `${effectiveVolume * 100}%`,
               height: '100%',
               borderRadius: 'var(--radius-full)',
-              background: 'var(--accent-gradient)',
-              position: 'relative'
+              background: isHovering ? '#6366f1' : 'rgba(255, 255, 255, 0.8)',
+              position: 'relative',
+              transition: 'background var(--transition-fast)'
             }}
           >
+            {/* Slider Thumb */}
             <div
               style={{
                 position: 'absolute',
                 right: '-4px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                width: '9px',
-                height: '9px',
+                width: isHovering ? '10px' : '8px',
+                height: isHovering ? '10px' : '8px',
                 borderRadius: '50%',
                 background: '#ffffff',
-                boxShadow: '0 0 6px rgba(0, 0, 0, 0.4)'
+                boxShadow: '0 0 6px rgba(0, 0, 0, 0.5)',
+                opacity: isHovering ? 1 : 0.75,
+                transition: 'all var(--transition-fast)'
               }}
             />
           </div>

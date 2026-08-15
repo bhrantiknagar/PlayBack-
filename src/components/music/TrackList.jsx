@@ -1,18 +1,18 @@
 import React from 'react';
-import { Heart, Plus, Clock } from 'lucide-react';
+import { Heart, Clock } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
 import { formatTime } from '../../utils/formatTime';
 import { IconButton } from '../ui/IconButton';
 
 export function TrackList({ tracks = [], showHeader = true }) {
-  const { currentTrack, isPlaying, playTrack, favorites, toggleFavorite, addToQueue } = usePlayer();
+  const { currentTrack, isPlaying, playTrack, favorites, toggleFavorite } = usePlayer();
 
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
       {showHeader && (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '44px 2.5fr 1.8fr 70px 76px',
+          gridTemplateColumns: '44px 2.5fr 1.8fr 70px 48px',
           padding: '8px 16px',
           color: 'var(--text-muted)',
           fontSize: '11px',
@@ -27,7 +27,7 @@ export function TrackList({ tracks = [], showHeader = true }) {
           <span>Title / Artist</span>
           <span>Album</span>
           <span style={{ textAlign: 'right' }}><Clock size={12} /></span>
-          <span style={{ textAlign: 'right' }}>Actions</span>
+          <span style={{ textAlign: 'right' }}>Like</span>
         </div>
       )}
 
@@ -43,7 +43,7 @@ export function TrackList({ tracks = [], showHeader = true }) {
               onClick={() => playTrack(track, tracks)}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '44px 2.5fr 1.8fr 70px 76px',
+                gridTemplateColumns: '44px 2.5fr 1.8fr 70px 48px',
                 alignItems: 'center',
                 padding: '9px 16px',
                 borderRadius: 'var(--radius-sm)',
@@ -122,19 +122,8 @@ export function TrackList({ tracks = [], showHeader = true }) {
                 {formatTime(track.duration)}
               </span>
 
-              {/* Action Buttons */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
-                <IconButton
-                  icon={Plus}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    addToQueue(track);
-                  }}
-                  size="sm"
-                  aria-label="Add to playback queue"
-                  title="Add to queue"
-                />
-
+              {/* Favorite Action Button */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                 <IconButton
                   icon={Heart}
                   onClick={(e) => {

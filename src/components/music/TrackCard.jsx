@@ -1,11 +1,11 @@
 import React from 'react';
-import { Heart, Plus } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
 import { PlayPauseButton } from '../player/PlayPauseButton';
 import { IconButton } from '../ui/IconButton';
 
 export function TrackCard({ track, trackList }) {
-  const { currentTrack, isPlaying, togglePlay, playTrack, favorites, toggleFavorite, addToQueue } = usePlayer();
+  const { currentTrack, isPlaying, togglePlay, playTrack, favorites, toggleFavorite } = usePlayer();
   const isCurrent = currentTrack?.id === track.id;
   const isLiked = favorites.includes(track.id);
 
@@ -16,11 +16,6 @@ export function TrackCard({ track, trackList }) {
     } else {
       playTrack(track, trackList);
     }
-  };
-
-  const handleAddToQueue = (e) => {
-    e.stopPropagation();
-    addToQueue(track);
   };
 
   return (
@@ -40,29 +35,16 @@ export function TrackCard({ track, trackList }) {
           loading="lazy"
         />
 
-        {/* Hover Action Overlay */}
+        {/* Hover Play Button (Only Play Button, no unexplained '+' button) */}
         <div className={`music-card-play-overlay ${isCurrent && isPlaying ? 'is-playing' : ''}`}>
-          <IconButton
-            icon={Plus}
-            onClick={handleAddToQueue}
-            size="sm"
-            aria-label="Add to playback queue"
-            title="Add to queue"
-            style={{
-              background: 'rgba(10, 13, 20, 0.85)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              color: '#ffffff'
-            }}
-          />
-
           <PlayPauseButton
             isPlaying={isCurrent && isPlaying}
             onClick={handlePlayClick}
-            size={40}
+            size={42}
           />
         </div>
 
-        {/* Quality Badge (Level 3 Hierarchy) */}
+        {/* Quality Badge if Hi-Res or Lossless */}
         {(track.quality === 'Hi-Res' || track.quality === 'Lossless') && (
           <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '6px', zIndex: 2 }}>
             <span className="flac-hi-res-tag">{track.quality}</span>
@@ -73,7 +55,7 @@ export function TrackCard({ track, trackList }) {
       {/* Metadata & Controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{ overflow: 'hidden', paddingRight: '8px' }}>
-          {/* Level 1 Hierarchy: Title */}
+          {/* Title */}
           <h4 style={{
             fontSize: '14px',
             fontWeight: '600',
@@ -84,7 +66,7 @@ export function TrackCard({ track, trackList }) {
           }}>
             {track.title}
           </h4>
-          {/* Level 2 Hierarchy: Artist */}
+          {/* Artist */}
           <p style={{
             fontSize: '12.5px',
             color: 'var(--text-secondary)',

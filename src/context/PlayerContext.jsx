@@ -3,14 +3,6 @@ import { sampleTracks } from '../data/sampleTracks';
 
 const PlayerContext = createContext(null);
 
-export const EQ_PRESETS = {
-  'Flat': { bass: 0, mid: 0, treble: 0 },
-  'Bass Boost': { bass: 6, mid: 1, treble: -2 },
-  'Cyber Club': { bass: 5, mid: -2, treble: 4 },
-  'Acoustic': { bass: 1, mid: 4, treble: 3 },
-  'Vocal': { bass: -2, mid: 5, treble: 2 }
-};
-
 export function PlayerProvider({ children }) {
   const [playlist, setPlaylist] = useState(sampleTracks);
   const [queue, setQueue] = useState([]);
@@ -22,8 +14,7 @@ export function PlayerProvider({ children }) {
   const [isMuted, setIsMuted] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState('off'); // 'off' | 'all' | 'one'
-  const [visualizerMode, setVisualizerMode] = useState('wave'); // 'wave' | 'spectrum' | 'particles'
-  const [eqPreset, setEqPreset] = useState('Cyber Club');
+  const [visualizerMode, setVisualizerMode] = useState('wave');
   const [isNowPlayingOpen, setIsNowPlayingOpen] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [selectedEnergy, setSelectedEnergy] = useState('All');
@@ -100,8 +91,10 @@ export function PlayerProvider({ children }) {
   };
 
   const handleNextTrack = (autoPlayNext = isPlaying) => {
+    // 1. Repeat ONE: restart same track
     if (repeatMode === 'one') {
       audioRef.current.currentTime = 0;
+      setCurrentTime(0);
       if (autoPlayNext) {
         audioRef.current.play().catch(console.warn);
         setIsPlaying(true);
@@ -109,7 +102,7 @@ export function PlayerProvider({ children }) {
       return;
     }
 
-    // Check custom user queue first
+    // 2. Custom User Queue
     if (queue.length > 0) {
       const nextTrack = queue[0];
       setQueue(prev => prev.slice(1));
@@ -117,26 +110,42 @@ export function PlayerProvider({ children }) {
       return;
     }
 
+    // 3. Shuffle ON: Pick random track (excluding current unless single track)
     if (isShuffle) {
-      const randomIndex = Math.floor(Math.random() * playlist.length);
+      if (playlist.length <= 1) {
+        audioRef.current.currentTime = 0;
+        if (autoPlayNext) audioRef.current.play().catch(console.warn);
+        return;
+      }
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * playlist.length);
+      } while (randomIndex === currentTrackIndex);
+
       setCurrentTrackIndex(randomIndex);
       if (autoPlayNext) setIsPlaying(true);
+      return;
+    }
+
+    // 4. Normal Sequential Playback
+    if (currentTrackIndex < playlist.length - 1) {
+      setCurrentTrackIndex(prev => prev + 1);
+      if (autoPlayNext) setIsPlaying(true);
+    } else if (repeatMode === 'all') {
+      // Repeat ALL: wrap to start
+      setCurrentTrackIndex(0);
+      if (autoPlayNext) setIsPlaying(true);
     } else {
-      if (currentTrackIndex < playlist.length - 1) {
-        setCurrentTrackIndex(prev => prev + 1);
-        if (autoPlayNext) setIsPlaying(true);
-      } else if (repeatMode === 'all') {
-        setCurrentTrackIndex(0);
-        if (autoPlayNext) setIsPlaying(true);
-      } else {
-        setIsPlaying(false);
-      }
+      // Repeat OFF: stop at end
+      setIsPlaying(false);
+      audioRef.current.pause();
     }
   };
 
   const handlePrevTrack = () => {
     if (currentTime > 3) {
       audioRef.current.currentTime = 0;
+      setCurrentTime(0);
       return;
     }
     if (currentTrackIndex > 0) {
@@ -161,6 +170,10 @@ export function PlayerProvider({ children }) {
     if (repeatMode === 'off') setRepeatMode('all');
     else if (repeatMode === 'all') setRepeatMode('one');
     else setRepeatMode('off');
+  };
+
+  const toggleShuffle = () => {
+    setIsShuffle(prev => !prev);
   };
 
   const addToQueue = (track) => {
@@ -194,13 +207,12 @@ export function PlayerProvider({ children }) {
         isMuted,
         setIsMuted,
         isShuffle,
+        toggleShuffle,
         setIsShuffle,
         repeatMode,
         toggleRepeat,
         visualizerMode,
         setVisualizerMode,
-        eqPreset,
-        setEqPreset,
         isNowPlayingOpen,
         setIsNowPlayingOpen,
         isQueueOpen,

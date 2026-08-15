@@ -6,10 +6,13 @@ import { TrackCard } from '../components/music/TrackCard';
 import { TrackList } from '../components/music/TrackList';
 import { PlaylistCard } from '../components/music/PlaylistCard';
 import { PrimaryButton } from '../components/ui/Button';
+import { EmptyState } from '../components/common/EmptyState';
 import { usePlayer } from '../context/PlayerContext';
 
 export function Home() {
-  const { playTrack, searchQuery, selectedEnergy } = usePlayer();
+  const { playTrack, searchQuery, selectedEnergy, setSelectedEnergy } = usePlayer();
+
+  const energyFilters = ['All', 'Focus', 'Drive', 'Euphoria', 'Chill', 'Late Night'];
 
   const filteredTracks = sampleTracks.filter(track => {
     // Energy filter
@@ -32,7 +35,7 @@ export function Home() {
   const featuredTrack = sampleTracks[0];
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       {/* Featured Hero Banner */}
       {!searchQuery && selectedEnergy === 'All' && (
         <div style={{
@@ -54,7 +57,6 @@ export function Home() {
               </span>
             </div>
 
-            {/* Level 1 Hierarchy: Album Title */}
             <h1 style={{
               fontSize: '38px',
               fontWeight: '900',
@@ -66,7 +68,6 @@ export function Home() {
               {featuredTrack.album}
             </h1>
 
-            {/* Level 2 Hierarchy: Description */}
             <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.82)', lineHeight: '1.55' }}>
               Experience state-of-the-art cyberpunk synthesis, atmospheric sub-bass, and cinematic spatial acoustics.
             </p>
@@ -81,6 +82,35 @@ export function Home() {
               </PrimaryButton>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Energy Vibe Filter Pills */}
+      {!searchQuery && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflowX: 'auto', padding: '2px 0' }} className="hide-scrollbar">
+          {energyFilters.map(filter => {
+            const isActive = selectedEnergy === filter;
+            return (
+              <button
+                key={filter}
+                onClick={() => setSelectedEnergy(filter)}
+                style={{
+                  padding: '7px 16px',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: '12.5px',
+                  fontWeight: '600',
+                  background: isActive ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                  color: isActive ? '#a5b4fc' : 'var(--text-secondary)',
+                  border: isActive ? '1px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
+                  transition: 'all var(--transition-fast)',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer'
+                }}
+              >
+                {filter}
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -99,9 +129,11 @@ export function Home() {
         </div>
 
         {filteredTracks.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '48px', color: 'var(--text-muted)', fontSize: '13.5px' }}>
-            No tracks found matching your search.
-          </div>
+          <EmptyState
+            type="search"
+            title="Nothing found"
+            description="Try searching for another song, artist, album, or playlist."
+          />
         ) : (
           <div style={{
             display: 'grid',
