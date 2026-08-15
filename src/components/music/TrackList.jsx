@@ -4,6 +4,8 @@ import { usePlayer } from '../../context/PlayerContext';
 import { formatTime } from '../../utils/formatTime';
 import { IconButton } from '../ui/IconButton';
 
+const DEFAULT_ARTWORK = '/images/albums/album-01.jpg';
+
 export function TrackList({ tracks = [], showHeader = true }) {
   const { currentTrack, isPlaying, playTrack, favorites, toggleFavorite } = usePlayer();
 
@@ -33,13 +35,18 @@ export function TrackList({ tracks = [], showHeader = true }) {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
         {tracks.map((track, idx) => {
+          if (!track) return null;
           const isCurrent = currentTrack?.id === track.id;
           const isLiked = favorites.includes(track.id);
           const isHighQuality = track.quality === 'Hi-Res' || track.quality === 'Lossless';
+          const artworkSrc = track.artwork || track.coverUrl || DEFAULT_ARTWORK;
+          const title = track.title || 'Untitled Track';
+          const artist = track.artist || 'Unknown Artist';
+          const album = track.album || 'Single';
 
           return (
             <div
-              key={track.id}
+              key={track.id || idx}
               onClick={() => playTrack(track, tracks)}
               style={{
                 display: 'grid',
@@ -77,9 +84,13 @@ export function TrackList({ tracks = [], showHeader = true }) {
               {/* Title & Artist with Artwork */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, paddingRight: '12px' }}>
                 <img
-                  src={track.coverUrl}
-                  alt={track.title}
+                  src={artworkSrc}
+                  alt={title}
                   style={{ width: '38px', height: '38px', borderRadius: 'var(--radius-xs)', objectFit: 'cover', flexShrink: 0 }}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = DEFAULT_ARTWORK;
+                  }}
                 />
                 <div style={{ minWidth: 0, overflow: 'hidden' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -91,7 +102,7 @@ export function TrackList({ tracks = [], showHeader = true }) {
                       overflow: 'hidden',
                       textOverflow: 'ellipsis'
                     }}>
-                      {track.title}
+                      {title}
                     </span>
                     {isHighQuality && (
                       <span className="flac-hi-res-tag" style={{ fontSize: '8.5px', padding: '1px 4px' }}>
@@ -107,19 +118,19 @@ export function TrackList({ tracks = [], showHeader = true }) {
                     textOverflow: 'ellipsis',
                     marginTop: '1px'
                   }}>
-                    {track.artist}
+                    {artist}
                   </div>
                 </div>
               </div>
 
               {/* Album */}
               <span style={{ fontSize: '13px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: '12px' }}>
-                {track.album || 'Single'}
+                {album}
               </span>
 
               {/* Duration */}
               <span style={{ fontSize: '12px', color: 'var(--text-muted)', textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
-                {formatTime(track.duration)}
+                {track.duration > 0 ? formatTime(track.duration) : '--:--'}
               </span>
 
               {/* Favorite Action Button */}

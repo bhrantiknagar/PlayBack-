@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Play, Clock, ArrowLeft, Shuffle } from 'lucide-react';
 import { mockPlaylists } from '../data/mockData';
-import { sampleTracks } from '../data/sampleTracks';
+import { tracks } from '../data/tracks';
 import { TrackList } from '../components/music/TrackList';
 import { PrimaryButton, SecondaryButton } from '../components/ui/Button';
 import { usePlayer } from '../context/PlayerContext';
@@ -16,8 +16,8 @@ export function PlaylistView() {
 
   const handleShufflePlay = () => {
     setIsShuffle(true);
-    const randomTrack = sampleTracks[Math.floor(Math.random() * sampleTracks.length)];
-    playTrack(randomTrack, sampleTracks);
+    const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
+    playTrack(randomTrack, tracks);
   };
 
   return (
@@ -81,7 +81,7 @@ export function PlaylistView() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
             <span>CURATOR: <strong style={{ color: '#fff' }}>{playlist.creator}</strong></span>
             <span>•</span>
-            <span>{sampleTracks.length} TRACKS</span>
+            <span>{tracks.length} TRACKS</span>
             <span>•</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Clock size={13} /> {playlist.duration}
@@ -95,7 +95,7 @@ export function PlaylistView() {
         <PrimaryButton
           size="lg"
           icon={Play}
-          onClick={() => playTrack(sampleTracks[0], sampleTracks)}
+          onClick={() => playTrack(tracks[0], tracks)}
         >
           Play Vault
         </PrimaryButton>
@@ -117,7 +117,7 @@ export function PlaylistView() {
         border: '1px solid var(--border-subtle)',
         boxShadow: 'var(--shadow-md)'
       }}>
-        <TrackList tracks={sampleTracks} />
+        <TrackList tracks={tracks} />
       </div>
     </div>
   );

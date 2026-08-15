@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
-import { sampleTracks } from '../../data/sampleTracks';
+import { tracks } from '../../data/tracks';
 import { PlayPauseButton } from '../player/PlayPauseButton';
 
 export function PlaylistCard({ playlist }) {
@@ -11,8 +11,8 @@ export function PlaylistCard({ playlist }) {
 
   const handlePlay = (e) => {
     e.stopPropagation();
-    if (sampleTracks.length > 0) {
-      playTrack(sampleTracks[0], sampleTracks);
+    if (tracks.length > 0) {
+      playTrack(tracks[0], tracks);
     }
   };
 

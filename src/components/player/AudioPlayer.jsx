@@ -7,6 +7,8 @@ import { VolumeControl } from './VolumeControl';
 import { Visualizer } from '../music/Visualizer';
 import { IconButton } from '../ui/IconButton';
 
+const DEFAULT_ARTWORK = '/images/albums/album-01.jpg';
+
 export function AudioPlayer() {
   const {
     currentTrack,
@@ -21,6 +23,10 @@ export function AudioPlayer() {
   if (!currentTrack) return null;
 
   const isLiked = favorites.includes(currentTrack.id);
+  const artworkSrc = currentTrack.artwork || currentTrack.coverUrl || DEFAULT_ARTWORK;
+  const title = currentTrack.title || 'Untitled Track';
+  const artist = currentTrack.artist || 'Unknown Artist';
+  const quality = currentTrack.quality || 'Standard';
 
   return (
     <aside
@@ -59,9 +65,13 @@ export function AudioPlayer() {
             zIndex: 1
           }}>
             <img
-              src={currentTrack.coverUrl}
-              alt={currentTrack.title}
+              src={artworkSrc}
+              alt={title}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = DEFAULT_ARTWORK;
+              }}
             />
           </div>
         </div>
@@ -80,10 +90,10 @@ export function AudioPlayer() {
                 color: '#ffffff'
               }}
             >
-              {currentTrack.title}
+              {title}
             </span>
-            {(currentTrack.quality === 'Hi-Res' || currentTrack.quality === 'Lossless') && (
-              <span className="flac-hi-res-tag">{currentTrack.quality}</span>
+            {(quality === 'Hi-Res' || quality === 'Lossless') && (
+              <span className="flac-hi-res-tag">{quality}</span>
             )}
           </div>
 
@@ -95,7 +105,7 @@ export function AudioPlayer() {
             textOverflow: 'ellipsis',
             marginTop: '2px'
           }}>
-            {currentTrack.artist}
+            {artist}
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Heart, Play, Shuffle } from 'lucide-react';
-import { sampleTracks } from '../data/sampleTracks';
+import { tracks } from '../data/tracks';
 import { TrackList } from '../components/music/TrackList';
 import { PrimaryButton, SecondaryButton } from '../components/ui/Button';
 import { EmptyState } from '../components/common/EmptyState';
@@ -11,7 +11,7 @@ export function Favorites() {
   const { favorites, playTrack, setIsShuffle } = usePlayer();
   const navigate = useNavigate();
 
-  const likedTracks = sampleTracks.filter(t => favorites.includes(t.id));
+  const likedTracks = tracks.filter(t => favorites.includes(t.id));
 
   const handleShuffleLiked = () => {
     if (likedTracks.length === 0) return;

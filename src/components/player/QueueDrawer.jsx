@@ -4,6 +4,8 @@ import { usePlayer } from '../../context/PlayerContext';
 import { formatTime } from '../../utils/formatTime';
 import { IconButton } from '../ui/IconButton';
 
+const DEFAULT_ARTWORK = '/images/albums/album-01.jpg';
+
 export function QueueDrawer() {
   const {
     isQueueOpen,
@@ -89,7 +91,7 @@ export function QueueDrawer() {
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
               <img
-                src={currentTrack.coverUrl}
+                src={currentTrack.artwork || currentTrack.coverUrl}
                 alt={currentTrack.title}
                 style={{ width: '42px', height: '42px', borderRadius: 'var(--radius-xs)', objectFit: 'cover' }}
               />
@@ -142,7 +144,7 @@ export function QueueDrawer() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                    <img src={track.coverUrl} alt="" style={{ width: '32px', height: '32px', borderRadius: '4px' }} />
+                    <img src={track.artwork || track.coverUrl} alt="" style={{ width: '32px', height: '32px', borderRadius: '4px' }} />
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {track.title}
@@ -185,7 +187,7 @@ export function QueueDrawer() {
                 className="track-row-hover"
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                  <img src={track.coverUrl} alt="" style={{ width: '32px', height: '32px', borderRadius: '4px' }} />
+                  <img src={track.artwork || track.coverUrl} alt="" style={{ width: '32px', height: '32px', borderRadius: '4px' }} />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {track.title}

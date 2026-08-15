@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
-import { sampleTracks } from '../data/sampleTracks';
+import { tracks } from '../data/tracks';
 
 const PlayerContext = createContext(null);
 
 export function PlayerProvider({ children }) {
-  const [playlist, setPlaylist] = useState(sampleTracks);
+  const [playlist, setPlaylist] = useState(tracks);
   const [queue, setQueue] = useState([]);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -20,7 +20,7 @@ export function PlayerProvider({ children }) {
   const [selectedEnergy, setSelectedEnergy] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState(() => {
-    return sampleTracks.filter(t => t.liked).map(t => t.id);
+    return tracks.filter(t => t.liked).map(t => t.id);
   });
 
   const audioRef = useRef(new Audio());
@@ -30,7 +30,7 @@ export function PlayerProvider({ children }) {
     const audio = audioRef.current;
     if (!currentTrack) return;
 
-    audio.src = currentTrack.audioUrl;
+    audio.src = currentTrack.audio || currentTrack.audioUrl;
     audio.volume = isMuted ? 0 : volume;
 
     if (isPlaying) {

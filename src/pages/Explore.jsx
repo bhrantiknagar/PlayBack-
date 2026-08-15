@@ -1,7 +1,7 @@
 import React from 'react';
 import { Compass, Music2, Radio, Sparkles, Disc } from 'lucide-react';
 import { mockGenres } from '../data/mockData';
-import { sampleTracks } from '../data/sampleTracks';
+import { tracks } from '../data/tracks';
 import { TrackCard } from '../components/music/TrackCard';
 import { usePlayer } from '../context/PlayerContext';
 
@@ -16,11 +16,12 @@ export function Explore() {
             width: '40px',
             height: '40px',
             borderRadius: 'var(--radius-sm)',
-            background: 'var(--accent-gradient)',
+            background: 'rgba(99, 102, 241, 0.15)',
+            border: '1px solid rgba(99, 102, 241, 0.3)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#fff'
+            color: '#a5b4fc'
           }}>
             <Compass size={22} />
           </div>
@@ -85,8 +86,8 @@ export function Explore() {
           gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
           gap: '24px'
         }}>
-          {sampleTracks.map(track => (
-            <TrackCard key={track.id} track={track} trackList={sampleTracks} />
+          {tracks.map(track => (
+            <TrackCard key={track.id} track={track} trackList={tracks} />
           ))}
         </div>
       </div>

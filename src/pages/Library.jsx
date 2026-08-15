@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Library as LibraryIcon, Heart, Plus } from 'lucide-react';
 import { mockPlaylists } from '../data/mockData';
-import { sampleTracks } from '../data/sampleTracks';
+import { tracks } from '../data/tracks';
 import { PlaylistCard } from '../components/music/PlaylistCard';
 import { TrackList } from '../components/music/TrackList';
 import { PrimaryButton, SecondaryButton } from '../components/ui/Button';
@@ -16,7 +16,7 @@ export function Library() {
   const [userPlaylists, setUserPlaylists] = useState(mockPlaylists);
 
   const { favorites } = usePlayer();
-  const likedTracks = sampleTracks.filter(t => favorites.includes(t.id));
+  const likedTracks = tracks.filter(t => favorites.includes(t.id));
 
   const handleCreatePlaylist = (e) => {
     e.preventDefault();
@@ -46,11 +46,12 @@ export function Library() {
             width: '38px',
             height: '38px',
             borderRadius: 'var(--radius-sm)',
-            background: 'var(--accent-gradient)',
+            background: 'rgba(99, 102, 241, 0.15)',
+            border: '1px solid rgba(99, 102, 241, 0.3)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#fff'
+            color: '#a5b4fc'
           }}>
             <LibraryIcon size={20} />
           </div>

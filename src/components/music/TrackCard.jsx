@@ -4,10 +4,19 @@ import { usePlayer } from '../../context/PlayerContext';
 import { PlayPauseButton } from '../player/PlayPauseButton';
 import { IconButton } from '../ui/IconButton';
 
+const DEFAULT_ARTWORK = '/images/albums/album-01.jpg';
+
 export function TrackCard({ track, trackList }) {
   const { currentTrack, isPlaying, togglePlay, playTrack, favorites, toggleFavorite } = usePlayer();
+  
+  if (!track) return null;
+
   const isCurrent = currentTrack?.id === track.id;
   const isLiked = favorites.includes(track.id);
+  const artworkSrc = track.artwork || track.coverUrl || DEFAULT_ARTWORK;
+  const title = track.title || 'Untitled Track';
+  const artist = track.artist || 'Unknown Artist';
+  const quality = track.quality || 'Standard';
 
   const handlePlayClick = (e) => {
     e.stopPropagation();
@@ -29,13 +38,17 @@ export function TrackCard({ track, trackList }) {
       {/* Artwork Box */}
       <div className="music-card-cover-box">
         <img
-          src={track.coverUrl}
-          alt={track.title}
+          src={artworkSrc}
+          alt={title}
           className="music-card-cover"
           loading="lazy"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = DEFAULT_ARTWORK;
+          }}
         />
 
-        {/* Hover Play Button (Only Play Button, no unexplained '+' button) */}
+        {/* Hover Play Button */}
         <div className={`music-card-play-overlay ${isCurrent && isPlaying ? 'is-playing' : ''}`}>
           <PlayPauseButton
             isPlaying={isCurrent && isPlaying}
@@ -45,9 +58,9 @@ export function TrackCard({ track, trackList }) {
         </div>
 
         {/* Quality Badge if Hi-Res or Lossless */}
-        {(track.quality === 'Hi-Res' || track.quality === 'Lossless') && (
+        {(quality === 'Hi-Res' || quality === 'Lossless') && (
           <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '6px', zIndex: 2 }}>
-            <span className="flac-hi-res-tag">{track.quality}</span>
+            <span className="flac-hi-res-tag">{quality}</span>
           </div>
         )}
       </div>
@@ -64,7 +77,7 @@ export function TrackCard({ track, trackList }) {
             overflow: 'hidden',
             textOverflow: 'ellipsis'
           }}>
-            {track.title}
+            {title}
           </h4>
           {/* Artist */}
           <p style={{
@@ -75,7 +88,7 @@ export function TrackCard({ track, trackList }) {
             overflow: 'hidden',
             textOverflow: 'ellipsis'
           }}>
-            {track.artist}
+            {artist}
           </p>
         </div>
 

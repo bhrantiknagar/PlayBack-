@@ -7,6 +7,8 @@ import { VolumeControl } from './VolumeControl';
 import { Visualizer } from '../music/Visualizer';
 import { IconButton } from '../ui/IconButton';
 
+const DEFAULT_ARTWORK = '/images/albums/album-01.jpg';
+
 export function NowPlayingModal() {
   const {
     isNowPlayingOpen,
@@ -22,6 +24,11 @@ export function NowPlayingModal() {
 
   const isLiked = favorites.includes(currentTrack.id);
   const activeColor = currentTrack.ambientColor || '#6366f1';
+  const artworkSrc = currentTrack.artwork || currentTrack.coverUrl || DEFAULT_ARTWORK;
+  const title = currentTrack.title || 'Untitled Track';
+  const artist = currentTrack.artist || 'Unknown Artist';
+  const album = currentTrack.album || 'Single';
+  const quality = currentTrack.quality || 'Standard';
 
   // Real-time synced lyric / subtitle snippet
   const currentLyric = currentTrack.lyrics?.slice().reverse().find(l => currentTime >= l.time)?.text ||
@@ -50,10 +57,10 @@ export function NowPlayingModal() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: '1080px', margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span className="flac-hi-res-tag">
-            {currentTrack.quality || 'LOSSLESS'}
+            {quality}
           </span>
           <span style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
-            {currentTrack.format || 'FLAC 24-bit / 96kHz'}
+            {quality === 'Hi-Res' ? 'FLAC 24-bit / 96kHz' : quality === 'Lossless' ? 'ALAC 16-bit / 44.1kHz' : 'Standard 320kbps'}
           </span>
         </div>
 
@@ -116,7 +123,7 @@ export function NowPlayingModal() {
                 width: '108px',
                 height: '108px',
                 borderRadius: '50%',
-                background: 'var(--play-gradient)',
+                background: '#151922',
                 border: '3px solid #111',
                 boxShadow: 'inset 0 0 12px rgba(0, 0, 0, 0.8)',
                 display: 'flex',
@@ -125,13 +132,17 @@ export function NowPlayingModal() {
                 overflow: 'hidden'
               }}>
                 <img
-                  src={currentTrack.coverUrl}
+                  src={artworkSrc}
                   alt=""
                   style={{
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
                     opacity: 0.85
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = DEFAULT_ARTWORK;
                   }}
                 />
                 {/* Center Spindle Hole */}
@@ -149,8 +160,8 @@ export function NowPlayingModal() {
 
             {/* Album Cover Sleeve Layer */}
             <img
-              src={currentTrack.coverUrl}
-              alt={currentTrack.title}
+              src={artworkSrc}
+              alt={title}
               style={{
                 width: '100%',
                 height: '100%',
@@ -160,6 +171,10 @@ export function NowPlayingModal() {
                 zIndex: 2,
                 border: '1px solid rgba(255, 255, 255, 0.12)',
                 boxShadow: '0 8px 30px rgba(0, 0, 0, 0.6)'
+              }}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = DEFAULT_ARTWORK;
               }}
             />
           </div>
@@ -205,11 +220,11 @@ export function NowPlayingModal() {
 
             {/* Track Title */}
             <h1 style={{ fontSize: '34px', fontWeight: '800', marginTop: '6px', letterSpacing: '-0.8px', lineHeight: '1.15' }}>
-              {currentTrack.title}
+              {title}
             </h1>
             {/* Artist & Album */}
             <h3 style={{ fontSize: '16px', color: 'var(--text-secondary)', fontWeight: '500', marginTop: '4px' }}>
-              {currentTrack.artist} — <span style={{ color: 'var(--text-muted)' }}>{currentTrack.album}</span>
+              {artist} — <span style={{ color: 'var(--text-muted)' }}>{album}</span>
             </h3>
           </div>
 
@@ -235,7 +250,7 @@ export function NowPlayingModal() {
           }}>
             <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
               <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>QUALITY</div>
-              <div style={{ fontSize: '13px', fontWeight: '700', color: '#34d399', marginTop: '2px' }}>{currentTrack.quality || 'Lossless'}</div>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: '#34d399', marginTop: '2px' }}>{quality}</div>
             </div>
             <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
               <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>MOOD</div>

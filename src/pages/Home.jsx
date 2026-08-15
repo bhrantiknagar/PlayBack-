@@ -1,6 +1,6 @@
 import React from 'react';
 import { Play, Flame, Radio, Zap } from 'lucide-react';
-import { sampleTracks } from '../data/sampleTracks';
+import { tracks } from '../data/tracks';
 import { mockPlaylists } from '../data/mockData';
 import { TrackCard } from '../components/music/TrackCard';
 import { TrackList } from '../components/music/TrackList';
@@ -14,7 +14,7 @@ export function Home() {
 
   const energyFilters = ['All', 'Focus', 'Drive', 'Euphoria', 'Chill', 'Late Night'];
 
-  const filteredTracks = sampleTracks.filter(track => {
+  const filteredTracks = tracks.filter(track => {
     // Energy filter
     if (selectedEnergy !== 'All' && track.energy !== selectedEnergy) {
       return false;
@@ -32,7 +32,7 @@ export function Home() {
     return true;
   });
 
-  const featuredTrack = sampleTracks[0];
+  const featuredTrack = tracks[0];
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -76,7 +76,7 @@ export function Home() {
               <PrimaryButton
                 size="lg"
                 icon={Play}
-                onClick={() => playTrack(featuredTrack, sampleTracks)}
+                onClick={() => playTrack(featuredTrack, tracks)}
               >
                 Listen Now
               </PrimaryButton>
@@ -183,7 +183,7 @@ export function Home() {
             </div>
           </div>
 
-          <TrackList tracks={sampleTracks} />
+          <TrackList tracks={tracks} />
         </div>
       )}
     </div>
