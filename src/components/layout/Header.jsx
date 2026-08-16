@@ -1,10 +1,27 @@
 import React from 'react';
 import { Search, X } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { usePlayer } from '../../context/PlayerContext';
 import logoImg from '../../assets/images/logo.png';
 
 export function Header() {
   const { searchQuery, setSearchQuery } = usePlayer();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleInputChange = (e) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    if (val.trim() && location.pathname !== '/') {
+      navigate('/');
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      setSearchQuery('');
+    }
+  };
 
   return (
     <header className="app-header" aria-label="Main header">
@@ -16,7 +33,8 @@ export function Header() {
           className="search-input-field"
           placeholder="Search songs, artists, albums, or playlists..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           aria-label="Search songs, artists, albums, or playlists"
           autoComplete="off"
           spellCheck="false"

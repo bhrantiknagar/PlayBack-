@@ -14,8 +14,8 @@ export function EmptyState({
     if (type === 'search') {
       return {
         icon: Search,
-        title: title || 'Nothing found',
-        description: description || 'Try searching for another song, artist, album, or playlist.'
+        title: title || 'No results found',
+        description: description || 'Try another song, artist, or album.'
       };
     }
     if (type === 'favorites') {
