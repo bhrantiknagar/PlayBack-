@@ -1,6 +1,15 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { tracks } from '../data/tracks';
-import { loadPlaybackState, savePlaybackState, savePlaybackPosition, loadFavorites, saveFavorites } from '../utils/storage';
+import {
+  loadPlaybackState,
+  savePlaybackState,
+  savePlaybackPosition,
+  loadFavorites,
+  saveFavorites,
+  loadPlaylists,
+  savePlaylists
+} from '../utils/storage';
+import { AddToPlaylistModal } from '../components/music/AddToPlaylistModal';
 
 const PlayerContext = createContext(null);
 
@@ -30,6 +39,10 @@ export function PlayerProvider({ children }) {
   const [favorites, setFavoritesState] = useState(() => {
     return loadFavorites();
   });
+  const [playlists, setPlaylists] = useState(() => {
+    return loadPlaylists();
+  });
+  const [addToPlaylistTrack, setAddToPlaylistTrack] = useState(null);
 
   const audioRef = useRef(null);
   if (!audioRef.current) {

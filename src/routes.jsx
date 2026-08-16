@@ -5,6 +5,8 @@ import { Home } from './pages/Home';
 import { Explore } from './pages/Explore';
 import { Library } from './pages/Library';
 import { PlaylistView } from './pages/PlaylistView';
+import { AlbumView } from './pages/AlbumView';
+import { ArtistView } from './pages/ArtistView';
 import { Favorites } from './pages/Favorites';
 
 export function AppRoutes() {
@@ -14,6 +16,8 @@ export function AppRoutes() {
         <Route index element={<Home />} />
         <Route path="explore" element={<Explore />} />
         <Route path="library" element={<Library />} />
+        <Route path="album/:id" element={<AlbumView />} />
+        <Route path="artist/:id" element={<ArtistView />} />
         <Route path="playlist/:id" element={<PlaylistView />} />
         <Route path="favorites" element={<Favorites />} />
         <Route path="*" element={<Home />} />

@@ -1,10 +1,13 @@
 /**
  * PlayBack Persistence Layer
- * Handles safe localStorage reading and writing for player settings, state, and favorites.
+ * Handles safe localStorage reading and writing for player settings, state, favorites, and playlists.
  */
+
+import { mockPlaylists } from '../data/mockData';
 
 const STORAGE_KEY = 'playback_player_state';
 const FAVORITES_STORAGE_KEY = 'playback_favorites';
+const PLAYLISTS_STORAGE_KEY = 'playback_user_playlists';
 
 export const DEFAULT_PLAYBACK_STATE = {
   trackId: 'track-01',
@@ -149,5 +152,42 @@ export function saveFavorites(favorites) {
     }
   } catch (error) {
     console.warn('Failed to save favorites to localStorage:', error);
+  }
+}
+
+/**
+ * Safely load user playlists from localStorage with graceful fallback.
+ */
+export function loadPlaylists() {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return [...mockPlaylists];
+    }
+    const item = window.localStorage.getItem(PLAYLISTS_STORAGE_KEY);
+    if (!item) {
+      return [...mockPlaylists];
+    }
+    const parsed = JSON.parse(item);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed;
+    }
+    return [...mockPlaylists];
+  } catch (error) {
+    console.warn('Failed to load playlists from localStorage:', error);
+    return [...mockPlaylists];
+  }
+}
+
+/**
+ * Safely save user playlists to localStorage.
+ */
+export function savePlaylists(playlists) {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    if (Array.isArray(playlists)) {
+      window.localStorage.setItem(PLAYLISTS_STORAGE_KEY, JSON.stringify(playlists));
+    }
+  } catch (error) {
+    console.warn('Failed to save playlists to localStorage:', error);
   }
 }

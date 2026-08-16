@@ -4,36 +4,40 @@ export const mockPlaylists = [
     title: 'Cyberpunk Synth Euphoria',
     description: 'High energy synthesized beats and neon basslines for late night coding.',
     coverUrl: '/images/albums/album-02.jpg',
-    trackCount: 24,
+    trackIds: ['track-01', 'track-02', 'track-06'],
+    trackCount: 3,
     creator: 'PlayBack Curators',
-    duration: '1 hr 45 min'
+    duration: '12 min'
   },
   {
     id: 'pl-2',
     title: 'Deep Focus & Flow',
     description: 'Minimal acoustic and ambient tones designed to keep you in the zone.',
     coverUrl: '/images/albums/album-03.jpg',
-    trackCount: 38,
+    trackIds: ['track-03', 'track-05'],
+    trackCount: 2,
     creator: 'SoundLab',
-    duration: '2 hr 10 min'
+    duration: '8 min'
   },
   {
     id: 'pl-3',
     title: 'Lo-Fi Chill Haven',
     description: 'Warm tape saturation, vinyl crackle and soothing chord progressions.',
     coverUrl: '/images/albums/album-05.jpg',
-    trackCount: 50,
+    trackIds: ['track-05', 'track-03', 'track-01'],
+    trackCount: 3,
     creator: 'PlayBack Studios',
-    duration: '3 hr 02 min'
+    duration: '11 min'
   },
   {
     id: 'pl-4',
     title: 'Future Bass Voltage',
     description: 'Heavy drops, sidechain synth cords, and melodic vocal chops.',
     coverUrl: '/images/albums/album-06.jpg',
-    trackCount: 19,
+    trackIds: ['track-04', 'track-06', 'track-02'],
+    trackCount: 3,
     creator: 'Vortex Protocol',
-    duration: '1 hr 12 min'
+    duration: '10 min'
   }
 ];
 
