@@ -19,9 +19,8 @@ export function Library() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newPlaylistTitle, setNewPlaylistTitle] = useState('');
   const [newPlaylistDesc, setNewPlaylistDesc] = useState('');
-  const [userPlaylists, setUserPlaylists] = useState(mockPlaylists);
 
-  const { playTrack } = usePlayer();
+  const { playTrack, playlists, createPlaylist } = usePlayer();
 
   // Distinct artists derived from centralized dataset
   const artistsList = useMemo(() => {
@@ -73,17 +72,11 @@ export function Library() {
     e.preventDefault();
     if (!newPlaylistTitle.trim()) return;
 
-    const newPl = {
-      id: `pl-${Date.now()}`,
+    createPlaylist({
       title: newPlaylistTitle,
-      description: newPlaylistDesc || 'Custom user audio frequency collection.',
-      coverUrl: '/images/albums/album-02.jpg',
-      trackCount: 0,
-      creator: 'Master Acoustic',
-      duration: '0 min'
-    };
+      description: newPlaylistDesc || 'Custom user audio frequency collection.'
+    });
 
-    setUserPlaylists(prev => [newPl, ...prev]);
     setNewPlaylistTitle('');
     setNewPlaylistDesc('');
     setIsCreateModalOpen(false);
@@ -93,7 +86,7 @@ export function Library() {
     { key: 'albums', label: 'Albums', icon: Disc, count: albums.length },
     { key: 'artists', label: 'Artists', icon: Users, count: artistsList.length },
     { key: 'songs', label: 'Songs', icon: Music2, count: tracks.length },
-    { key: 'vaults', label: 'Sound Vaults', icon: Radio, count: userPlaylists.length }
+    { key: 'vaults', label: 'Sound Vaults', icon: Radio, count: playlists.length }
   ];
 
   return (
@@ -255,7 +248,7 @@ export function Library() {
             gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))',
             gap: '20px'
           }}>
-            {userPlaylists.map(pl => (
+            {playlists.map(pl => (
               <PlaylistCard key={pl.id} playlist={pl} />
             ))}
           </div>

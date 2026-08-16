@@ -1,12 +1,13 @@
 import React from 'react';
-import { Heart, Clock } from 'lucide-react';
+import { Heart, Clock, Trash2 } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
 import { formatTime } from '../../utils/formatTime';
 import { IconButton } from '../ui/IconButton';
+import { TrackContextMenuButton } from './TrackContextMenuButton';
 
 const DEFAULT_ARTWORK = '/images/albums/album-01.jpg';
 
-export function TrackList({ tracks = [], showHeader = true }) {
+export function TrackList({ tracks = [], showHeader = true, onRemoveTrack = null }) {
   const { currentTrack, isPlaying, playTrack, favorites, toggleFavorite } = usePlayer();
 
   return (
@@ -14,7 +15,7 @@ export function TrackList({ tracks = [], showHeader = true }) {
       {showHeader && (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '44px 2.5fr 1.8fr 70px 48px',
+          gridTemplateColumns: onRemoveTrack ? '44px 2.5fr 1.8fr 70px 80px' : '44px 2.5fr 1.8fr 70px 80px',
           padding: '8px 16px',
           color: 'var(--text-muted)',
           fontSize: '11px',
@@ -29,7 +30,7 @@ export function TrackList({ tracks = [], showHeader = true }) {
           <span>Title / Artist</span>
           <span>Album</span>
           <span style={{ textAlign: 'right' }}><Clock size={12} /></span>
-          <span style={{ textAlign: 'right' }}>Like</span>
+          <span style={{ textAlign: 'right' }}>Actions</span>
         </div>
       )}
 
@@ -50,7 +51,7 @@ export function TrackList({ tracks = [], showHeader = true }) {
               onClick={() => playTrack(track, tracks)}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '44px 2.5fr 1.8fr 70px 48px',
+                gridTemplateColumns: onRemoveTrack ? '44px 2.5fr 1.8fr 70px 80px' : '44px 2.5fr 1.8fr 70px 80px',
                 alignItems: 'center',
                 padding: '9px 16px',
                 borderRadius: 'var(--radius-sm)',
@@ -133,8 +134,8 @@ export function TrackList({ tracks = [], showHeader = true }) {
                 {track.duration > 0 ? formatTime(track.duration) : '--:--'}
               </span>
 
-              {/* Favorite Action Button */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+              {/* Actions */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
                 <IconButton
                   icon={Heart}
                   onClick={(e) => {
@@ -149,6 +150,22 @@ export function TrackList({ tracks = [], showHeader = true }) {
                   title="Favorite"
                   style={{ color: isLiked ? '#ec4899' : 'var(--text-muted)' }}
                 />
+
+                {!onRemoveTrack ? (
+                  <TrackContextMenuButton track={track} contextTracks={tracks} />
+                ) : (
+                  <IconButton
+                    icon={Trash2}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRemoveTrack(track.id);
+                    }}
+                    size="sm"
+                    aria-label="Remove from Playlist"
+                    title="Remove from Vault"
+                    style={{ color: '#ef4444' }} // Red icon for removal
+                  />
+                )}
               </div>
             </div>
           );

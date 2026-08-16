@@ -7,13 +7,21 @@ import {
   loadFavorites,
   saveFavorites,
   loadPlaylists,
-  savePlaylists
+  savePlaylists,
+  loadState
 } from '../utils/storage';
 import { AddToPlaylistModal } from '../components/music/AddToPlaylistModal';
 
 const PlayerContext = createContext(null);
 
 export function PlayerProvider({ children }) {
+  // Read app settings once at init (avoids circular context dependency)
+  const appSettings = useRef(loadState('playback_settings', {
+    rememberPosition: true,
+    defaultVolume: 80,
+    confirmClearQueue: true,
+  })).current;
+
   // Load persisted player settings from localStorage (safe with fallbacks)
   const initialSavedState = useRef(loadPlaybackState()).current;
   const initialTrackIndex = (() => {
@@ -25,9 +33,16 @@ export function PlayerProvider({ children }) {
   const [queue, setQueue] = useState([]);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(initialTrackIndex);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(initialSavedState.currentTime || 0);
+  const [currentTime, setCurrentTime] = useState(
+    // Only restore position if the setting allows it
+    appSettings.rememberPosition ? (initialSavedState.currentTime || 0) : 0
+  );
   const [duration, setDuration] = useState(0);
-  const [volume, setVolumeState] = useState(initialSavedState.volume);
+  // Use defaultVolume from settings if no explicit volume was ever saved
+  const initialVolume = initialSavedState.volume !== 0.85
+    ? initialSavedState.volume
+    : (appSettings.defaultVolume / 100);
+  const [volume, setVolumeState] = useState(initialVolume);
   const [isMuted, setIsMutedState] = useState(initialSavedState.isMuted);
   const [isShuffle, setIsShuffleState] = useState(initialSavedState.isShuffle);
   const [repeatMode, setRepeatModeState] = useState(initialSavedState.repeatMode); // 'off' | 'all' | 'one'
@@ -548,6 +563,74 @@ export function PlayerProvider({ children }) {
     });
   }, []);
 
+  // Playlist Management Methods
+  const closeAddToPlaylist = useCallback(() => {
+    setAddToPlaylistTrack(null);
+  }, []);
+
+  const createPlaylist = useCallback((data) => {
+    const newPlaylist = {
+      id: `pl-${Date.now()}`,
+      title: data.title || 'Untitled Vault',
+      description: data.description || 'Custom audio collection.',
+      coverUrl: data.coverUrl || '/images/albums/album-02.jpg',
+      trackIds: data.trackIds || [],
+      trackCount: (data.trackIds || []).length,
+      creator: 'User',
+      duration: '0 min' // Dynamic calculation could be added here later
+    };
+
+    setPlaylists(prev => {
+      const next = [newPlaylist, ...prev];
+      savePlaylists(next);
+      return next;
+    });
+
+    return newPlaylist;
+  }, []);
+
+  const addTrackToPlaylist = useCallback((playlistId, trackId) => {
+    setPlaylists(prev => {
+      const next = prev.map(pl => {
+        if (pl.id === playlistId && !pl.trackIds.includes(trackId)) {
+          return {
+            ...pl,
+            trackIds: [...pl.trackIds, trackId],
+            trackCount: pl.trackCount + 1
+          };
+        }
+        return pl;
+      });
+      savePlaylists(next);
+      return next;
+    });
+  }, []);
+
+  const removeTrackFromPlaylist = useCallback((playlistId, trackId) => {
+    setPlaylists(prev => {
+      const next = prev.map(pl => {
+        if (pl.id === playlistId && pl.trackIds.includes(trackId)) {
+          return {
+            ...pl,
+            trackIds: pl.trackIds.filter(id => id !== trackId),
+            trackCount: Math.max(0, pl.trackCount - 1)
+          };
+        }
+        return pl;
+      });
+      savePlaylists(next);
+      return next;
+    });
+  }, []);
+
+  const deletePlaylist = useCallback((playlistId) => {
+    setPlaylists(prev => {
+      const next = prev.filter(pl => pl.id !== playlistId);
+      savePlaylists(next);
+      return next;
+    });
+  }, []);
+
   const addToQueue = useCallback((track) => {
     setQueue(prev => [...prev, track]);
   }, []);
@@ -557,8 +640,11 @@ export function PlayerProvider({ children }) {
   }, []);
 
   const clearQueue = useCallback(() => {
+    if (appSettings.confirmClearQueue) {
+      if (!window.confirm('Clear the entire queue?')) return;
+    }
     setQueue([]);
-  }, []);
+  }, [appSettings.confirmClearQueue]);
 
   return (
     <PlayerContext.Provider
@@ -602,7 +688,16 @@ export function PlayerProvider({ children }) {
         handlePrevTrack,
         seek,
         analyserNode: analyserNode || analyserRef.current,
-        initAudioContext
+        initAudioContext,
+        playlists,
+        setPlaylists,
+        addToPlaylistTrack,
+        setAddToPlaylistTrack,
+        closeAddToPlaylist,
+        createPlaylist,
+        addTrackToPlaylist,
+        removeTrackFromPlaylist,
+        deletePlaylist
       }}
     >
       {children}

@@ -142,7 +142,7 @@ button.is-liked svg {
   animation: skeletonShimmer 1.5s ease infinite;
 }
 
-/* Accessibility: Reduced Motion */
+/* Accessibility: Reduced Motion (system preference) */
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,
@@ -152,4 +152,14 @@ button.is-liked svg {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Accessibility: Reduced Motion (user preference via Settings toggle) */
+body.reduced-motion *,
+body.reduced-motion ::before,
+body.reduced-motion ::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }

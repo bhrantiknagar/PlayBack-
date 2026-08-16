@@ -191,3 +191,30 @@ export function savePlaylists(playlists) {
     console.warn('Failed to save playlists to localStorage:', error);
   }
 }
+
+/**
+ * Generic key-based load with a fallback default value.
+ */
+export function loadState(key, defaultValue) {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return defaultValue;
+    const item = window.localStorage.getItem(key);
+    if (!item) return defaultValue;
+    return { ...defaultValue, ...JSON.parse(item) };
+  } catch (error) {
+    console.warn(`Failed to load "${key}" from localStorage:`, error);
+    return defaultValue;
+  }
+}
+
+/**
+ * Generic key-based save.
+ */
+export function saveState(key, value) {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.warn(`Failed to save "${key}" to localStorage:`, error);
+  }
+}

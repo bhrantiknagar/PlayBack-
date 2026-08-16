@@ -1,30 +1,54 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Play, Clock, ArrowLeft, Shuffle } from 'lucide-react';
-import { mockPlaylists } from '../data/mockData';
-import { tracks } from '../data/tracks';
+import { Play, Clock, ArrowLeft, Shuffle, Radio } from 'lucide-react';
+import { tracks as allTracks } from '../data/tracks';
 import { TrackList } from '../components/music/TrackList';
 import { PrimaryButton, SecondaryButton } from '../components/ui/Button';
+import { EmptyState } from '../components/common/EmptyState';
 import { usePlayer } from '../context/PlayerContext';
 
 export function PlaylistView() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { playTrack, setIsShuffle } = usePlayer();
+  const { playlists, playTrack, setIsShuffle, removeTrackFromPlaylist } = usePlayer();
 
-  const playlist = mockPlaylists.find(p => p.id === id) || mockPlaylists[0];
+  const playlist = playlists.find(p => p.id === id);
+
+  if (!playlist) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '16px' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: '800' }}>Vault Not Found</h2>
+        <SecondaryButton onClick={() => navigate('/library')}>Back to Library</SecondaryButton>
+      </div>
+    );
+  }
+
+  // Get the actual track objects from the track IDs
+  const playlistTracks = (playlist.trackIds || [])
+    .map(trackId => allTracks.find(t => t.id === trackId))
+    .filter(Boolean);
 
   const handleShufflePlay = () => {
+    if (playlistTracks.length === 0) return;
     setIsShuffle(true);
-    const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
-    playTrack(randomTrack, tracks);
+    const randomTrack = playlistTracks[Math.floor(Math.random() * playlistTracks.length)];
+    playTrack(randomTrack, playlistTracks);
+  };
+
+  const handlePlayAll = () => {
+    if (playlistTracks.length === 0) return;
+    playTrack(playlistTracks[0], playlistTracks);
+  };
+
+  const handleRemoveTrack = (trackId) => {
+    removeTrackFromPlaylist(playlist.id, trackId);
   };
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       {/* Custom Back Button */}
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate('/library')}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -67,7 +91,7 @@ export function PlaylistView() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span className="flac-hi-res-tag">CURATED VAULT</span>
-            <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#a5b4fc' }}>STUDIO CERTIFIED</span>
+            <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#a5b4fc' }}>USER COLLECTION</span>
           </div>
 
           <h1 style={{ fontSize: '36px', fontWeight: '900', letterSpacing: '-1px', lineHeight: '1.1' }}>
@@ -81,7 +105,7 @@ export function PlaylistView() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
             <span>CURATOR: <strong style={{ color: '#fff' }}>{playlist.creator}</strong></span>
             <span>•</span>
-            <span>{tracks.length} TRACKS</span>
+            <span>{playlistTracks.length} TRACKS</span>
             <span>•</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Clock size={13} /> {playlist.duration}
@@ -90,35 +114,47 @@ export function PlaylistView() {
         </div>
       </div>
 
-      {/* Action Row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-        <PrimaryButton
-          size="lg"
-          icon={Play}
-          onClick={() => playTrack(tracks[0], tracks)}
-        >
-          Play Vault
-        </PrimaryButton>
+      {playlistTracks.length > 0 ? (
+        <>
+          {/* Action Row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <PrimaryButton
+              size="lg"
+              icon={Play}
+              onClick={handlePlayAll}
+            >
+              Play Vault
+            </PrimaryButton>
 
-        <SecondaryButton
-          size="lg"
-          icon={Shuffle}
-          onClick={handleShufflePlay}
-        >
-          Shuffle
-        </SecondaryButton>
-      </div>
+            <SecondaryButton
+              size="lg"
+              icon={Shuffle}
+              onClick={handleShufflePlay}
+            >
+              Shuffle
+            </SecondaryButton>
+          </div>
 
-      {/* Track Listing */}
-      <div style={{
-        background: 'var(--bg-card)',
-        padding: '24px',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-subtle)',
-        boxShadow: 'var(--shadow-md)'
-      }}>
-        <TrackList tracks={tracks} />
-      </div>
+          {/* Track Listing */}
+          <div style={{
+            background: 'var(--bg-card)',
+            padding: '24px',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--border-subtle)',
+            boxShadow: 'var(--shadow-md)'
+          }}>
+            <TrackList tracks={playlistTracks} onRemoveTrack={handleRemoveTrack} />
+          </div>
+        </>
+      ) : (
+        <EmptyState
+          icon={Radio}
+          title="This Vault is Empty"
+          description="Browse your library or explore to find tracks and add them to this vault."
+          actionText="Discover Frequencies"
+          onAction={() => navigate('/explore')}
+        />
+      )}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { MobileNav } from './MobileNav';
 import { AudioPlayer } from '../player/AudioPlayer';
 import { QueueDrawer } from '../player/QueueDrawer';
 import { NowPlayingModal } from '../player/NowPlayingModal';
+import { AddToPlaylistModal } from '../music/AddToPlaylistModal';
 import { usePlayer } from '../../context/PlayerContext';
 
 export function MainLayout() {
@@ -41,6 +42,7 @@ export function MainLayout() {
       {/* Fullscreen Listening Space & Queue Drawer */}
       <QueueDrawer />
       <NowPlayingModal />
+      <AddToPlaylistModal />
     </div>
   );
 }

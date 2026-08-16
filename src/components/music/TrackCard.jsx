@@ -3,6 +3,7 @@ import { Heart } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
 import { PlayPauseButton } from '../player/PlayPauseButton';
 import { IconButton } from '../ui/IconButton';
+import { TrackContextMenuButton } from './TrackContextMenuButton';
 
 const DEFAULT_ARTWORK = '/images/albums/album-01.jpg';
 
@@ -92,19 +93,22 @@ export function TrackCard({ track, trackList }) {
           </p>
         </div>
 
-        <IconButton
-          icon={Heart}
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleFavorite(track.id);
-          }}
-          variant={isLiked ? 'danger' : 'default'}
-          className={isLiked ? 'animate-heart-pop is-liked' : ''}
-          iconProps={{ fill: isLiked ? 'currentColor' : 'none' }}
-          size="sm"
-          aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
-          style={{ color: isLiked ? '#ec4899' : 'var(--text-muted)' }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <IconButton
+            icon={Heart}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleFavorite(track.id);
+            }}
+            variant={isLiked ? 'danger' : 'default'}
+            className={isLiked ? 'animate-heart-pop is-liked' : ''}
+            iconProps={{ fill: isLiked ? 'currentColor' : 'none' }}
+            size="sm"
+            aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
+            style={{ color: isLiked ? '#ec4899' : 'var(--text-muted)' }}
+          />
+          <TrackContextMenuButton track={track} contextTracks={trackList} />
+        </div>
       </div>
     </div>
   );

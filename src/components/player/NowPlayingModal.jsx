@@ -42,10 +42,7 @@ export function NowPlayingModal() {
         background: `radial-gradient(circle at 50% 35%, ${activeColor}22 0%, rgba(14, 18, 26, 0.98) 65%, #06070a 100%)`,
         backdropFilter: 'blur(36px)',
         zIndex: 1000,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '36px 48px',
+        overflowY: 'auto',
         color: '#fff',
         animation: 'fadeInScale 0.28s cubic-bezier(0.16, 1, 0.3, 1)'
       }}
@@ -53,7 +50,15 @@ export function NowPlayingModal() {
       aria-modal="true"
       aria-label="Now playing listening space"
     >
-      {/* Top Header Bar */}
+      {/* 100vh wrapper for main player to preserve existing layout */}
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '36px 48px',
+      }}>
+        {/* Top Header Bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: '1080px', margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span className="flac-hi-res-tag">
@@ -282,6 +287,47 @@ export function NowPlayingModal() {
           <TrackControls />
           <VolumeControl />
         </div>
+      </div>
+      </div>
+      
+      {/* Lyrics Section */}
+      <div style={{ 
+        padding: '24px 48px 96px 48px', 
+        maxWidth: '800px', 
+        margin: '0 auto', 
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '24px'
+      }}>
+        <h2 style={{ fontSize: '20px', fontWeight: '800', color: activeColor, textTransform: 'uppercase', letterSpacing: '2px' }}>
+          Lyrics
+        </h2>
+        
+        {currentTrack.lyrics && currentTrack.lyrics.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {currentTrack.lyrics.map((lyric, idx) => (
+              <p key={idx} style={{ 
+                fontSize: '24px', 
+                lineHeight: '1.8', 
+                color: 'var(--text-primary)',
+                fontWeight: '500',
+                textShadow: '0 2px 10px rgba(0,0,0,0.5)'
+              }}>
+                {lyric.text}
+              </p>
+            ))}
+          </div>
+        ) : (
+          <p style={{ 
+            fontSize: '18px', 
+            color: 'var(--text-muted)', 
+            fontStyle: 'italic',
+            marginTop: '32px'
+          }}>
+            No lyrics available for this track.
+          </p>
+        )}
       </div>
     </div>
   );

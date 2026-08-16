@@ -1,10 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Compass, Library, Heart, Radio } from 'lucide-react';
-import { mockPlaylists } from '../../data/mockData';
+import { Home, Compass, Library, Heart, Radio, Settings } from 'lucide-react';
 import logoImg from '../../assets/images/logo.png';
+import { usePlayer } from '../../context/PlayerContext';
 
 export function Sidebar() {
+  const { playlists } = usePlayer();
+
   const mainNav = [
     { to: '/', label: 'Acoustic Space', icon: Home },
     { to: '/explore', label: 'Discovery Matrix', icon: Compass },
@@ -61,7 +63,7 @@ export function Sidebar() {
         overflowY: 'auto',
         flex: 1
       }}>
-        {mockPlaylists.map(pl => (
+        {playlists.map(pl => (
           <NavLink
             key={pl.id}
             to={`/playlist/${pl.id}`}
@@ -74,6 +76,19 @@ export function Sidebar() {
             </span>
           </NavLink>
         ))}
+      </div>
+
+      {/* Pinned Settings link */}
+      <div style={{ padding: '0 14px 12px', marginTop: 'auto' }}>
+        <div style={{ height: '1px', background: 'var(--border-subtle)', marginBottom: '10px' }} />
+        <NavLink
+          to="/settings"
+          className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+          style={{ fontSize: '13px' }}
+        >
+          <Settings size={16} />
+          <span>Settings</span>
+        </NavLink>
       </div>
     </aside>
   );
