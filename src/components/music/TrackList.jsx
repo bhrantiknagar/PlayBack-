@@ -142,7 +142,8 @@ export function TrackList({ tracks = [], showHeader = true }) {
                     toggleFavorite(track.id);
                   }}
                   variant={isLiked ? 'danger' : 'default'}
-                  className={isLiked ? 'animate-heart-pop' : ''}
+                  className={isLiked ? 'animate-heart-pop is-liked' : ''}
+                  iconProps={{ fill: isLiked ? 'currentColor' : 'none' }}
                   size="sm"
                   aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
                   title="Favorite"

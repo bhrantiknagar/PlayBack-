@@ -1,9 +1,10 @@
 /**
  * PlayBack Persistence Layer
- * Handles safe localStorage reading and writing for player settings and state.
+ * Handles safe localStorage reading and writing for player settings, state, and favorites.
  */
 
 const STORAGE_KEY = 'playback_player_state';
+const FAVORITES_STORAGE_KEY = 'playback_favorites';
 
 export const DEFAULT_PLAYBACK_STATE = {
   trackId: 'track-01',
@@ -13,6 +14,8 @@ export const DEFAULT_PLAYBACK_STATE = {
   isShuffle: false,
   repeatMode: 'off' // 'off' | 'all' | 'one'
 };
+
+export const DEFAULT_FAVORITES = ['track-01', 'track-03', 'track-05'];
 
 /**
  * Validate and sanitize loaded state to prevent corrupted localStorage data from crashing the app.
@@ -108,5 +111,43 @@ export function clearPlaybackState() {
     window.localStorage.removeItem(STORAGE_KEY);
   } catch (error) {
     console.warn('Failed to clear playback state:', error);
+  }
+}
+
+/**
+ * Safely load favorite track IDs from localStorage with graceful fallback.
+ */
+export function loadFavorites() {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return [...DEFAULT_FAVORITES];
+    }
+    const item = window.localStorage.getItem(FAVORITES_STORAGE_KEY);
+    if (!item) {
+      return [...DEFAULT_FAVORITES];
+    }
+    const parsed = JSON.parse(item);
+    if (Array.isArray(parsed)) {
+      return parsed.filter(id => typeof id === 'string' && id.trim().length > 0);
+    }
+    return [...DEFAULT_FAVORITES];
+  } catch (error) {
+    console.warn('Failed to load favorites from localStorage:', error);
+    return [...DEFAULT_FAVORITES];
+  }
+}
+
+/**
+ * Safely save favorite track IDs array to localStorage.
+ */
+export function saveFavorites(favorites) {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    if (Array.isArray(favorites)) {
+      const sanitized = favorites.filter(id => typeof id === 'string' && id.trim().length > 0);
+      window.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(sanitized));
+    }
+  } catch (error) {
+    console.warn('Failed to save favorites to localStorage:', error);
   }
 }

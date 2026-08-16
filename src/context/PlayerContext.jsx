@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { tracks } from '../data/tracks';
-import { loadPlaybackState, savePlaybackState, savePlaybackPosition } from '../utils/storage';
+import { loadPlaybackState, savePlaybackState, savePlaybackPosition, loadFavorites, saveFavorites } from '../utils/storage';
 
 const PlayerContext = createContext(null);
 
@@ -27,8 +27,8 @@ export function PlayerProvider({ children }) {
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [selectedEnergy, setSelectedEnergy] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [favorites, setFavorites] = useState(() => {
-    return tracks.filter(t => t.liked).map(t => t.id);
+  const [favorites, setFavoritesState] = useState(() => {
+    return loadFavorites();
   });
 
   const audioRef = useRef(null);
@@ -525,9 +525,14 @@ export function PlayerProvider({ children }) {
   }, [currentTrack?.id]);
 
   const toggleFavorite = useCallback((trackId) => {
-    setFavorites(prev => 
-      prev.includes(trackId) ? prev.filter(id => id !== trackId) : [...prev, trackId]
-    );
+    if (!trackId) return;
+    setFavoritesState(prev => {
+      const next = prev.includes(trackId)
+        ? prev.filter(id => id !== trackId)
+        : [...prev, trackId];
+      saveFavorites(next);
+      return next;
+    });
   }, []);
 
   const addToQueue = useCallback((track) => {

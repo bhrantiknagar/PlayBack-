@@ -113,7 +113,8 @@ export function AudioPlayer() {
           icon={Heart}
           onClick={() => toggleFavorite(currentTrack.id)}
           variant={isLiked ? 'danger' : 'default'}
-          className={isLiked ? 'animate-heart-pop' : ''}
+          className={isLiked ? 'animate-heart-pop is-liked' : ''}
+          iconProps={{ fill: isLiked ? 'currentColor' : 'none' }}
           aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
           style={{ color: isLiked ? '#ec4899' : 'var(--text-muted)' }}
           size="sm"

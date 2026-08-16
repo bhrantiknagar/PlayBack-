@@ -123,6 +123,11 @@
   animation: heartPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+.animate-heart-pop svg,
+button.is-liked svg {
+  fill: currentColor;
+}
+
 .animate-spin-slow {
   animation: rotateVinyl 12s linear infinite;
 }

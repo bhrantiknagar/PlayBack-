@@ -9,6 +9,7 @@ export function IconButton({
   variant = 'default', // 'default' | 'active' | 'danger'
   className = '',
   disabled = false,
+  iconProps = {},
   ...props
 }) {
   const [isPressed, setIsPressed] = useState(false);
@@ -73,7 +74,7 @@ export function IconButton({
       className={`icon-btn ${className}`}
       {...props}
     >
-      {Icon && <Icon size={currentSize.iconSize} />}
+      {Icon && <Icon size={currentSize.iconSize} {...iconProps} />}
     </button>
   );
 }
