@@ -1,19 +1,27 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { tracks } from '../data/tracks';
+import { loadPlaybackState, savePlaybackState, savePlaybackPosition } from '../utils/storage';
 
 const PlayerContext = createContext(null);
 
 export function PlayerProvider({ children }) {
+  // Load persisted player settings from localStorage (safe with fallbacks)
+  const initialSavedState = useRef(loadPlaybackState()).current;
+  const initialTrackIndex = (() => {
+    const idx = tracks.findIndex(t => t.id === initialSavedState.trackId);
+    return idx !== -1 ? idx : 0;
+  })();
+
   const [playlist, setPlaylist] = useState(tracks);
   const [queue, setQueue] = useState([]);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(initialTrackIndex);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState(initialSavedState.currentTime || 0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolumeState] = useState(0.85);
-  const [isMuted, setIsMutedState] = useState(false);
-  const [isShuffle, setIsShuffle] = useState(false);
-  const [repeatMode, setRepeatMode] = useState('off'); // 'off' | 'all' | 'one'
+  const [volume, setVolumeState] = useState(initialSavedState.volume);
+  const [isMuted, setIsMutedState] = useState(initialSavedState.isMuted);
+  const [isShuffle, setIsShuffleState] = useState(initialSavedState.isShuffle);
+  const [repeatMode, setRepeatModeState] = useState(initialSavedState.repeatMode); // 'off' | 'all' | 'one'
   const [visualizerMode, setVisualizerMode] = useState('wave');
   const [isNowPlayingOpen, setIsNowPlayingOpen] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
@@ -25,15 +33,178 @@ export function PlayerProvider({ children }) {
 
   const audioRef = useRef(null);
   if (!audioRef.current) {
-    audioRef.current = new Audio();
+    const audio = new Audio();
+    audio.crossOrigin = 'anonymous';
+    audio.preload = 'metadata';
+    audioRef.current = audio;
   }
 
+  // Ref to track last throttled save timestamp
+  const lastSaveTimeRef = useRef(0);
+
+  // Web Audio API Analyser Integration
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+  const sourceNodeRef = useRef(null);
+  const [analyserNode, setAnalyserNode] = useState(null);
+
+  const initAudioContext = useCallback(() => {
+    try {
+      if (!audioContextRef.current) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return null;
+        
+        const ctx = new AudioContextClass();
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.82;
+        analyser.minDecibels = -90;
+        analyser.maxDecibels = -10;
+
+        if (audioRef.current && !sourceNodeRef.current) {
+          try {
+            const source = ctx.createMediaElementSource(audioRef.current);
+            source.connect(analyser);
+            analyser.connect(ctx.destination);
+            sourceNodeRef.current = source;
+          } catch (err) {
+            console.warn('Web Audio createMediaElementSource note:', err);
+          }
+        }
+
+        audioContextRef.current = ctx;
+        analyserRef.current = analyser;
+        setAnalyserNode(analyser);
+      }
+
+      if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume().catch(() => {});
+      }
+
+      return analyserRef.current;
+    } catch (e) {
+      console.warn('AudioContext initialization note:', e);
+      return null;
+    }
+  }, []);
+
+  // Unlock AudioContext on first user interaction if suspended
+  useEffect(() => {
+    const handleUnlock = () => {
+      if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume().catch(() => {});
+      }
+    };
+    window.addEventListener('click', handleUnlock, { passive: true, once: false });
+    window.addEventListener('keydown', handleUnlock, { passive: true, once: false });
+    window.addEventListener('touchstart', handleUnlock, { passive: true, once: false });
+    return () => {
+      window.removeEventListener('click', handleUnlock);
+      window.removeEventListener('keydown', handleUnlock);
+      window.removeEventListener('touchstart', handleUnlock);
+    };
+  }, []);
+
   const currentTrack = playlist[currentTrackIndex] || playlist[0] || tracks[0];
+
+  // Initial setup on mount: restore audio source and position without autoplaying
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.volume = initialSavedState.isMuted ? 0 : initialSavedState.volume;
+    
+    const initialTrack = playlist[initialTrackIndex] || tracks[0];
+    if (initialTrack) {
+      const trackSrc = initialTrack.audio || initialTrack.audioUrl;
+      if (trackSrc) {
+        audio.src = trackSrc;
+        audio.load();
+
+        if (initialSavedState.currentTime > 0) {
+          const restorePosition = () => {
+            try {
+              if (initialSavedState.currentTime < (audio.duration || Infinity)) {
+                audio.currentTime = initialSavedState.currentTime;
+              }
+            } catch (err) {
+              console.warn('Could not restore initial audio position:', err);
+            }
+          };
+
+          if (audio.readyState >= 1) {
+            restorePosition();
+          } else {
+            audio.addEventListener('loadedmetadata', restorePosition, { once: true });
+          }
+        }
+      }
+    }
+  }, []); // Run once on mount
+
+  // Flush state on page unload / refresh
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const audio = audioRef.current;
+      const pos = audio ? audio.currentTime : currentTime;
+      savePlaybackState({
+        trackId: currentTrack?.id,
+        currentTime: pos,
+        volume,
+        isMuted,
+        isShuffle,
+        repeatMode
+      });
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pagehide', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pagehide', handleBeforeUnload);
+    };
+  }, [currentTrack?.id, currentTime, volume, isMuted, isShuffle, repeatMode]);
+
+  // Set Shuffle with persistence
+  const setIsShuffle = useCallback((value) => {
+    setIsShuffleState(prev => {
+      const next = typeof value === 'function' ? value(prev) : value;
+      savePlaybackState({ isShuffle: next });
+      return next;
+    });
+  }, []);
+
+  const toggleShuffle = useCallback(() => {
+    setIsShuffleState(prev => {
+      const next = !prev;
+      savePlaybackState({ isShuffle: next });
+      return next;
+    });
+  }, []);
+
+  // Set Repeat Mode with persistence
+  const setRepeatMode = useCallback((value) => {
+    setRepeatModeState(prev => {
+      const next = typeof value === 'function' ? value(prev) : value;
+      savePlaybackState({ repeatMode: next });
+      return next;
+    });
+  }, []);
+
+  const toggleRepeat = useCallback(() => {
+    setRepeatModeState(prev => {
+      const next = prev === 'off' ? 'all' : prev === 'all' ? 'one' : 'off';
+      savePlaybackState({ repeatMode: next });
+      return next;
+    });
+  }, []);
 
   // Play a specific track
   const playTrack = useCallback((track, trackList = null) => {
     const audio = audioRef.current;
     if (!audio || !track) return;
+
+    initAudioContext();
 
     let targetIndex = 0;
     if (trackList && Array.isArray(trackList)) {
@@ -58,22 +229,30 @@ export function PlayerProvider({ children }) {
       setDuration(0);
     }
 
+    // Persist new track with 0 starting position
+    savePlaybackState({
+      trackId: track.id,
+      currentTime: 0
+    });
+
     audio.play().then(() => {
       setIsPlaying(true);
     }).catch(err => {
       console.warn('Play track interrupted:', err);
     });
-  }, [playlist]);
+  }, [playlist, initAudioContext]);
 
   // Next Track Logic
   const handleNextTrack = useCallback((autoPlayNext = true) => {
     const audio = audioRef.current;
+    initAudioContext();
 
     // 1. Repeat ONE: restart same track from beginning
     if (repeatMode === 'one') {
       if (audio) {
         audio.currentTime = 0;
         setCurrentTime(0);
+        savePlaybackPosition(0, currentTrack?.id);
         if (autoPlayNext) {
           audio.play().catch(console.warn);
         }
@@ -94,6 +273,8 @@ export function PlayerProvider({ children }) {
       if (playlist.length <= 1) {
         if (audio) {
           audio.currentTime = 0;
+          setCurrentTime(0);
+          savePlaybackPosition(0, currentTrack?.id);
           if (autoPlayNext) audio.play().catch(console.warn);
         }
         return;
@@ -113,6 +294,10 @@ export function PlayerProvider({ children }) {
           setCurrentTime(0);
           setDuration(0);
         }
+        savePlaybackState({
+          trackId: nextTrack.id,
+          currentTime: 0
+        });
         if (autoPlayNext) {
           audio.play().then(() => setIsPlaying(true)).catch(console.warn);
         }
@@ -134,6 +319,7 @@ export function PlayerProvider({ children }) {
         audio.currentTime = 0;
         setCurrentTime(0);
       }
+      savePlaybackPosition(0, currentTrack?.id);
       return;
     }
 
@@ -147,18 +333,25 @@ export function PlayerProvider({ children }) {
         setCurrentTime(0);
         setDuration(0);
       }
+      savePlaybackState({
+        trackId: nextTrack.id,
+        currentTime: 0
+      });
       if (autoPlayNext) {
         audio.play().then(() => setIsPlaying(true)).catch(console.warn);
       }
     }
-  }, [currentTrackIndex, playlist, repeatMode, queue, isShuffle, playTrack]);
+  }, [currentTrackIndex, playlist, repeatMode, queue, isShuffle, playTrack, initAudioContext, currentTrack?.id]);
 
   // Previous Track Logic
   const handlePrevTrack = useCallback(() => {
     const audio = audioRef.current;
+    initAudioContext();
+
     if (audio && audio.currentTime > 3) {
       audio.currentTime = 0;
       setCurrentTime(0);
+      savePlaybackPosition(0, currentTrack?.id);
       return;
     }
 
@@ -179,11 +372,15 @@ export function PlayerProvider({ children }) {
         setCurrentTime(0);
         setDuration(0);
       }
+      savePlaybackState({
+        trackId: prevTrack.id,
+        currentTime: 0
+      });
       audio.play().then(() => {
         setIsPlaying(true);
       }).catch(console.warn);
     }
-  }, [currentTrackIndex, playlist]);
+  }, [currentTrackIndex, playlist, initAudioContext, currentTrack?.id]);
 
   // Set up real HTML5 audio event listeners
   useEffect(() => {
@@ -191,8 +388,26 @@ export function PlayerProvider({ children }) {
     if (!audio) return;
 
     const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime || 0);
+    const handlePause = () => {
+      setIsPlaying(false);
+      // Persist exact position on pause
+      if (audio && currentTrack) {
+        savePlaybackPosition(audio.currentTime, currentTrack.id);
+      }
+    };
+    const handleTimeUpdate = () => {
+      const currentSec = audio.currentTime || 0;
+      setCurrentTime(currentSec);
+
+      // Throttled periodic persistence (~1.5s interval during playback)
+      const now = Date.now();
+      if (now - lastSaveTimeRef.current > 1500) {
+        lastSaveTimeRef.current = now;
+        if (currentTrack) {
+          savePlaybackPosition(currentSec, currentTrack.id);
+        }
+      }
+    };
     const handleLoadedMetadata = () => {
       if (audio.duration && !isNaN(audio.duration)) {
         setDuration(audio.duration);
@@ -204,6 +419,8 @@ export function PlayerProvider({ children }) {
       }
     };
     const handleEnded = () => {
+      // Clear position on natural track completion
+      savePlaybackPosition(0, currentTrack?.id);
       handleNextTrack(true);
     };
     const handleError = (e) => {
@@ -228,7 +445,7 @@ export function PlayerProvider({ children }) {
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
     };
-  }, [handleNextTrack, currentTrack?.title]);
+  }, [handleNextTrack, currentTrack]);
 
   // Sync track src on currentTrack change
   useEffect(() => {
@@ -253,13 +470,14 @@ export function PlayerProvider({ children }) {
     }
   }, [currentTrack, isPlaying]);
 
-  // Volume & Mute synchronizer
+  // Volume & Mute synchronizer with persistence
   const setVolume = useCallback((newVol) => {
     const clamped = Math.max(0, Math.min(1, newVol));
     setVolumeState(clamped);
     if (audioRef.current) {
       audioRef.current.volume = isMuted ? 0 : clamped;
     }
+    savePlaybackState({ volume: clamped });
   }, [isMuted]);
 
   const setIsMuted = useCallback((muted) => {
@@ -267,12 +485,15 @@ export function PlayerProvider({ children }) {
     if (audioRef.current) {
       audioRef.current.volume = muted ? 0 : volume;
     }
+    savePlaybackState({ isMuted: muted });
   }, [volume]);
 
   // Toggle play/pause
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
+
+    initAudioContext();
 
     if (!audio.src && currentTrack) {
       audio.src = currentTrack.audio || currentTrack.audioUrl;
@@ -287,35 +508,26 @@ export function PlayerProvider({ children }) {
     } else {
       audio.pause();
       setIsPlaying(false);
+      savePlaybackPosition(audio.currentTime, currentTrack?.id);
     }
-  }, [currentTrack]);
+  }, [currentTrack, initAudioContext]);
 
   // Seeking
   const seek = useCallback((time) => {
     const audio = audioRef.current;
     if (!audio) return;
     if (isFinite(time)) {
-      audio.currentTime = Math.max(0, Math.min(audio.duration || time, time));
-      setCurrentTime(audio.currentTime);
+      const targetTime = Math.max(0, Math.min(audio.duration || time, time));
+      audio.currentTime = targetTime;
+      setCurrentTime(targetTime);
+      savePlaybackPosition(targetTime, currentTrack?.id);
     }
-  }, []);
+  }, [currentTrack?.id]);
 
   const toggleFavorite = useCallback((trackId) => {
     setFavorites(prev => 
       prev.includes(trackId) ? prev.filter(id => id !== trackId) : [...prev, trackId]
     );
-  }, []);
-
-  const toggleRepeat = useCallback(() => {
-    setRepeatMode(prev => {
-      if (prev === 'off') return 'all';
-      if (prev === 'all') return 'one';
-      return 'off';
-    });
-  }, []);
-
-  const toggleShuffle = useCallback(() => {
-    setIsShuffle(prev => !prev);
   }, []);
 
   const addToQueue = useCallback((track) => {
@@ -353,6 +565,7 @@ export function PlayerProvider({ children }) {
         setIsShuffle,
         repeatMode,
         toggleRepeat,
+        setRepeatMode,
         visualizerMode,
         setVisualizerMode,
         isNowPlayingOpen,
@@ -369,7 +582,9 @@ export function PlayerProvider({ children }) {
         playTrack,
         handleNextTrack,
         handlePrevTrack,
-        seek
+        seek,
+        analyserNode: analyserNode || analyserRef.current,
+        initAudioContext
       }}
     >
       {children}
