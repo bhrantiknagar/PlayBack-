@@ -59,6 +59,23 @@ export function PlayerProvider({ children }) {
   });
   const [addToPlaylistTrack, setAddToPlaylistTrack] = useState(null);
 
+  // Recently played history — capped at 20, persisted to localStorage
+  const [recentlyPlayed, setRecentlyPlayed] = useState(() => {
+    try {
+      const saved = window.localStorage.getItem('playback_recently_played');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+
+  const addToRecentlyPlayed = useCallback((trackId) => {
+    setRecentlyPlayed(prev => {
+      const deduped = prev.filter(id => id !== trackId);
+      const next = [trackId, ...deduped].slice(0, 20);
+      try { window.localStorage.setItem('playback_recently_played', JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+
   const audioRef = useRef(null);
   if (!audioRef.current) {
     const audio = new Audio();
@@ -263,12 +280,15 @@ export function PlayerProvider({ children }) {
       currentTime: 0
     });
 
+    // Record in play history
+    addToRecentlyPlayed(track.id);
+
     audio.play().then(() => {
       setIsPlaying(true);
     }).catch(err => {
       console.warn('Play track interrupted:', err);
     });
-  }, [playlist, initAudioContext]);
+  }, [playlist, initAudioContext, addToRecentlyPlayed]);
 
   // Next Track Logic
   const handleNextTrack = useCallback((autoPlayNext = true) => {
@@ -697,7 +717,8 @@ export function PlayerProvider({ children }) {
         createPlaylist,
         addTrackToPlaylist,
         removeTrackFromPlaylist,
-        deletePlaylist
+        deletePlaylist,
+        recentlyPlayed
       }}
     >
       {children}

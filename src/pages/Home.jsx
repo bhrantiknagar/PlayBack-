@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Flame, Radio, Zap } from 'lucide-react';
+import { Play, Flame, Radio, Zap, Clock, Heart, Disc } from 'lucide-react';
 import { tracks } from '../data/tracks';
 import { mockPlaylists } from '../data/mockData';
 import { TrackCard } from '../components/music/TrackCard';
@@ -9,36 +9,94 @@ import { PrimaryButton } from '../components/ui/Button';
 import { EmptyState } from '../components/common/EmptyState';
 import { usePlayer } from '../context/PlayerContext';
 
+const SECTION_MIN = 1; // Minimum tracks needed to show a section
+
+// Reusable section header component
+function SectionHeader({ icon: Icon, iconColor, title, count }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Icon size={18} color={iconColor} />
+        <h2 style={{ fontSize: '19px', fontWeight: '700' }}>{title}</h2>
+      </div>
+      {count != null && (
+        <span style={{ fontSize: '11.5px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+          {count} {count === 1 ? 'track' : 'tracks'}
+        </span>
+      )}
+    </div>
+  );
+}
+
+// Track card grid
+function TrackGrid({ tracks: trackList }) {
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(195px, 1fr))',
+      gap: '18px'
+    }}>
+      {trackList.map(track => (
+        <TrackCard key={track.id} track={track} trackList={trackList} />
+      ))}
+    </div>
+  );
+}
+
 export function Home() {
-  const { playTrack, searchQuery, setSearchQuery, selectedEnergy, setSelectedEnergy } = usePlayer();
+  const {
+    playTrack,
+    searchQuery, setSearchQuery,
+    selectedEnergy, setSelectedEnergy,
+    favorites,
+    recentlyPlayed
+  } = usePlayer();
 
   const energyFilters = ['All', 'Focus', 'Drive', 'Euphoria', 'Chill', 'Late Night'];
   const normalizedQuery = (searchQuery || '').trim().toLowerCase();
+  const isFiltered = normalizedQuery || selectedEnergy !== 'All';
 
+  // ── Search / Energy filtered tracks ──────────────────────────────────────
   const filteredTracks = tracks.filter(track => {
-    // 1. Category / Energy filter
     const matchesCategory =
       selectedEnergy === 'All' ||
       track.category === selectedEnergy ||
       track.energy === selectedEnergy;
-
     if (!matchesCategory) return false;
-
-    // 2. Real-time multi-field search across title, artist, album, genre
     if (normalizedQuery) {
-      const titleMatch = track.title ? track.title.toLowerCase().includes(normalizedQuery) : false;
-      const artistMatch = track.artist ? track.artist.toLowerCase().includes(normalizedQuery) : false;
-      const albumMatch = track.album ? track.album.toLowerCase().includes(normalizedQuery) : false;
-      const genreMatch = track.genre ? track.genre.toLowerCase().includes(normalizedQuery) : false;
-      return titleMatch || artistMatch || albumMatch || genreMatch;
+      return (
+        track.title?.toLowerCase().includes(normalizedQuery) ||
+        track.artist?.toLowerCase().includes(normalizedQuery) ||
+        track.album?.toLowerCase().includes(normalizedQuery) ||
+        track.genre?.toLowerCase().includes(normalizedQuery)
+      );
     }
-
     return true;
   });
 
+  // ── Personalized sections (only on unfiltered home) ────────────────────
+  const trackById = Object.fromEntries(tracks.map(t => [t.id, t]));
+
+  // Recently Played — ordered by most recent play, limit 6
+  const recentTracks = recentlyPlayed
+    .map(id => trackById[id])
+    .filter(Boolean)
+    .slice(0, 6);
+
+  // Your Favorites — tracks that are liked
+  const favoriteTracks = tracks.filter(t => favorites.includes(t.id));
+
+  // Recently Added — sorted by addedDate if present, otherwise first 6 tracks
+  const recentlyAdded = [...tracks]
+    .sort((a, b) => {
+      if (a.addedDate && b.addedDate) return new Date(b.addedDate) - new Date(a.addedDate);
+      return 0;
+    })
+    .slice(0, 6);
+
   const featuredTrack = tracks[0];
 
-  // Dynamic Section Title reflecting Category + Search
+  // Dynamic section title
   let sectionHeading = 'Sonic Frequencies';
   if (normalizedQuery && selectedEnergy !== 'All') {
     sectionHeading = `Results for "${searchQuery}" in ${selectedEnergy}`;
@@ -50,8 +108,9 @@ export function Home() {
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-      {/* Featured Hero Banner (Shown on clean unfiltered Home) */}
-      {!normalizedQuery && selectedEnergy === 'All' && (
+
+      {/* ── Hero Banner ── */}
+      {!isFiltered && (
         <div style={{
           position: 'relative',
           borderRadius: 'var(--radius-lg)',
@@ -70,28 +129,14 @@ export function Home() {
                 {featuredTrack.artist}
               </span>
             </div>
-
-            <h1 style={{
-              fontSize: '38px',
-              fontWeight: '900',
-              lineHeight: '1.1',
-              letterSpacing: '-1.2px',
-              fontFamily: 'var(--font-display)',
-              color: '#ffffff'
-            }}>
+            <h1 style={{ fontSize: '38px', fontWeight: '900', lineHeight: '1.1', letterSpacing: '-1.2px', fontFamily: 'var(--font-display)', color: '#ffffff' }}>
               {featuredTrack.album}
             </h1>
-
             <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.82)', lineHeight: '1.55' }}>
               Experience state-of-the-art cyberpunk synthesis, atmospheric sub-bass, and cinematic spatial acoustics.
             </p>
-
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '6px' }}>
-              <PrimaryButton
-                size="lg"
-                icon={Play}
-                onClick={() => playTrack(featuredTrack, tracks)}
-              >
+              <PrimaryButton size="lg" icon={Play} onClick={() => playTrack(featuredTrack, tracks)}>
                 Listen Now
               </PrimaryButton>
             </div>
@@ -99,7 +144,7 @@ export function Home() {
         </div>
       )}
 
-      {/* Energy Vibe Category Filter Pills (Always accessible and synchronized) */}
+      {/* ── Energy Filter Pills ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflowX: 'auto', padding: '2px 0' }} className="hide-scrollbar">
         {energyFilters.map(filter => {
           const isActive = selectedEnergy === filter;
@@ -126,20 +171,9 @@ export function Home() {
         })}
       </div>
 
-      {/* Recommended Frequencies Grid */}
+      {/* ── Search / Filter Results ── */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Zap size={18} color="var(--accent-primary)" />
-            <h2 style={{ fontSize: '19px', fontWeight: '700' }}>
-              {sectionHeading}
-            </h2>
-          </div>
-          <span style={{ fontSize: '11.5px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
-            {filteredTracks.length} {filteredTracks.length === 1 ? 'track' : 'tracks'}
-          </span>
-        </div>
-
+        <SectionHeader icon={Zap} iconColor="var(--accent-primary)" title={sectionHeading} count={filteredTracks.length} />
         {filteredTracks.length === 0 ? (
           <EmptyState
             type="search"
@@ -148,66 +182,79 @@ export function Home() {
               normalizedQuery && selectedEnergy !== 'All'
                 ? `No tracks matching "${searchQuery}" in ${selectedEnergy}.`
                 : normalizedQuery
-                ? "Try another song, artist, or album."
+                ? 'Try another song, artist, or album.'
                 : `No tracks found in ${selectedEnergy} category.`
             }
-            actionText={normalizedQuery && selectedEnergy !== 'All' ? "Reset All Filters" : normalizedQuery ? "Clear Search" : "Show All Tracks"}
+            actionText={normalizedQuery && selectedEnergy !== 'All' ? 'Reset All Filters' : normalizedQuery ? 'Clear Search' : 'Show All Tracks'}
             onAction={() => {
               if (normalizedQuery) setSearchQuery('');
               if (selectedEnergy !== 'All') setSelectedEnergy('All');
             }}
           />
         ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(195px, 1fr))',
-            gap: '18px'
-          }}>
-            {filteredTracks.map(track => (
-              <TrackCard key={track.id} track={track} trackList={filteredTracks} />
-            ))}
-          </div>
+          <TrackGrid tracks={filteredTracks} />
         )}
       </div>
 
-      {/* Curated Sound Vaults (Shown when unfiltered) */}
-      {!normalizedQuery && selectedEnergy === 'All' && (
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '18px' }}>
-            <Radio size={18} color="var(--accent-secondary)" />
-            <h2 style={{ fontSize: '19px', fontWeight: '700' }}>Curated Sound Vaults</h2>
-          </div>
+      {/* ── Personalized sections — only on clean unfiltered home ── */}
+      {!isFiltered && (
+        <>
+          {/* Recently Played */}
+          {recentTracks.length >= SECTION_MIN && (
+            <div>
+              <SectionHeader icon={Clock} iconColor="#38bdf8" title="Recently Played" count={recentTracks.length} />
+              <TrackGrid tracks={recentTracks} />
+            </div>
+          )}
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-            gap: '18px'
-          }}>
-            {mockPlaylists.map(pl => (
-              <PlaylistCard key={pl.id} playlist={pl} />
-            ))}
-          </div>
-        </div>
-      )}
+          {/* Your Favorites */}
+          {favoriteTracks.length >= SECTION_MIN && (
+            <div>
+              <SectionHeader icon={Heart} iconColor="#ec4899" title="Your Favorites" count={favoriteTracks.length} />
+              <TrackGrid tracks={favoriteTracks} />
+            </div>
+          )}
 
-      {/* Popular Tracks Table (Shown when unfiltered) */}
-      {!normalizedQuery && selectedEnergy === 'All' && (
-        <div style={{
-          background: 'var(--bg-card)',
-          padding: '24px',
-          borderRadius: 'var(--radius-lg)',
-          border: '1px solid var(--border-subtle)',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Flame size={18} color="#f43f5e" />
-              <h2 style={{ fontSize: '18px', fontWeight: '700' }}>Popular Tracks</h2>
+          {/* Recently Added */}
+          {recentlyAdded.length >= SECTION_MIN && (
+            <div>
+              <SectionHeader icon={Disc} iconColor="#a855f7" title="Recently Added" count={recentlyAdded.length} />
+              <TrackGrid tracks={recentlyAdded} />
+            </div>
+          )}
+
+          {/* Curated Sound Vaults */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '18px' }}>
+              <Radio size={18} color="var(--accent-secondary)" />
+              <h2 style={{ fontSize: '19px', fontWeight: '700' }}>Curated Sound Vaults</h2>
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+              gap: '18px'
+            }}>
+              {mockPlaylists.map(pl => (
+                <PlaylistCard key={pl.id} playlist={pl} />
+              ))}
             </div>
           </div>
 
-          <TrackList tracks={tracks} />
-        </div>
+          {/* Popular Tracks table */}
+          <div style={{
+            background: 'var(--bg-card)',
+            padding: '24px',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--border-subtle)',
+            boxShadow: 'var(--shadow-sm)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <Flame size={18} color="#f43f5e" />
+              <h2 style={{ fontSize: '18px', fontWeight: '700' }}>Popular Tracks</h2>
+            </div>
+            <TrackList tracks={tracks} />
+          </div>
+        </>
       )}
     </div>
   );
