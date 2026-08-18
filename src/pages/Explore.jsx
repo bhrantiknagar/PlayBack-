@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, Music2, Radio, Sparkles, Disc } from 'lucide-react';
+import { Compass, Music2, Sparkles } from 'lucide-react';
 import { mockGenres } from '../data/mockData';
 import { tracks } from '../data/tracks';
 import { TrackCard } from '../components/music/TrackCard';
@@ -9,7 +9,7 @@ export function Explore() {
   const { playTrack } = usePlayer();
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
@@ -26,7 +26,7 @@ export function Explore() {
             <Compass size={22} />
           </div>
           <div>
-            <h1 style={{ fontSize: '28px', fontWeight: '800', letterSpacing: '-0.5px' }}>Discovery Matrix</h1>
+            <h1 style={{ fontSize: '32px', fontWeight: '800', letterSpacing: '-0.5px' }}>Discovery Matrix</h1>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Explore spatial audio frequencies by genre, mood, and synth generation.</p>
           </div>
         </div>
@@ -34,7 +34,7 @@ export function Explore() {
 
       {/* Futuristic Genre Matrix Cards */}
       <div>
-        <h2 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '16px', color: 'var(--text-secondary)' }}>
+        <h2 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '16px', color: 'var(--text-secondary)' }}>
           Sonic Domains
         </h2>
         <div style={{
@@ -55,8 +55,7 @@ export function Explore() {
                 justifyContent: 'space-between',
                 cursor: 'pointer',
                 boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                transition: 'transform var(--transition-fast)'
+                border: '1px solid rgba(255, 255, 255, 0.15)'
               }}
               className="genre-card-hover"
             >

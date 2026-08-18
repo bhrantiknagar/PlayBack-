@@ -10,9 +10,11 @@ export function IconButton({
   className = '',
   disabled = false,
   iconProps = {},
+  style = {},
   ...props
 }) {
   const [isPressed, setIsPressed] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const sizeStyles = {
     sm: { width: '32px', height: '32px', iconSize: 16 },
@@ -26,18 +28,24 @@ export function IconButton({
     if (variant === 'active') {
       return {
         color: 'var(--accent-primary)',
-        background: 'rgba(99, 102, 241, 0.12)'
+        background: isHovered && !disabled
+          ? 'rgba(99, 102, 241, 0.2)'
+          : 'rgba(99, 102, 241, 0.12)'
       };
     }
     if (variant === 'danger') {
       return {
-        color: '#f43f5e',
-        background: 'transparent'
+        color: isHovered && !disabled ? '#fb7185' : '#f43f5e',
+        background: isHovered && !disabled
+          ? 'rgba(244, 63, 94, 0.15)'
+          : 'transparent'
       };
     }
     return {
-      color: 'var(--text-secondary)',
-      background: 'transparent'
+      color: isHovered && !disabled ? 'var(--text-primary)' : 'var(--text-secondary)',
+      background: isHovered && !disabled
+        ? 'rgba(255, 255, 255, 0.06)'
+        : 'transparent'
     };
   };
 
@@ -58,6 +66,8 @@ export function IconButton({
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         width: currentSize.width,
         height: currentSize.height,
@@ -69,7 +79,8 @@ export function IconButton({
         opacity: disabled ? 0.4 : 1,
         transition: 'background var(--transition-fast), color var(--transition-fast), transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)',
         transform: isPressed ? 'scale(0.92)' : 'scale(1)',
-        ...getVariantStyles()
+        ...getVariantStyles(),
+        ...style
       }}
       className={`icon-btn ${className}`}
       {...props}

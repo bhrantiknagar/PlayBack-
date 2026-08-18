@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 
-export function Button({ 
-  children, 
+export function Button({
+  children,
   variant = 'primary', // 'primary' | 'secondary' | 'ghost' | 'outline'
   size = 'md', // 'sm' | 'md' | 'lg'
-  icon: Icon, 
-  className = '', 
-  onClick, 
+  icon: Icon,
+  className = '',
+  onClick,
   disabled = false,
   'aria-label': ariaLabel,
   style = {},
-  ...props 
+  ...props
 }) {
   const [isPressed, setIsPressed] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const baseStyles = {
     display: 'inline-flex',
@@ -36,29 +37,68 @@ export function Button({
     lg: { padding: '12px 26px', fontSize: '14.5px' }
   };
 
-  const variants = {
-    primary: {
-      background: '#6366f1',
-      color: '#ffffff',
-      fontWeight: '600',
-      boxShadow: 'none',
-      border: '1px solid #6366f1'
-    },
-    secondary: {
-      background: 'rgba(255, 255, 255, 0.08)',
-      color: '#ffffff',
-      border: '1px solid rgba(255, 255, 255, 0.14)',
-      boxShadow: 'var(--shadow-sm)'
-    },
-    outline: {
-      background: 'transparent',
-      border: '1px solid rgba(255, 255, 255, 0.2)',
-      color: '#ffffff'
-    },
-    ghost: {
+  const getVariantStyles = () => {
+    if (isHovered && !disabled) {
+      if (variant === 'primary') {
+        return {
+          background: '#4f46e5',
+          color: '#ffffff',
+          fontWeight: '600',
+          boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35)',
+          border: '1px solid #4f46e5'
+        };
+      }
+      if (variant === 'secondary') {
+        return {
+          background: 'rgba(255, 255, 255, 0.12)',
+          color: '#ffffff',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: 'var(--shadow-sm)'
+        };
+      }
+      if (variant === 'outline') {
+        return {
+          background: 'rgba(255, 255, 255, 0.06)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          color: '#ffffff'
+        };
+      }
+      if (variant === 'ghost') {
+        return {
+          background: 'rgba(255, 255, 255, 0.06)',
+          color: 'var(--text-primary)'
+        };
+      }
+    }
+
+    if (variant === 'primary') {
+      return {
+        background: 'var(--accent-primary)',
+        color: '#ffffff',
+        fontWeight: '600',
+        boxShadow: 'none',
+        border: '1px solid var(--accent-primary)'
+      };
+    }
+    if (variant === 'secondary') {
+      return {
+        background: 'rgba(255, 255, 255, 0.08)',
+        color: '#ffffff',
+        border: '1px solid rgba(255, 255, 255, 0.14)',
+        boxShadow: 'var(--shadow-sm)'
+      };
+    }
+    if (variant === 'outline') {
+      return {
+        background: 'transparent',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        color: '#ffffff'
+      };
+    }
+    return {
       background: 'transparent',
       color: 'var(--text-secondary)'
-    }
+    };
   };
 
   return (
@@ -68,7 +108,9 @@ export function Button({
       onPointerDown={() => setIsPressed(true)}
       onPointerUp={() => setIsPressed(false)}
       onPointerLeave={() => setIsPressed(false)}
-      style={{ ...baseStyles, ...sizes[size], ...variants[variant], ...style }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{ ...baseStyles, ...sizes[size], ...getVariantStyles(), ...style }}
       className={`playback-btn ${className}`}
       onClick={onClick}
       {...props}

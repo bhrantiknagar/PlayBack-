@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play } from 'lucide-react';
+import { PlayPauseButton } from '../player/PlayPauseButton';
 import { usePlayer } from '../../context/PlayerContext';
 import { tracks } from '../../data/tracks';
-import { PlayPauseButton } from '../player/PlayPauseButton';
+
+const DEFAULT_ARTWORK = '/images/albums/album-01.jpg';
 
 export function PlaylistCard({ playlist }) {
   const navigate = useNavigate();
@@ -27,6 +28,10 @@ export function PlaylistCard({ playlist }) {
           alt={playlist.title}
           className="music-card-cover"
           loading="lazy"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = DEFAULT_ARTWORK;
+          }}
         />
 
         {/* Hover Play Button */}

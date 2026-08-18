@@ -463,12 +463,91 @@ input, textarea, select {
   font-size: 9.5px;
   font-weight: 700;
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   background: rgba(16, 185, 129, 0.15);
   color: #34d399;
   border: 1px solid rgba(16, 185, 129, 0.3);
   letter-spacing: 0.5px;
   text-transform: uppercase;
+}
+
+/* Track Row Hover States */
+.track-row-hover {
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.track-row-hover:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Back Navigation Button */
+.back-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  width: fit-content;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.back-nav-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-medium);
+}
+
+.back-nav-btn:active {
+  transform: scale(0.97);
+}
+
+/* Genre Card Hover States */
+.genre-card-hover {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.genre-card-hover:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Context Menu Option */
+.context-menu-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+}
+
+.context-menu-option:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+}
+
+.context-menu-option:active {
+  transform: scale(0.98);
+}
+
+/* Slide In Right Animation Utility */
+.animate-slide-in-right {
+  animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Mobile Bottom Navigation */
