@@ -91,7 +91,12 @@ export function PlayerProvider({ children }) {
               savePlaylists(mapped);
             }
             if (data.history) {
-              setRecentlyPlayed(data.history.map(h => h.songId));
+              const mappedHistory = data.history.map(h => ({
+                id: h.songId,
+                position: h.position || 0,
+                playedAt: h.playedAt || Date.now()
+              }));
+              setRecentlyPlayed(mappedHistory);
             }
           })
           .catch(console.error);
@@ -103,21 +108,39 @@ export function PlayerProvider({ children }) {
   const [recentlyPlayed, setRecentlyPlayed] = useState(() => {
     try {
       const saved = window.localStorage.getItem('playback_recently_played');
-      return saved ? JSON.parse(saved) : [];
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      return parsed.map(item => typeof item === 'string' ? { id: item, position: 0, playedAt: Date.now() } : item);
     } catch { return []; }
   });
 
-  const addToRecentlyPlayed = useCallback((trackId) => {
+  const addToRecentlyPlayed = useCallback((trackId, position = 0) => {
     setRecentlyPlayed(prev => {
-      const deduped = prev.filter(id => id !== trackId);
-      const next = [trackId, ...deduped].slice(0, 20);
+      const deduped = prev.filter(item => item.id !== trackId);
+      const next = [{ id: trackId, position, playedAt: Date.now() }, ...deduped].slice(0, 20);
       try { window.localStorage.setItem('playback_recently_played', JSON.stringify(next)); } catch {}
       return next;
     });
 
     if (token) {
       import('../api/userData').then(({ addToHistory }) => {
-        addToHistory(token, trackId).catch(() => {});
+        addToHistory(token, trackId, position).catch(() => {});
+      });
+    }
+  }, [token]);
+
+  const updateTrackPosition = useCallback((trackId, position) => {
+    setRecentlyPlayed(prev => {
+      const exists = prev.find(item => item.id === trackId);
+      if (!exists) return prev;
+      const next = prev.map(item => item.id === trackId ? { ...item, position, playedAt: Date.now() } : item);
+      try { window.localStorage.setItem('playback_recently_played', JSON.stringify(next)); } catch {}
+      return next;
+    });
+
+    if (token) {
+      import('../api/userData').then(({ addToHistory }) => {
+        addToHistory(token, trackId, position).catch(() => {});
       });
     }
   }, [token]);
@@ -246,6 +269,9 @@ export function PlayerProvider({ children }) {
         isShuffle,
         repeatMode
       });
+      if (currentTrack?.id && pos > 0) {
+        updateTrackPosition(currentTrack.id, pos);
+      }
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -316,14 +342,23 @@ export function PlayerProvider({ children }) {
     if (trackAudioSrc && audio.getAttribute('src') !== trackAudioSrc) {
       audio.src = trackAudioSrc;
       audio.load();
-      setCurrentTime(0);
+      // Inject saved position if we are resuming from "Continue Listening" (passed via track object temporarily if we want, or from history)
+      const savedPosition = track.savedPosition || 0;
+      setCurrentTime(savedPosition);
       setDuration(0);
+      
+      const restorePosition = () => {
+        if (savedPosition > 0 && savedPosition < (audio.duration || Infinity)) {
+          audio.currentTime = savedPosition;
+        }
+      };
+      audio.addEventListener('loadedmetadata', restorePosition, { once: true });
     }
 
-    // Persist new track with 0 starting position
+    // Persist new track
     savePlaybackState({
       trackId: track.id,
-      currentTime: 0
+      currentTime: track.savedPosition || 0
     });
 
     // Record in play history
@@ -487,6 +522,7 @@ export function PlayerProvider({ children }) {
       // Persist exact position on pause
       if (audio && currentTrack) {
         savePlaybackPosition(audio.currentTime, currentTrack.id);
+        updateTrackPosition(currentTrack.id, audio.currentTime);
       }
     };
     const handleTimeUpdate = () => {
@@ -515,6 +551,7 @@ export function PlayerProvider({ children }) {
     const handleEnded = () => {
       // Clear position on natural track completion
       savePlaybackPosition(0, currentTrack?.id);
+      updateTrackPosition(currentTrack?.id, 0);
       handleNextTrack(true);
     };
     const handleError = (e) => {

@@ -80,9 +80,20 @@ export function Home() {
   // ── Personalized sections (only on unfiltered home) ────────────────────
   const trackById = Object.fromEntries(tracks.map(t => [t.id, t]));
 
+  // Continue Listening - tracks with position > 5s
+  const continueListeningTracks = recentlyPlayed
+    .filter(item => item.position > 5)
+    .map(item => {
+       const track = trackById[item.id];
+       if (track) return { ...track, savedPosition: item.position };
+       return null;
+    })
+    .filter(Boolean)
+    .slice(0, 6);
+
   // Recently Played — ordered by most recent play, limit 6
   const recentTracks = recentlyPlayed
-    .map(id => trackById[id])
+    .map(item => trackById[item.id])
     .filter(Boolean)
     .slice(0, 6);
 
@@ -119,17 +130,17 @@ export function Home() {
             <h1 style={{ fontSize: '32px', fontWeight: '900', letterSpacing: '-0.5px' }}>
               Welcome back, <span style={{ color: 'var(--accent-primary)' }}>{user.name.split(' ')[0]}</span>
             </h1>
-            {recentTracks.length > 0 && (
+            {continueListeningTracks.length > 0 && (
               <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', gap: '16px', background: 'var(--bg-card)', padding: '16px 24px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-sm)' }}>
                 <div style={{ width: '60px', height: '60px', borderRadius: 'var(--radius-md)', overflow: 'hidden', flexShrink: 0 }}>
-                  <img src={recentTracks[0].coverUrl || recentTracks[0].cover} alt={recentTracks[0].title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={continueListeningTracks[0].coverUrl || continueListeningTracks[0].cover} alt={continueListeningTracks[0].title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: '12px', color: 'var(--accent-primary)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Continue Listening</span>
-                  <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: '4px 0' }}>{recentTracks[0].title}</h3>
-                  <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{recentTracks[0].artist}</p>
+                  <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: '4px 0' }}>{continueListeningTracks[0].title}</h3>
+                  <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{continueListeningTracks[0].artist}</p>
                 </div>
-                <PrimaryButton icon={Play} onClick={() => playTrack(recentTracks[0], tracks)}>Play Now</PrimaryButton>
+                <PrimaryButton icon={Play} onClick={() => playTrack(continueListeningTracks[0], tracks)}>Resume</PrimaryButton>
               </div>
             )}
           </div>
@@ -223,10 +234,18 @@ export function Home() {
       {/* ── Personalized sections — only on clean unfiltered home ── */}
       {!isFiltered && (
         <>
+          {/* Continue Listening Grid */}
+          {continueListeningTracks.length > 1 && (
+            <div>
+              <SectionHeader icon={Clock} iconColor="#38bdf8" title="Continue Listening" count={continueListeningTracks.length} />
+              <TrackGrid tracks={continueListeningTracks} />
+            </div>
+          )}
+
           {/* Recently Played */}
           {recentTracks.length >= SECTION_MIN && (
             <div>
-              <SectionHeader icon={Clock} iconColor="#38bdf8" title="Recently Played" count={recentTracks.length} />
+              <SectionHeader icon={Clock} iconColor="#94a3b8" title="Recently Played" count={recentTracks.length} />
               <TrackGrid tracks={recentTracks} />
             </div>
           )}
