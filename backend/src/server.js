@@ -6,6 +6,11 @@ const healthRoutes = require('./routes/health');
 // Load environment variables
 dotenv.config();
 
+const connectDB = require('./config/db');
+
+// Connect to database
+connectDB();
+
 const app = express();
 
 // Middleware
