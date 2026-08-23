@@ -9,10 +9,15 @@ import { AlbumView } from './pages/AlbumView';
 import { ArtistView } from './pages/ArtistView';
 import { Favorites } from './pages/Favorites';
 import { Settings } from './pages/Settings';
+import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
 
 export function AppRoutes() {
   return (
     <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Home />} />
         <Route path="explore" element={<Explore />} />
