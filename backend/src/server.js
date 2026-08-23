@@ -23,6 +23,7 @@ const authRoutes = require('./routes/auth');
 app.use('/api/health', require('./routes/health'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/userdata', require('./routes/userData'));
+app.use('/api/library', require('./routes/library'));
 
 // Central error handler
 app.use((err, req, res, next) => {

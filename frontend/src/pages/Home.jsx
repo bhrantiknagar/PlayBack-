@@ -1,6 +1,5 @@
 import React from 'react';
 import { Play, Flame, Radio, Zap, Clock, Heart, Disc } from 'lucide-react';
-import { tracks } from '../data/tracks';
 import { mockPlaylists } from '../data/mockData';
 import { TrackCard } from '../components/music/TrackCard';
 import { TrackList } from '../components/music/TrackList';
@@ -46,6 +45,9 @@ function TrackGrid({ tracks: trackList }) {
 
 export function Home() {
   const {
+    globalTracks: tracks,
+    isLibraryLoading,
+    libraryError,
     playTrack,
     searchQuery, setSearchQuery,
     selectedEnergy, setSelectedEnergy,
@@ -54,6 +56,22 @@ export function Home() {
     playlists
   } = usePlayer();
   const { user } = useAuth();
+
+  if (isLibraryLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh', color: 'var(--text-secondary)' }}>
+        Loading library...
+      </div>
+    );
+  }
+
+  if (libraryError) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh', color: 'var(--accent-primary)' }}>
+        Error loading library: {libraryError}
+      </div>
+    );
+  }
 
   const energyFilters = ['All', 'Focus', 'Drive', 'Euphoria', 'Chill', 'Late Night'];
   const normalizedQuery = (searchQuery || '').trim().toLowerCase();

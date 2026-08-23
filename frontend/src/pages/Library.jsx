@@ -1,9 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Library as LibraryIcon, Disc, Users, Music2, Radio, Plus, ArrowUpDown, Play } from 'lucide-react';
 import { mockPlaylists } from '../data/mockData';
-import { tracks } from '../data/tracks';
-import { albums } from '../data/albums';
-import { getArtists } from '../data/artists';
+import { fetchAlbums, fetchArtists } from '../api/library';
 import { AlbumCard } from '../components/music/AlbumCard';
 import { ArtistCard } from '../components/music/ArtistCard';
 import { PlaylistCard } from '../components/music/PlaylistCard';
@@ -20,11 +18,20 @@ export function Library() {
   const [newPlaylistTitle, setNewPlaylistTitle] = useState('');
   const [newPlaylistDesc, setNewPlaylistDesc] = useState('');
 
-  const { playTrack, playlists, createPlaylist } = usePlayer();
+  const { globalTracks: tracks, isLibraryLoading, playTrack, playlists, createPlaylist } = usePlayer();
+  
+  const [albums, setAlbums] = useState([]);
+  const [artistsList, setArtistsList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Distinct artists derived from centralized dataset
-  const artistsList = useMemo(() => {
-    return getArtists();
+  React.useEffect(() => {
+    Promise.all([fetchAlbums(), fetchArtists()])
+      .then(([albumsData, artistsData]) => {
+        setAlbums(albumsData);
+        setArtistsList(artistsData);
+        setIsLoading(false);
+      })
+      .catch(console.error);
   }, []);
 
   // Sorted Albums
@@ -88,6 +95,14 @@ export function Library() {
     { key: 'songs', label: 'Songs', icon: Music2, count: tracks.length },
     { key: 'vaults', label: 'Sound Vaults', icon: Radio, count: playlists.length }
   ];
+
+  if (isLibraryLoading || isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh', color: 'var(--text-secondary)' }}>
+        Loading library...
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>

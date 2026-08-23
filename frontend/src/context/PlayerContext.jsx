@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
-import { tracks } from '../data/tracks';
+import { fetchTracks } from '../api/library';
 import {
   loadPlaybackState,
   savePlaybackState,
@@ -25,14 +25,27 @@ export function PlayerProvider({ children }) {
 
   // Load persisted player settings from localStorage (safe with fallbacks)
   const initialSavedState = useRef(loadPlaybackState()).current;
-  const initialTrackIndex = (() => {
-    const idx = tracks.findIndex(t => t.id === initialSavedState.trackId);
-    return idx !== -1 ? idx : 0;
-  })();
+  const [globalTracks, setGlobalTracks] = useState([]);
+  const [isLibraryLoading, setIsLibraryLoading] = useState(true);
+  const [libraryError, setLibraryError] = useState('');
 
-  const [playlist, setPlaylist] = useState(tracks);
+  // Fetch tracks on mount
+  useEffect(() => {
+    fetchTracks()
+      .then(data => {
+        setGlobalTracks(data);
+        setPlaylist(data);
+        setIsLibraryLoading(false);
+      })
+      .catch(err => {
+        setLibraryError(err.message);
+        setIsLibraryLoading(false);
+      });
+  }, []);
+
+  const [playlist, setPlaylist] = useState([]);
   const [queue, setQueue] = useState([]);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(initialTrackIndex);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(
     // Only restore position if the setting allows it
@@ -221,17 +234,22 @@ export function PlayerProvider({ children }) {
 
   const currentTrack = playlist[currentTrackIndex] || playlist[0] || tracks[0];
 
-  // Initial setup on mount: restore audio source and position without autoplaying
+  // Initial setup on mount or when tracks load: restore audio source and position
   useEffect(() => {
+    if (globalTracks.length === 0) return;
+    
     const audio = audioRef.current;
     if (!audio) return;
 
     audio.volume = initialSavedState.isMuted ? 0 : initialSavedState.volume;
     
-    const initialTrack = playlist[initialTrackIndex] || tracks[0];
+    const idx = globalTracks.findIndex(t => t.id === initialSavedState.trackId);
+    const initialTrack = idx !== -1 ? globalTracks[idx] : globalTracks[0];
+    setCurrentTrackIndex(idx !== -1 ? idx : 0);
+
     if (initialTrack) {
       const trackSrc = initialTrack.audio || initialTrack.audioUrl;
-      if (trackSrc) {
+      if (trackSrc && audio.getAttribute('src') !== trackSrc) {
         audio.src = trackSrc;
         audio.load();
 
@@ -254,7 +272,7 @@ export function PlayerProvider({ children }) {
         }
       }
     }
-  }, []); // Run once on mount
+  }, [globalTracks.length]); // Run once when tracks are populated
 
   // Flush state on page unload / refresh
   useEffect(() => {
@@ -789,6 +807,9 @@ export function PlayerProvider({ children }) {
   return (
     <PlayerContext.Provider
       value={{
+        globalTracks,
+        isLibraryLoading,
+        libraryError,
         playlist,
         setPlaylist,
         queue,

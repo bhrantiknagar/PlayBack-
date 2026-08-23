@@ -1,12 +1,11 @@
 import React from 'react';
 import { Compass, Music2, Sparkles } from 'lucide-react';
 import { mockGenres } from '../data/mockData';
-import { tracks } from '../data/tracks';
 import { TrackCard } from '../components/music/TrackCard';
 import { usePlayer } from '../context/PlayerContext';
 
 export function Explore() {
-  const { playTrack } = usePlayer();
+  const { globalTracks: tracks, playTrack } = usePlayer();
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>

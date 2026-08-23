@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Play, Clock, ArrowLeft, Shuffle, Radio } from 'lucide-react';
-import { tracks as allTracks } from '../data/tracks';
 import { TrackList } from '../components/music/TrackList';
 import { PrimaryButton, SecondaryButton } from '../components/ui/Button';
 import { EmptyState } from '../components/common/EmptyState';
@@ -10,7 +9,7 @@ import { usePlayer } from '../context/PlayerContext';
 export function PlaylistView() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { playlists, playTrack, setIsShuffle, removeTrackFromPlaylist } = usePlayer();
+  const { globalTracks: allTracks, playlists, playTrack, setIsShuffle, removeTrackFromPlaylist } = usePlayer();
 
   const playlist = playlists.find(p => p.id === id);
 

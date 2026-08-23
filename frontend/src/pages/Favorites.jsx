@@ -1,6 +1,5 @@
 import React from 'react';
 import { Heart, Play, Shuffle } from 'lucide-react';
-import { tracks } from '../data/tracks';
 import { TrackList } from '../components/music/TrackList';
 import { PrimaryButton, SecondaryButton } from '../components/ui/Button';
 import { EmptyState } from '../components/common/EmptyState';
@@ -8,7 +7,7 @@ import { usePlayer } from '../context/PlayerContext';
 import { useNavigate } from 'react-router-dom';
 
 export function Favorites() {
-  const { favorites, playTrack, setIsShuffle } = usePlayer();
+  const { globalTracks: tracks, favorites, playTrack, setIsShuffle } = usePlayer();
   const navigate = useNavigate();
 
   const likedTracks = tracks.filter(t => favorites.includes(t.id));
