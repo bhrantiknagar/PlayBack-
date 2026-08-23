@@ -46,3 +46,20 @@ export const getMe = async (token) => {
   }
   return data;
 };
+
+export const updateProfile = async (token, profileData) => {
+  const response = await fetch(`${API_URL}/profile`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(profileData),
+  });
+  
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to update profile');
+  }
+  return data;
+};

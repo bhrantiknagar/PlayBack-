@@ -12,6 +12,12 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    
+    // Clear user-specific data from local cache upon logout so next guest starts fresh
+    localStorage.removeItem('playback_favorites');
+    localStorage.removeItem('playback_playlists');
+    localStorage.removeItem('playback_recently_played');
+    
     setToken(null);
     setUser(null);
   };
@@ -47,8 +53,15 @@ export const AuthProvider = ({ children }) => {
     setUser(data);
   };
 
+  const updateProfile = async (profileData) => {
+    const data = await authService.updateProfile(token, profileData);
+    localStorage.setItem('token', data.token);
+    setToken(data.token);
+    setUser(data);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, register, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, register, login, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

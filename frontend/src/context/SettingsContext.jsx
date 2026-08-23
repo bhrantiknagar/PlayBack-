@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { loadState, saveState } from '../utils/storage';
+import { useAuth } from './AuthContext';
 
 const SettingsContext = createContext();
 
@@ -15,14 +16,34 @@ const defaultSettings = {
 };
 
 export function SettingsProvider({ children }) {
+  const { token } = useAuth();
+  
   const [settings, setSettings] = useState(() => {
     return loadState('playback_settings', defaultSettings);
   });
 
+  // Sync from backend when token changes
+  useEffect(() => {
+    if (token) {
+      import('../api/userData').then(({ fetchUserData }) => {
+        fetchUserData(token).then(data => {
+          if (data.settings && Object.keys(data.settings).length > 0) {
+            setSettings(prev => ({ ...prev, ...data.settings }));
+          }
+        }).catch(console.error);
+      });
+    }
+  }, [token]);
+
   // Persist settings whenever they change
   useEffect(() => {
     saveState('playback_settings', settings);
-  }, [settings]);
+    if (token) {
+      import('../api/userData').then(({ updateSettings }) => {
+        updateSettings(token, settings).catch(console.error);
+      });
+    }
+  }, [settings, token]);
 
   // Apply visual settings side-effects
   useEffect(() => {

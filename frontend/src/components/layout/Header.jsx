@@ -58,27 +58,33 @@ export function Header() {
       {/* Right User Avatar or Auth Buttons */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         {user ? (
-          <div style={{
+          <div 
+            onClick={() => navigate('/profile')}
+            style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '5px 12px 5px 6px',
+            padding: '4px 12px 4px 4px',
             background: 'rgba(255, 255, 255, 0.04)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-full)',
             cursor: 'pointer',
             transition: 'background var(--transition-fast)'
           }}>
-            <img
-              src={logoImg}
-              alt="PlayBack"
-              style={{
-                width: '22px',
-                height: '22px',
-                objectFit: 'contain',
-                filter: 'drop-shadow(0 0 6px rgba(99, 102, 241, 0.35))'
-              }}
-            />
+            <div style={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              background: 'var(--accent-primary)',
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '11px',
+              fontWeight: 'bold'
+            }}>
+              {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+            </div>
             <span style={{ fontSize: '12.5px', fontWeight: '600', color: 'var(--text-primary)' }}>{user.name}</span>
           </div>
         ) : (

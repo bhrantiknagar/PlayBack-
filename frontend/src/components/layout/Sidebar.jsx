@@ -1,11 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Compass, Library, Heart, Radio, Settings } from 'lucide-react';
+import { Home, Compass, Library, Heart, Radio, Settings, User } from 'lucide-react';
 import logoImg from '../../assets/images/logo.png';
 import { usePlayer } from '../../context/PlayerContext';
+import { useAuth } from '../../context/AuthContext';
 
 export function Sidebar() {
   const { playlists } = usePlayer();
+  const { user } = useAuth();
 
   const mainNav = [
     { to: '/', label: 'Acoustic Space', icon: Home },
@@ -78,9 +80,21 @@ export function Sidebar() {
         ))}
       </div>
 
-      {/* Pinned Settings link */}
+      {/* Pinned Bottom Links */}
       <div style={{ padding: '0 14px 12px', marginTop: 'auto' }}>
         <div style={{ height: '1px', background: 'var(--border-subtle)', marginBottom: '10px' }} />
+        
+        {user && (
+          <NavLink
+            to="/profile"
+            className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            style={{ fontSize: '13px' }}
+          >
+            <User size={16} />
+            <span>Profile</span>
+          </NavLink>
+        )}
+
         <NavLink
           to="/settings"
           className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}

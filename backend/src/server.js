@@ -20,8 +20,9 @@ app.use(express.json());
 const authRoutes = require('./routes/auth');
 
 // Routes
-app.use('/api/health', healthRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/api/health', require('./routes/health'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/userdata', require('./routes/userData'));
 
 // Central error handler
 app.use((err, req, res, next) => {

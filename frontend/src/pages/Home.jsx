@@ -8,6 +8,7 @@ import { PlaylistCard } from '../components/music/PlaylistCard';
 import { PrimaryButton } from '../components/ui/Button';
 import { EmptyState } from '../components/common/EmptyState';
 import { usePlayer } from '../context/PlayerContext';
+import { useAuth } from '../context/AuthContext';
 
 const SECTION_MIN = 1; // Minimum tracks needed to show a section
 
@@ -49,8 +50,10 @@ export function Home() {
     searchQuery, setSearchQuery,
     selectedEnergy, setSelectedEnergy,
     favorites,
-    recentlyPlayed
+    recentlyPlayed,
+    playlists
   } = usePlayer();
+  const { user } = useAuth();
 
   const energyFilters = ['All', 'Focus', 'Drive', 'Euphoria', 'Chill', 'Late Night'];
   const normalizedQuery = (searchQuery || '').trim().toLowerCase();
@@ -111,6 +114,26 @@ export function Home() {
 
       {/* ── Hero Banner ── */}
       {!isFiltered && (
+        user ? (
+          <div style={{ marginBottom: '10px' }}>
+            <h1 style={{ fontSize: '32px', fontWeight: '900', letterSpacing: '-0.5px' }}>
+              Welcome back, <span style={{ color: 'var(--accent-primary)' }}>{user.name.split(' ')[0]}</span>
+            </h1>
+            {recentTracks.length > 0 && (
+              <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', gap: '16px', background: 'var(--bg-card)', padding: '16px 24px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ width: '60px', height: '60px', borderRadius: 'var(--radius-md)', overflow: 'hidden', flexShrink: 0 }}>
+                  <img src={recentTracks[0].coverUrl || recentTracks[0].cover} alt={recentTracks[0].title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontSize: '12px', color: 'var(--accent-primary)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Continue Listening</span>
+                  <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: '4px 0' }}>{recentTracks[0].title}</h3>
+                  <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{recentTracks[0].artist}</p>
+                </div>
+                <PrimaryButton icon={Play} onClick={() => playTrack(recentTracks[0], tracks)}>Play Now</PrimaryButton>
+              </div>
+            )}
+          </div>
+        ) : (
         <div style={{
           position: 'relative',
           borderRadius: 'var(--radius-lg)',
@@ -142,6 +165,7 @@ export function Home() {
             </div>
           </div>
         </div>
+        )
       )}
 
       {/* ── Energy Filter Pills ── */}
@@ -207,6 +231,25 @@ export function Home() {
             </div>
           )}
 
+          {/* Your Playlists (Only if Logged In & Has Playlists) */}
+          {user && playlists.length > 0 && (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '18px' }}>
+                <Radio size={18} color="var(--accent-secondary)" />
+                <h2 style={{ fontSize: '19px', fontWeight: '700' }}>Your Playlists</h2>
+              </div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                gap: '18px'
+              }}>
+                {playlists.map(pl => (
+                  <PlaylistCard key={pl.id} playlist={pl} />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Your Favorites */}
           {favoriteTracks.length >= SECTION_MIN && (
             <div>
@@ -223,22 +266,24 @@ export function Home() {
             </div>
           )}
 
-          {/* Curated Sound Vaults */}
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '18px' }}>
-              <Radio size={18} color="var(--accent-secondary)" />
-              <h2 style={{ fontSize: '19px', fontWeight: '700' }}>Curated Sound Vaults</h2>
+          {/* Curated Sound Vaults (Only for guests or if user has no playlists yet, or just keep it below) */}
+          {(!user || playlists.length === 0) && (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '18px' }}>
+                <Radio size={18} color="var(--accent-secondary)" />
+                <h2 style={{ fontSize: '19px', fontWeight: '700' }}>Curated Sound Vaults</h2>
+              </div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                gap: '18px'
+              }}>
+                {mockPlaylists.map(pl => (
+                  <PlaylistCard key={pl.id} playlist={pl} />
+                ))}
+              </div>
             </div>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-              gap: '18px'
-            }}>
-              {mockPlaylists.map(pl => (
-                <PlaylistCard key={pl.id} playlist={pl} />
-              ))}
-            </div>
-          </div>
+          )}
 
           {/* Popular Tracks table */}
           <div style={{

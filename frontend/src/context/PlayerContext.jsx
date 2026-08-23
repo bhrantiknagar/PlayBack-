@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
+import { useAuth } from './AuthContext';
 import { tracks } from '../data/tracks';
 import {
   loadPlaybackState,
@@ -59,6 +60,45 @@ export function PlayerProvider({ children }) {
   });
   const [addToPlaylistTrack, setAddToPlaylistTrack] = useState(null);
 
+  const { token } = useAuth();
+  
+  // Sync Data Effect
+  useEffect(() => {
+    if (token) {
+      import('../api/userData').then(({ syncUserData }) => {
+        const localData = {
+          favorites: loadFavorites(),
+          playlists: loadPlaylists().map(p => ({ title: p.title, songs: p.trackIds }))
+        };
+        syncUserData(token, localData)
+          .then(data => {
+            if (data.favorites) {
+              setFavoritesState(data.favorites);
+              saveFavorites(data.favorites);
+            }
+            if (data.playlists) {
+              const mapped = data.playlists.map(pl => ({
+                id: pl.id,
+                title: pl.title,
+                description: 'Synced playlist',
+                coverUrl: '/images/albums/album-02.jpg',
+                trackIds: pl.songs,
+                trackCount: pl.songs.length,
+                creator: 'User',
+                duration: '0 min'
+              }));
+              setPlaylists(mapped);
+              savePlaylists(mapped);
+            }
+            if (data.history) {
+              setRecentlyPlayed(data.history.map(h => h.songId));
+            }
+          })
+          .catch(console.error);
+      });
+    }
+  }, [token]);
+
   // Recently played history — capped at 20, persisted to localStorage
   const [recentlyPlayed, setRecentlyPlayed] = useState(() => {
     try {
@@ -74,7 +114,13 @@ export function PlayerProvider({ children }) {
       try { window.localStorage.setItem('playback_recently_played', JSON.stringify(next)); } catch {}
       return next;
     });
-  }, []);
+
+    if (token) {
+      import('../api/userData').then(({ addToHistory }) => {
+        addToHistory(token, trackId).catch(() => {});
+      });
+    }
+  }, [token]);
 
   const audioRef = useRef(null);
   if (!audioRef.current) {
@@ -581,7 +627,13 @@ export function PlayerProvider({ children }) {
       saveFavorites(next);
       return next;
     });
-  }, []);
+
+    if (token) {
+      import('../api/userData').then(({ toggleFavorite }) => {
+        toggleFavorite(token, trackId).catch(console.error);
+      });
+    }
+  }, [token]);
 
   // Playlist Management Methods
   const closeAddToPlaylist = useCallback(() => {
@@ -606,8 +658,14 @@ export function PlayerProvider({ children }) {
       return next;
     });
 
+    if (token) {
+      import('../api/userData').then(({ savePlaylist }) => {
+        savePlaylist(token, { title: newPlaylist.title, songs: [] }).catch(console.error);
+      });
+    }
+
     return newPlaylist;
-  }, []);
+  }, [token]);
 
   const addTrackToPlaylist = useCallback((playlistId, trackId) => {
     setPlaylists(prev => {
@@ -624,7 +682,17 @@ export function PlayerProvider({ children }) {
       savePlaylists(next);
       return next;
     });
-  }, []);
+
+    if (token) {
+      // Find the specific playlist
+      const pl = playlists.find(p => p.id === playlistId);
+      if (pl) {
+        import('../api/userData').then(({ savePlaylist }) => {
+          savePlaylist(token, { id: playlistId, title: pl.title, songs: [...pl.trackIds, trackId] }).catch(console.error);
+        });
+      }
+    }
+  }, [token, playlists]);
 
   const removeTrackFromPlaylist = useCallback((playlistId, trackId) => {
     setPlaylists(prev => {
@@ -641,7 +709,16 @@ export function PlayerProvider({ children }) {
       savePlaylists(next);
       return next;
     });
-  }, []);
+
+    if (token) {
+      const pl = playlists.find(p => p.id === playlistId);
+      if (pl) {
+        import('../api/userData').then(({ savePlaylist }) => {
+          savePlaylist(token, { id: playlistId, title: pl.title, songs: pl.trackIds.filter(id => id !== trackId) }).catch(console.error);
+        });
+      }
+    }
+  }, [token, playlists]);
 
   const deletePlaylist = useCallback((playlistId) => {
     setPlaylists(prev => {
@@ -649,7 +726,13 @@ export function PlayerProvider({ children }) {
       savePlaylists(next);
       return next;
     });
-  }, []);
+
+    if (token) {
+      import('../api/userData').then(({ deletePlaylist: apiDelete }) => {
+        apiDelete(token, playlistId).catch(console.error);
+      });
+    }
+  }, [token]);
 
   const addToQueue = useCallback((track) => {
     setQueue(prev => [...prev, track]);

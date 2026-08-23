@@ -11,6 +11,7 @@ import { Favorites } from './pages/Favorites';
 import { Settings } from './pages/Settings';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
+import { Profile } from './pages/Profile';
 
 export function AppRoutes() {
   return (
@@ -27,6 +28,7 @@ export function AppRoutes() {
         <Route path="playlist/:id" element={<PlaylistView />} />
         <Route path="favorites" element={<Favorites />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="*" element={<Home />} />
       </Route>
     </Routes>
