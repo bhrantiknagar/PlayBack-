@@ -35,10 +35,11 @@ exports.register = async (req, res) => {
 
     if (user) {
       res.status(201).json({
-        _id: user.id,
+        _id: user._id,
         name: user.name,
         email: user.email,
-        token: generateToken(user.id),
+        isAdmin: user.isAdmin,
+        token: generateToken(user._id),
       });
     } else {
       res.status(400).json({ message: 'Invalid user data' });
@@ -64,10 +65,11 @@ exports.login = async (req, res) => {
 
     if (user && (await user.matchPassword(password))) {
       res.json({
-        _id: user.id,
+        _id: user._id,
         name: user.name,
         email: user.email,
-        token: generateToken(user.id),
+        isAdmin: user.isAdmin,
+        token: generateToken(user._id),
       });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
@@ -85,6 +87,7 @@ exports.getMe = async (req, res) => {
     _id: req.user._id,
     name: req.user.name,
     email: req.user.email,
+    isAdmin: req.user.isAdmin,
     createdAt: req.user.createdAt
   });
 };
@@ -106,6 +109,7 @@ exports.updateProfile = async (req, res) => {
         _id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
+        isAdmin: updatedUser.isAdmin,
         createdAt: updatedUser.createdAt,
         token: generateToken(updatedUser._id) // re-issue token just in case
       });

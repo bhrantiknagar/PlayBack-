@@ -58,19 +58,38 @@ export function Header() {
       {/* Right User Avatar or Auth Buttons */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         {user ? (
-          <div 
-            onClick={() => navigate('/profile')}
-            style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '4px 12px 4px 4px',
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-full)',
-            cursor: 'pointer',
-            transition: 'background var(--transition-fast)'
-          }}>
+          <>
+            {user.isAdmin && (
+              <button
+                onClick={() => navigate('/admin')}
+                style={{
+                  background: 'rgba(99, 102, 241, 0.15)',
+                  border: '1px solid rgba(99, 102, 241, 0.3)',
+                  color: '#a5b4fc',
+                  padding: '4px 12px',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  marginRight: '8px'
+                }}
+              >
+                Admin
+              </button>
+            )}
+            <div 
+              onClick={() => navigate('/profile')}
+              style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '4px 12px 4px 4px',
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-full)',
+              cursor: 'pointer',
+              transition: 'background var(--transition-fast)'
+            }}>
             <div style={{
               width: '24px',
               height: '24px',
