@@ -146,7 +146,7 @@ export function Home() {
         user ? (
           <div style={{ marginBottom: '10px' }}>
             <h1 style={{ fontSize: '32px', fontWeight: '900', letterSpacing: '-0.5px' }}>
-              Welcome back, <span style={{ color: 'var(--accent-primary)' }}>{user.name.split(' ')[0]}</span>
+              Welcome back, <span style={{ color: 'var(--accent-primary)' }}>{user.name ? user.name.split(' ')[0] : 'User'}</span>
             </h1>
             {continueListeningTracks.length > 0 && (
               <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', gap: '16px', background: 'var(--bg-card)', padding: '16px 24px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-sm)' }}>
@@ -162,7 +162,7 @@ export function Home() {
               </div>
             )}
           </div>
-        ) : (
+        ) : featuredTrack ? (
         <div style={{
           position: 'relative',
           borderRadius: 'var(--radius-lg)',
@@ -194,7 +194,7 @@ export function Home() {
             </div>
           </div>
         </div>
-        )
+        ) : null
       )}
 
       {/* ── Energy Filter Pills ── */}

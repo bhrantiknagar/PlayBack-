@@ -106,6 +106,7 @@ export function Header() {
             </div>
             <span style={{ fontSize: '12.5px', fontWeight: '600', color: 'var(--text-primary)' }}>{user.name}</span>
           </div>
+          </>
         ) : (
           <div style={{ display: 'flex', gap: '10px' }}>
             <button 

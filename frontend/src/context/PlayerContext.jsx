@@ -232,7 +232,7 @@ export function PlayerProvider({ children }) {
     };
   }, []);
 
-  const currentTrack = playlist[currentTrackIndex] || playlist[0] || tracks[0];
+  const currentTrack = playlist[currentTrackIndex] || playlist[0] || globalTracks[0];
 
   // Initial setup on mount or when tracks load: restore audio source and position
   useEffect(() => {
