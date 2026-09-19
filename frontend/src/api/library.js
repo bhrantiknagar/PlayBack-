@@ -17,3 +17,15 @@ export const fetchArtists = async () => {
   if (!res.ok) throw new Error('Failed to fetch artists');
   return res.json();
 };
+
+export const fetchAlbum = async (id) => {
+  const res = await fetch(`${API_URL}/albums/${id}`);
+  if (!res.ok) throw new Error('Failed to fetch album');
+  return res.json();
+};
+
+export const fetchArtist = async (id) => {
+  const res = await fetch(`${API_URL}/artists/${id}`);
+  if (!res.ok) throw new Error('Failed to fetch artist');
+  return res.json();
+};

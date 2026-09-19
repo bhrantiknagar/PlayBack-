@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {
-  getTracks, getTrackById, getAlbums, getArtists,
+  getTracks, getTrackById, getAlbums, getAlbumById, getArtists, getArtistById,
   createTrack, updateTrack, deleteTrack,
   createAlbum, updateAlbum, deleteAlbum,
   createArtist, updateArtist, deleteArtist
@@ -11,7 +11,9 @@ const { protect, admin } = require('../middleware/authMiddleware');
 router.get('/tracks', getTracks);
 router.get('/tracks/:id', getTrackById);
 router.get('/albums', getAlbums);
+router.get('/albums/:id', getAlbumById);
 router.get('/artists', getArtists);
+router.get('/artists/:id', getArtistById);
 
 router.post('/tracks', protect, admin, createTrack);
 router.put('/tracks/:id', protect, admin, updateTrack);

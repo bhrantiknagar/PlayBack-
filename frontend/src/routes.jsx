@@ -12,6 +12,7 @@ import { Settings } from './pages/Settings';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { Profile } from './pages/Profile';
+import { AdminDashboard } from './pages/AdminDashboard';
 
 export function AppRoutes() {
   return (
@@ -29,6 +30,7 @@ export function AppRoutes() {
         <Route path="favorites" element={<Favorites />} />
         <Route path="settings" element={<Settings />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="admin" element={<AdminDashboard />} />
         <Route path="*" element={<Home />} />
       </Route>
     </Routes>

@@ -83,6 +83,48 @@ exports.getAlbums = async (req, res) => {
   }
 };
 
+// @desc    Get single album
+// @route   GET /api/library/albums/:id
+// @access  Public
+exports.getAlbumById = async (req, res) => {
+  try {
+    const album = await Album.findById(req.params.id).populate('artistId', 'name');
+    if (!album) return res.status(404).json({ message: 'Album not found' });
+    
+    const tracks = await Track.find({ albumId: req.params.id }).populate('artistId', 'name').populate('albumId', 'title');
+    
+    const formattedTracks = tracks.map(t => ({
+      id: t._id,
+      title: t.title,
+      artist: t.artistId ? t.artistId.name : 'Unknown Artist',
+      album: t.albumId ? t.albumId.title : 'Unknown Album',
+      audio: t.audio,
+      artwork: t.artwork,
+      duration: t.duration,
+      quality: t.quality,
+      genre: t.genre,
+      category: t.category,
+      energy: t.energy,
+      ambientColor: t.ambientColor,
+      plays: t.plays,
+      lyrics: t.lyrics
+    }));
+    
+    res.json({
+      id: album._id,
+      title: album.title,
+      artist: album.artistId ? album.artistId.name : 'Unknown Artist',
+      coverUrl: album.coverUrl,
+      artwork: album.coverUrl, // For backward compatibility
+      releaseYear: album.releaseYear,
+      genre: album.genre,
+      tracks: formattedTracks
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error fetching album' });
+  }
+};
+
 // @desc    Get all artists
 // @route   GET /api/library/artists
 // @access  Public
@@ -97,6 +139,58 @@ exports.getArtists = async (req, res) => {
     })));
   } catch (error) {
     res.status(500).json({ message: 'Server error fetching artists' });
+  }
+};
+
+// @desc    Get single artist
+// @route   GET /api/library/artists/:id
+// @access  Public
+exports.getArtistById = async (req, res) => {
+  try {
+    const artist = await Artist.findById(req.params.id);
+    if (!artist) return res.status(404).json({ message: 'Artist not found' });
+    
+    const albums = await Album.find({ artistId: req.params.id }).populate('artistId', 'name');
+    const tracks = await Track.find({ artistId: req.params.id }).populate('artistId', 'name').populate('albumId', 'title');
+    
+    const formattedAlbums = albums.map(a => ({
+      id: a._id,
+      title: a.title,
+      artist: a.artistId ? a.artistId.name : 'Unknown Artist',
+      coverUrl: a.coverUrl,
+      artwork: a.coverUrl, // For backward compatibility
+      releaseYear: a.releaseYear,
+      genre: a.genre
+    }));
+
+    const formattedTracks = tracks.map(t => ({
+      id: t._id,
+      title: t.title,
+      artist: t.artistId ? t.artistId.name : 'Unknown Artist',
+      album: t.albumId ? t.albumId.title : 'Unknown Album',
+      audio: t.audio,
+      artwork: t.artwork,
+      duration: t.duration,
+      quality: t.quality,
+      genre: t.genre,
+      category: t.category,
+      energy: t.energy,
+      ambientColor: t.ambientColor,
+      plays: t.plays,
+      lyrics: t.lyrics
+    }));
+    
+    res.json({
+      id: artist._id,
+      name: artist.name,
+      coverUrl: artist.coverUrl,
+      avatar: artist.coverUrl, // For backward compatibility
+      bio: artist.bio,
+      albums: formattedAlbums,
+      tracks: formattedTracks
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error fetching artist' });
   }
 };
 

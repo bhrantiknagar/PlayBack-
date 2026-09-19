@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Play, Clock, ArrowLeft, Shuffle, Disc, Sparkles } from 'lucide-react';
-import { albums, getAlbumTracks } from '../data/albums';
+import { fetchAlbum } from '../api/library';
 import { TrackList } from '../components/music/TrackList';
 import { PrimaryButton, SecondaryButton } from '../components/ui/Button';
 import { usePlayer } from '../context/PlayerContext';
@@ -12,8 +12,41 @@ export function AlbumView() {
   const navigate = useNavigate();
   const { playTrack, currentTrack, isPlaying, setIsShuffle } = usePlayer();
 
-  const album = albums.find(a => a.id === id) || albums[0];
-  const albumTracks = getAlbumTracks(album);
+  const [album, setAlbum] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchAlbum(id)
+      .then(data => {
+        setAlbum(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        setError('Failed to load album data.');
+        setIsLoading(false);
+      });
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh', color: 'var(--text-secondary)' }}>
+        Loading album...
+      </div>
+    );
+  }
+
+  if (error || !album) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '50vh', gap: '16px' }}>
+        <p style={{ color: 'var(--text-secondary)' }}>{error || 'Album not found.'}</p>
+        <SecondaryButton onClick={() => navigate('/library')}>Back to Library</SecondaryButton>
+      </div>
+    );
+  }
+
+  const albumTracks = album.tracks || [];
 
   const totalDurationSeconds = albumTracks.reduce((acc, t) => acc + (t.duration || 180), 0);
   const isCurrentAlbumPlaying = isPlaying && currentTrack?.album === album.title;

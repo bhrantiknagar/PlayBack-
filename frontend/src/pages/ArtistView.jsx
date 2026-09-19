@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Play, ArrowLeft, Shuffle, Flame, Disc, CheckCircle2 } from 'lucide-react';
-import { getArtistByIdOrName } from '../data/artists';
+import { fetchArtist } from '../api/library';
 import { TrackList } from '../components/music/TrackList';
 import { AlbumCard } from '../components/music/AlbumCard';
 import { PrimaryButton, SecondaryButton } from '../components/ui/Button';
@@ -12,7 +12,39 @@ export function ArtistView() {
   const navigate = useNavigate();
   const { playTrack, currentTrack, isPlaying, setIsShuffle } = usePlayer();
 
-  const artist = getArtistByIdOrName(id);
+  const [artist, setArtist] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchArtist(id)
+      .then(data => {
+        setArtist(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        setError('Failed to load artist data.');
+        setIsLoading(false);
+      });
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh', color: 'var(--text-secondary)' }}>
+        Loading artist...
+      </div>
+    );
+  }
+
+  if (error || !artist) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '50vh', gap: '16px' }}>
+        <p style={{ color: 'var(--text-secondary)' }}>{error || 'Artist not found.'}</p>
+        <SecondaryButton onClick={() => navigate('/library')}>Back to Library</SecondaryButton>
+      </div>
+    );
+  }
   const isCurrentArtistPlaying = isPlaying && currentTrack?.artist === artist.name;
 
   const handlePlayArtist = () => {

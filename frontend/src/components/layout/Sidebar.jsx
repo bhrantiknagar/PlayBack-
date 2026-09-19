@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Compass, Library, Heart, Radio, Settings, User } from 'lucide-react';
+import { Home, Compass, Library, Heart, Radio, Settings, User, Shield } from 'lucide-react';
 import logoImg from '../../assets/images/logo.png';
 import { usePlayer } from '../../context/PlayerContext';
 import { useAuth } from '../../context/AuthContext';
@@ -92,6 +92,17 @@ export function Sidebar() {
           >
             <User size={16} />
             <span>Profile</span>
+          </NavLink>
+        )}
+
+        {user && user.isAdmin && (
+          <NavLink
+            to="/admin"
+            className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            style={{ fontSize: '13px' }}
+          >
+            <Shield size={16} />
+            <span>Admin</span>
           </NavLink>
         )}
 
