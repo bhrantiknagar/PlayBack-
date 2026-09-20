@@ -11,25 +11,63 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Multer config (memory storage)
+// Allowed file mimetypes
+const ALLOWED_MIMETYPES = [
+  'audio/mpeg',
+  'audio/mp3',
+  'audio/wav',
+  'audio/x-wav',
+  'audio/flac',
+  'audio/ogg',
+  'audio/aac',
+  'audio/mp4',
+  'audio/x-m4a',
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp'
+];
+
+// Multer config (memory storage with fileFilter)
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
   limits: {
     fileSize: 50 * 1024 * 1024 // 50MB max file size
+  },
+  fileFilter: (req, file, cb) => {
+    if (ALLOWED_MIMETYPES.includes(file.mimetype) || file.mimetype.startsWith('audio/') || file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only audio (MP3, WAV, FLAC) and image (JPG, PNG, WebP) files are allowed.'));
+    }
   }
 });
+
+// Middleware helper for upload single with error catching
+const handleUpload = (req, res, next) => {
+  upload.single('file')(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ message: 'File too large. Maximum allowed size is 50MB.' });
+      }
+      return res.status(400).json({ message: `Upload error: ${err.message}` });
+    } else if (err) {
+      return res.status(400).json({ message: err.message });
+    }
+    next();
+  });
+};
 
 // @desc    Upload file to Cloudinary
 // @route   POST /api/upload
 // @access  Private/Admin
-router.post('/', protect, admin, upload.single('file'), (req, res) => {
+router.post('/', protect, admin, handleUpload, (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No file uploaded' });
   }
 
   // Determine resource type based on mimetype
-  // Mime types starting with 'audio' should be treated as video by Cloudinary for correct processing.
   let resourceType = 'auto';
   if (req.file.mimetype.startsWith('audio/')) {
     resourceType = 'video';

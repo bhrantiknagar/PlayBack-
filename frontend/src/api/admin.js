@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL + '/api/library';
+const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const API_URL = `${BASE_URL}/api/library`;
 
 // Helper to make API calls with token
 const fetchWithToken = async (url, method, token, body = null) => {
@@ -33,7 +34,7 @@ const fetchWithToken = async (url, method, token, body = null) => {
 export const uploadFile = (token, file, onProgress) => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${import.meta.env.VITE_API_URL}/api/upload`);
+    xhr.open('POST', `${BASE_URL}/api/upload`);
     xhr.setRequestHeader('Authorization', `Bearer ${token}`);
 
     xhr.upload.onprogress = (event) => {

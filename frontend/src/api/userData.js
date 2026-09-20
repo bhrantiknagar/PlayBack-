@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL + '/api/userdata';
+const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const API_URL = `${BASE_URL}/api/userdata`;
 
 const getHeaders = (token) => ({
   'Content-Type': 'application/json',

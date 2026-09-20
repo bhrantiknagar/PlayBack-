@@ -77,6 +77,10 @@ exports.syncUserData = async (req, res) => {
 exports.toggleFavorite = async (req, res) => {
   try {
     const { songId } = req.body;
+    if (!songId) {
+      return res.status(400).json({ message: 'Song ID is required' });
+    }
+
     const existing = await Favorite.findOne({ userId: req.user._id, songId });
     
     if (existing) {
@@ -97,10 +101,12 @@ exports.toggleFavorite = async (req, res) => {
 exports.savePlaylist = async (req, res) => {
   try {
     const { id, title, songs } = req.body;
+    if (!title && !id) {
+      return res.status(400).json({ message: 'Playlist title is required' });
+    }
+
     let playlist;
-    
     if (id && id !== Date.now().toString()) {
-      // If it has a true mongo ID or local ID, let's try to find it
       playlist = await Playlist.findOne({ _id: id, userId: req.user._id }).catch(() => null);
     }
 
@@ -111,7 +117,7 @@ exports.savePlaylist = async (req, res) => {
     } else {
       playlist = await Playlist.create({
         userId: req.user._id,
-        name: title,
+        name: title || 'Untitled Playlist',
         songs: songs || []
       });
     }
@@ -131,10 +137,12 @@ exports.savePlaylist = async (req, res) => {
 // @access  Private
 exports.deletePlaylist = async (req, res) => {
   try {
-    const playlist = await Playlist.findOne({ _id: req.params.id, userId: req.user._id });
-    if (playlist) {
-      await playlist.deleteOne();
+    const playlist = await Playlist.findOne({ _id: req.params.id, userId: req.user._id }).catch(() => null);
+    if (!playlist) {
+      return res.status(404).json({ message: 'Playlist not found or not owned by user' });
     }
+
+    await playlist.deleteOne();
     res.json({ message: 'Playlist removed' });
   } catch (error) {
     res.status(500).json({ message: 'Server error deleting playlist' });
@@ -147,6 +155,9 @@ exports.deletePlaylist = async (req, res) => {
 exports.updateSettings = async (req, res) => {
   try {
     const { settings } = req.body;
+    if (!settings || typeof settings !== 'object') {
+      return res.status(400).json({ message: 'Settings object is required' });
+    }
     await User.findByIdAndUpdate(req.user._id, { settings });
     res.json(settings);
   } catch (error) {
@@ -160,6 +171,9 @@ exports.updateSettings = async (req, res) => {
 exports.addToHistory = async (req, res) => {
   try {
     const { songId } = req.body;
+    if (!songId) {
+      return res.status(400).json({ message: 'Song ID is required' });
+    }
     const history = await ListeningHistory.create({ userId: req.user._id, songId });
     res.json(history);
   } catch (error) {

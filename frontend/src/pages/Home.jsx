@@ -98,12 +98,26 @@ export function Home() {
   // ── Personalized sections (only on unfiltered home) ────────────────────
   const trackById = Object.fromEntries(tracks.map(t => [t.id, t]));
 
+  // Helper format time
+  const formatTime = (secs) => {
+    if (!secs || isNaN(secs)) return '0:00';
+    const mins = Math.floor(secs / 60);
+    const remainingSecs = Math.floor(secs % 60);
+    return `${mins}:${remainingSecs < 10 ? '0' : ''}${remainingSecs}`;
+  };
+
   // Continue Listening - tracks with position > 5s
   const continueListeningTracks = recentlyPlayed
     .filter(item => item.position > 5)
     .map(item => {
        const track = trackById[item.id];
-       if (track) return { ...track, savedPosition: item.position };
+       if (track) {
+         return {
+           ...track,
+           artwork: track.artwork || track.coverUrl || track.cover || '/images/albums/album-01.jpg',
+           savedPosition: item.position
+         };
+       }
        return null;
     })
     .filter(Boolean)
@@ -111,7 +125,16 @@ export function Home() {
 
   // Recently Played — ordered by most recent play, limit 6
   const recentTracks = recentlyPlayed
-    .map(item => trackById[item.id])
+    .map(item => {
+      const track = trackById[item.id];
+      if (track) {
+        return {
+          ...track,
+          artwork: track.artwork || track.coverUrl || track.cover || '/images/albums/album-01.jpg'
+        };
+      }
+      return null;
+    })
     .filter(Boolean)
     .slice(0, 6);
 
@@ -138,6 +161,8 @@ export function Home() {
     sectionHeading = `${selectedEnergy} Frequencies`;
   }
 
+  const topResumeTrack = continueListeningTracks[0];
+
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
@@ -148,17 +173,122 @@ export function Home() {
             <h1 style={{ fontSize: '32px', fontWeight: '900', letterSpacing: '-0.5px' }}>
               Welcome back, <span style={{ color: 'var(--accent-primary)' }}>{user.name ? user.name.split(' ')[0] : 'User'}</span>
             </h1>
-            {continueListeningTracks.length > 0 && (
-              <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', gap: '16px', background: 'var(--bg-card)', padding: '16px 24px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-sm)' }}>
-                <div style={{ width: '60px', height: '60px', borderRadius: 'var(--radius-md)', overflow: 'hidden', flexShrink: 0 }}>
-                  <img src={continueListeningTracks[0].coverUrl || continueListeningTracks[0].cover} alt={continueListeningTracks[0].title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            {topResumeTrack && (
+              <div style={{
+                position: 'relative',
+                marginTop: '20px',
+                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.14) 0%, rgba(99, 102, 241, 0.08) 50%, rgba(15, 23, 42, 0.8) 100%)',
+                backdropFilter: 'blur(16px)',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                padding: '20px 24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '20px',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  position: 'relative',
+                  width: '70px',
+                  height: '70px',
+                  borderRadius: 'var(--radius-md)',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <img
+                    src={topResumeTrack.artwork}
+                    alt={topResumeTrack.title}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = '/images/albums/album-01.jpg';
+                    }}
+                  />
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'rgba(0,0,0,0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <Clock size={20} color="#38bdf8" />
+                  </div>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <span style={{ fontSize: '12px', color: 'var(--accent-primary)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Continue Listening</span>
-                  <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: '4px 0' }}>{continueListeningTracks[0].title}</h3>
-                  <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{continueListeningTracks[0].artist}</p>
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: '700',
+                      color: '#38bdf8',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.8px',
+                      background: 'rgba(56, 189, 248, 0.15)',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(56, 189, 248, 0.3)'
+                    }}>
+                      Continue Listening
+                    </span>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                      {formatTime(topResumeTrack.savedPosition)}
+                      {topResumeTrack.duration ? ` / ${formatTime(topResumeTrack.duration)}` : ''}
+                    </span>
+                  </div>
+
+                  <h3 style={{
+                    fontSize: '18px',
+                    fontWeight: '700',
+                    color: '#ffffff',
+                    margin: '2px 0',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {topResumeTrack.title}
+                  </h3>
+                  <p style={{
+                    fontSize: '13.5px',
+                    color: 'var(--text-secondary)',
+                    margin: 0,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {topResumeTrack.artist}
+                  </p>
+
+                  {topResumeTrack.duration > 0 && (
+                    <div style={{
+                      width: '100%',
+                      maxWidth: '320px',
+                      height: '4px',
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      borderRadius: '2px',
+                      marginTop: '8px',
+                      overflow: 'hidden'
+                    }}>
+                      <div style={{
+                        width: `${Math.min(100, Math.round((topResumeTrack.savedPosition / topResumeTrack.duration) * 100))}%`,
+                        height: '100%',
+                        background: 'linear-gradient(90deg, #38bdf8, #6366f1)',
+                        borderRadius: '2px'
+                      }} />
+                    </div>
+                  )}
                 </div>
-                <PrimaryButton icon={Play} onClick={() => playTrack(continueListeningTracks[0], tracks)}>Resume</PrimaryButton>
+
+                <PrimaryButton
+                  icon={Play}
+                  onClick={() => playTrack(topResumeTrack, tracks)}
+                  style={{ boxShadow: '0 4px 14px rgba(56, 189, 248, 0.3)', flexShrink: 0 }}
+                >
+                  Resume
+                </PrimaryButton>
               </div>
             )}
           </div>
@@ -253,7 +383,7 @@ export function Home() {
       {!isFiltered && (
         <>
           {/* Continue Listening Grid */}
-          {continueListeningTracks.length > 1 && (
+          {continueListeningTracks.length > 0 && (
             <div>
               <SectionHeader icon={Clock} iconColor="#38bdf8" title="Continue Listening" count={continueListeningTracks.length} />
               <TrackGrid tracks={continueListeningTracks} />

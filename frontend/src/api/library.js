@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL + '/api/library';
+const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const API_URL = `${BASE_URL}/api/library`;
 
 export const fetchTracks = async () => {
   const res = await fetch(`${API_URL}/tracks`);

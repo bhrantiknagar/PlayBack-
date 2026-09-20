@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL + '/api/auth';
+const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const API_URL = `${BASE_URL}/api/auth`;
 
 export const register = async (userData) => {
   const response = await fetch(`${API_URL}/register`, {

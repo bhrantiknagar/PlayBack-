@@ -208,13 +208,31 @@ const generateId = (prefix, name) => {
 // @access  Private/Admin
 exports.createTrack = async (req, res) => {
   try {
+    if (!req.body.title || !req.body.title.trim()) {
+      return res.status(400).json({ message: 'Track title is required' });
+    }
+    const _id = generateId('track', req.body.title);
     const newTrack = await Track.create({
-      _id: generateId('track', req.body.title),
+      _id,
+      artistId: req.body.artistId || 'artist-default',
+      albumId: req.body.albumId || 'album-default',
+      audio: req.body.audio || '/music/track-01.mp3',
+      artwork: req.body.artwork || '/images/albums/album-01.jpg',
       ...req.body
     });
-    res.status(201).json(newTrack);
+    res.status(201).json({
+      id: newTrack._id,
+      _id: newTrack._id,
+      title: newTrack.title,
+      artist: newTrack.artist || 'Unknown Artist',
+      album: newTrack.album || 'Unknown Album',
+      audio: newTrack.audio,
+      artwork: newTrack.artwork,
+      genre: newTrack.genre
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Server error creating track' });
+    console.error('Error creating track:', error);
+    res.status(500).json({ message: error.message || 'Server error creating track' });
   }
 };
 
@@ -223,9 +241,18 @@ exports.createTrack = async (req, res) => {
 // @access  Private/Admin
 exports.updateTrack = async (req, res) => {
   try {
-    const updatedTrack = await Track.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedTrack = await Track.findByIdAndUpdate(req.params.id, req.body, { new: true }).catch(() => null);
     if (!updatedTrack) return res.status(404).json({ message: 'Track not found' });
-    res.json(updatedTrack);
+    res.json({
+      id: updatedTrack._id,
+      _id: updatedTrack._id,
+      title: updatedTrack.title,
+      artist: updatedTrack.artist || 'Unknown Artist',
+      album: updatedTrack.album || 'Unknown Album',
+      audio: updatedTrack.audio,
+      artwork: updatedTrack.artwork,
+      genre: updatedTrack.genre
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error updating track' });
   }
@@ -236,7 +263,7 @@ exports.updateTrack = async (req, res) => {
 // @access  Private/Admin
 exports.deleteTrack = async (req, res) => {
   try {
-    const track = await Track.findById(req.params.id);
+    const track = await Track.findById(req.params.id).catch(() => null);
     if (!track) return res.status(404).json({ message: 'Track not found' });
     await track.deleteOne();
     res.json({ message: 'Track removed' });
@@ -250,11 +277,20 @@ exports.deleteTrack = async (req, res) => {
 // @access  Private/Admin
 exports.createAlbum = async (req, res) => {
   try {
+    if (!req.body.title || !req.body.title.trim()) {
+      return res.status(400).json({ message: 'Album title is required' });
+    }
+    const _id = generateId('album', req.body.title);
     const newAlbum = await Album.create({
-      _id: generateId('album', req.body.title),
+      _id,
       ...req.body
     });
-    res.status(201).json(newAlbum);
+    res.status(201).json({
+      id: newAlbum._id,
+      _id: newAlbum._id,
+      title: newAlbum.title,
+      coverUrl: newAlbum.coverUrl
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error creating album' });
   }
@@ -265,7 +301,7 @@ exports.createAlbum = async (req, res) => {
 // @access  Private/Admin
 exports.updateAlbum = async (req, res) => {
   try {
-    const updatedAlbum = await Album.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedAlbum = await Album.findByIdAndUpdate(req.params.id, req.body, { new: true }).catch(() => null);
     if (!updatedAlbum) return res.status(404).json({ message: 'Album not found' });
     res.json(updatedAlbum);
   } catch (error) {
@@ -278,7 +314,7 @@ exports.updateAlbum = async (req, res) => {
 // @access  Private/Admin
 exports.deleteAlbum = async (req, res) => {
   try {
-    const album = await Album.findById(req.params.id);
+    const album = await Album.findById(req.params.id).catch(() => null);
     if (!album) return res.status(404).json({ message: 'Album not found' });
     await album.deleteOne();
     res.json({ message: 'Album removed' });
@@ -292,6 +328,9 @@ exports.deleteAlbum = async (req, res) => {
 // @access  Private/Admin
 exports.createArtist = async (req, res) => {
   try {
+    if (!req.body.name || !req.body.name.trim()) {
+      return res.status(400).json({ message: 'Artist name is required' });
+    }
     const newArtist = await Artist.create({
       _id: generateId('artist', req.body.name),
       ...req.body
@@ -307,7 +346,7 @@ exports.createArtist = async (req, res) => {
 // @access  Private/Admin
 exports.updateArtist = async (req, res) => {
   try {
-    const updatedArtist = await Artist.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedArtist = await Artist.findByIdAndUpdate(req.params.id, req.body, { new: true }).catch(() => null);
     if (!updatedArtist) return res.status(404).json({ message: 'Artist not found' });
     res.json(updatedArtist);
   } catch (error) {
@@ -320,7 +359,7 @@ exports.updateArtist = async (req, res) => {
 // @access  Private/Admin
 exports.deleteArtist = async (req, res) => {
   try {
-    const artist = await Artist.findById(req.params.id);
+    const artist = await Artist.findById(req.params.id).catch(() => null);
     if (!artist) return res.status(404).json({ message: 'Artist not found' });
     await artist.deleteOne();
     res.json({ message: 'Artist removed' });
