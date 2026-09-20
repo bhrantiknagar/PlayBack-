@@ -14,6 +14,10 @@ export function AdminDashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({});
+  const [audioFile, setAudioFile] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     loadData();
@@ -52,6 +56,10 @@ export function AdminDashboard() {
     setIsModalOpen(false);
     setEditingItem(null);
     setFormData({});
+    setAudioFile(null);
+    setImageFile(null);
+    setIsUploading(false);
+    setUploadProgress(0);
   };
 
   const handleChange = (e) => {
@@ -59,23 +67,50 @@ export function AdminDashboard() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e, type) => {
+    if (e.target.files && e.target.files[0]) {
+      if (type === 'audio') setAudioFile(e.target.files[0]);
+      if (type === 'image') setImageFile(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsUploading(true);
+    setUploadProgress(0);
+
     try {
+      let finalFormData = { ...formData };
+
+      // Upload Audio if selected
+      if (audioFile) {
+        const audioRes = await adminApi.uploadFile(token, audioFile, setUploadProgress);
+        finalFormData.audio = audioRes.url;
+      }
+
+      // Upload Image if selected
+      if (imageFile) {
+        const imageRes = await adminApi.uploadFile(token, imageFile, setUploadProgress);
+        if (activeTab === 'tracks') finalFormData.artwork = imageRes.url;
+        else finalFormData.coverUrl = imageRes.url;
+      }
+
       if (activeTab === 'tracks') {
-        if (editingItem) await adminApi.updateTrack(token, editingItem.id, formData);
-        else await adminApi.createTrack(token, formData);
+        if (editingItem) await adminApi.updateTrack(token, editingItem.id, finalFormData);
+        else await adminApi.createTrack(token, finalFormData);
       } else if (activeTab === 'albums') {
-        if (editingItem) await adminApi.updateAlbum(token, editingItem.id, formData);
-        else await adminApi.createAlbum(token, formData);
+        if (editingItem) await adminApi.updateAlbum(token, editingItem.id, finalFormData);
+        else await adminApi.createAlbum(token, finalFormData);
       } else if (activeTab === 'artists') {
-        if (editingItem) await adminApi.updateArtist(token, editingItem.id, formData);
-        else await adminApi.createArtist(token, formData);
+        if (editingItem) await adminApi.updateArtist(token, editingItem.id, finalFormData);
+        else await adminApi.createArtist(token, finalFormData);
       }
       
+      setIsUploading(false);
       handleCloseModal();
       loadData(); // Refresh data
     } catch (err) {
+      setIsUploading(false);
       alert('Error saving data: ' + err.message);
     }
   };
@@ -157,12 +192,14 @@ export function AdminDashboard() {
               <input type="text" name="albumId" value={formData.albumId || ''} onChange={handleChange} style={inputStyle} required placeholder="e.g. album-frequency-shift" />
             </div>
             <div>
-              <label style={labelStyle}>Audio File URL/Path</label>
-              <input type="text" name="audio" value={formData.audio || ''} onChange={handleChange} style={inputStyle} required placeholder="/music/track.mp3" />
+              <label style={labelStyle}>Audio File (MP3/WAV/FLAC)</label>
+              <input type="file" accept="audio/*" onChange={(e) => handleFileChange(e, 'audio')} style={inputStyle} />
+              {formData.audio && <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Current: {formData.audio.substring(0, 40)}...</div>}
             </div>
             <div>
-              <label style={labelStyle}>Artwork URL</label>
-              <input type="text" name="artwork" value={formData.artwork || ''} onChange={handleChange} style={inputStyle} placeholder="/images/albums/cover.jpg" />
+              <label style={labelStyle}>Artwork Image</label>
+              <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'image')} style={inputStyle} />
+              {formData.artwork && <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Current: {formData.artwork.substring(0, 40)}...</div>}
             </div>
             <div style={{ display: 'flex', gap: '16px' }}>
               <div style={{ flex: 1 }}>
@@ -188,8 +225,9 @@ export function AdminDashboard() {
               <input type="text" name="artistId" value={formData.artistId || ''} onChange={handleChange} style={inputStyle} required />
             </div>
             <div>
-              <label style={labelStyle}>Cover URL</label>
-              <input type="text" name="coverUrl" value={formData.coverUrl || ''} onChange={handleChange} style={inputStyle} />
+              <label style={labelStyle}>Cover Image</label>
+              <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'image')} style={inputStyle} />
+              {formData.coverUrl && <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Current: {formData.coverUrl.substring(0, 40)}...</div>}
             </div>
             <div style={{ display: 'flex', gap: '16px' }}>
               <div style={{ flex: 1 }}>
@@ -211,8 +249,9 @@ export function AdminDashboard() {
               <input type="text" name="name" value={formData.name || ''} onChange={handleChange} style={inputStyle} required />
             </div>
             <div>
-              <label style={labelStyle}>Cover URL</label>
-              <input type="text" name="coverUrl" value={formData.coverUrl || ''} onChange={handleChange} style={inputStyle} />
+              <label style={labelStyle}>Cover Image</label>
+              <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'image')} style={inputStyle} />
+              {formData.coverUrl && <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Current: {formData.coverUrl.substring(0, 40)}...</div>}
             </div>
             <div>
               <label style={labelStyle}>Bio</label>
@@ -221,9 +260,21 @@ export function AdminDashboard() {
           </>
         )}
 
+        {isUploading && (
+          <div style={{ marginTop: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '6px' }}>
+              <span>Uploading...</span>
+              <span>{uploadProgress}%</span>
+            </div>
+            <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+              <div style={{ width: `${uploadProgress}%`, height: '100%', background: 'var(--accent-primary)', transition: 'width 0.2s ease' }} />
+            </div>
+          </div>
+        )}
+
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
-          <SecondaryButton type="button" onClick={handleCloseModal}>Cancel</SecondaryButton>
-          <PrimaryButton type="submit">{editingItem ? 'Save Changes' : 'Create'}</PrimaryButton>
+          <SecondaryButton type="button" onClick={handleCloseModal} disabled={isUploading}>Cancel</SecondaryButton>
+          <PrimaryButton type="submit" disabled={isUploading}>{isUploading ? 'Saving...' : (editingItem ? 'Save Changes' : 'Create')}</PrimaryButton>
         </div>
       </form>
     );

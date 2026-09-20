@@ -29,6 +29,41 @@ const fetchWithToken = async (url, method, token, body = null) => {
   return data;
 };
 
+// Upload File with Progress
+export const uploadFile = (token, file, onProgress) => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${import.meta.env.VITE_API_URL}/api/upload`);
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable && onProgress) {
+        const progress = Math.round((event.loaded / event.total) * 100);
+        onProgress(progress);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(JSON.parse(xhr.responseText));
+      } else {
+        try {
+          const errData = JSON.parse(xhr.responseText);
+          reject(new Error(errData.message || 'Upload failed'));
+        } catch (e) {
+          reject(new Error('Upload failed'));
+        }
+      }
+    };
+
+    xhr.onerror = () => reject(new Error('Network error during upload'));
+
+    const formData = new FormData();
+    formData.append('file', file);
+    xhr.send(formData);
+  });
+};
+
 // Tracks
 export const createTrack = (token, data) => fetchWithToken(`${API_URL}/tracks`, 'POST', token, data);
 export const updateTrack = (token, id, data) => fetchWithToken(`${API_URL}/tracks/${id}`, 'PUT', token, data);
