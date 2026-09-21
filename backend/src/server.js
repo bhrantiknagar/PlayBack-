@@ -21,7 +21,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:4173'
 ].filter(Boolean);
-
+ 
 // Middleware
 app.use(cors({
   origin: function (origin, callback) {
