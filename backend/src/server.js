@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 
 // Load environment variables
 dotenv.config();
@@ -27,7 +28,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       return callback(null, true);
     }
-    return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));
@@ -43,14 +44,16 @@ app.use('/api/upload', require('./routes/upload'));
 // Production Static File Serving (Single-Server Deployment)
 if (process.env.NODE_ENV === 'production') {
   const distPath = path.resolve(__dirname, '../../frontend/dist');
-  app.use(express.static(distPath));
+  if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
 
-  app.get('{*path}', (req, res, next) => {
-    if (req.path.startsWith('/api')) {
-      return next();
-    }
-    res.sendFile(path.join(distPath, 'index.html'));
-  });
+    app.get('{*path}', (req, res, next) => {
+      if (req.path.startsWith('/api')) {
+        return next();
+      }
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+  }
 }
 
 // Central error handler
