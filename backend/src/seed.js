@@ -128,9 +128,11 @@ const tracks = [
   }
 ];
 
+const connectDB = require('./config/db');
+
 const seedData = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/playback');
+    await connectDB();
     console.log('MongoDB Connected for Seeding');
 
     // Clear existing data
