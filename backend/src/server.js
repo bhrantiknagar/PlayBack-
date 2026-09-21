@@ -47,6 +47,8 @@ app.use('/api/health', require('./routes/health'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/userdata', require('./routes/userData'));
 app.use('/api/library', require('./routes/library'));
+app.use('/api/upload', require('./routes/upload'));
+
 // Root info endpoint
 app.get('/', (req, res) => {
   res.json({
@@ -55,7 +57,7 @@ app.get('/', (req, res) => {
     health: '/api/health'
   });
 });
-
+ 
 // Production Static File Serving (Single-Server Deployment)
 if (process.env.NODE_ENV === 'production') {
   const distPath = path.resolve(__dirname, '../../frontend/dist');
