@@ -67,19 +67,22 @@ router.post('/', protect, admin, handleUpload, (req, res) => {
     return res.status(400).json({ message: 'No file uploaded' });
   }
 
-  // Determine resource type based on mimetype
-  let resourceType = 'auto';
+  // Determine resource type and format based on mimetype
+  const uploadOptions = {
+    folder: 'playback'
+  };
+
   if (req.file.mimetype.startsWith('audio/')) {
-    resourceType = 'video';
+    uploadOptions.resource_type = 'video';
+    uploadOptions.format = 'mp3';
   } else if (req.file.mimetype.startsWith('image/')) {
-    resourceType = 'image';
+    uploadOptions.resource_type = 'image';
+  } else {
+    uploadOptions.resource_type = 'auto';
   }
 
   const uploadStream = cloudinary.uploader.upload_stream(
-    {
-      resource_type: resourceType,
-      folder: 'playback'
-    },
+    uploadOptions,
     (error, result) => {
       if (error) {
         console.error('Cloudinary upload error:', error);

@@ -91,8 +91,12 @@ export function AdminDashboard() {
       // Upload Image if selected
       if (imageFile) {
         const imageRes = await adminApi.uploadFile(token, imageFile, setUploadProgress);
-        if (activeTab === 'tracks') finalFormData.artwork = imageRes.url;
-        else finalFormData.coverUrl = imageRes.url;
+        if (activeTab === 'tracks') {
+          finalFormData.artwork = imageRes.url;
+          finalFormData.coverUrl = imageRes.url;
+        } else {
+          finalFormData.coverUrl = imageRes.url;
+        }
       }
 
       if (activeTab === 'tracks') {
