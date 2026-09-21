@@ -13,7 +13,7 @@ const connectDB = require('./config/db');
 connectDB();
 
 const app = express();
-
+ 
 const allowedOrigins = [
   process.env.CLIENT_URL,
   process.env.FRONTEND_URL,
@@ -25,7 +25,15 @@ const allowedOrigins = [
 // Middleware
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+    if (
+      !origin ||
+      allowedOrigins.length === 0 ||
+      allowedOrigins.includes(origin) ||
+      allowedOrigins.includes('*') ||
+      origin.endsWith('.vercel.app') ||
+      origin.endsWith('.onrender.com') ||
+      origin.includes('localhost')
+    ) {
       return callback(null, true);
     }
     return callback(new Error('Not allowed by CORS'));
@@ -39,7 +47,14 @@ app.use('/api/health', require('./routes/health'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/userdata', require('./routes/userData'));
 app.use('/api/library', require('./routes/library'));
-app.use('/api/upload', require('./routes/upload'));
+// Root info endpoint
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'PlayBack API Server is Live',
+    health: '/api/health'
+  });
+});
 
 // Production Static File Serving (Single-Server Deployment)
 if (process.env.NODE_ENV === 'production') {
