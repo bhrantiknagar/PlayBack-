@@ -3,8 +3,10 @@ const mongoose = require('mongoose');
 const trackSchema = new mongoose.Schema({
   _id: { type: String, required: true },
   title: { type: String, required: true },
-  artistId: { type: String, ref: 'Artist', required: true },
-  albumId: { type: String, ref: 'Album', required: true },
+  artistId: { type: String, ref: 'Artist' },
+  albumId: { type: String, ref: 'Album' },
+  artist: { type: String },
+  album: { type: String },
   audio: { type: String, required: true },
   artwork: { type: String },
   duration: { type: Number, default: 0 },

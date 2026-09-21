@@ -13,8 +13,8 @@ exports.getTracks = async (req, res) => {
     const formatted = tracks.map(t => ({
       id: t._id,
       title: t.title,
-      artist: t.artistId ? t.artistId.name : 'Unknown Artist',
-      album: t.albumId ? t.albumId.title : 'Unknown Album',
+      artist: (t.artistId && t.artistId.name) ? t.artistId.name : (t.artist || 'Unknown Artist'),
+      album: (t.albumId && t.albumId.title) ? t.albumId.title : (t.album || 'Unknown Album'),
       audio: t.audio,
       artwork: t.artwork,
       duration: t.duration,
@@ -214,10 +214,10 @@ exports.createTrack = async (req, res) => {
     const _id = generateId('track', req.body.title);
     const newTrack = await Track.create({
       _id,
-      artistId: req.body.artistId || 'artist-default',
-      albumId: req.body.albumId || 'album-default',
       audio: req.body.audio || '/music/track-01.mp3',
       artwork: req.body.artwork || '/images/albums/album-01.jpg',
+      artist: req.body.artist || req.body.artistName || 'Unknown Artist',
+      album: req.body.album || req.body.albumTitle || 'Single',
       ...req.body
     });
     res.status(201).json({

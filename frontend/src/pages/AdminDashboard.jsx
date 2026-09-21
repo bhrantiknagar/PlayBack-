@@ -18,7 +18,7 @@ export function AdminDashboard() {
   const [imageFile, setImageFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-
+ 
   useEffect(() => {
     loadData();
   }, []);
@@ -180,16 +180,15 @@ export function AdminDashboard() {
           <>
             <div>
               <label style={labelStyle}>Title</label>
-              <input type="text" name="title" value={formData.title || ''} onChange={handleChange} style={inputStyle} required />
-            </div>
-            {/* The artistId and albumId need to be objectIds in backend, but our mock data used strings. For simplicity in this admin panel, we accept strings and the backend handles them, but ideally we select from a list. To keep it simple per requirements, we will just use string inputs for artistId and albumId or just let them type the ID. */}
-            <div>
-              <label style={labelStyle}>Artist ID (Starts with artist-)</label>
-              <input type="text" name="artistId" value={formData.artistId || ''} onChange={handleChange} style={inputStyle} required placeholder="e.g. artist-nova-kinetic" />
+              <input type="text" name="title" value={formData.title || ''} onChange={handleChange} style={inputStyle} required placeholder="e.g. Midnight Resonance" />
             </div>
             <div>
-              <label style={labelStyle}>Album ID (Starts with album-)</label>
-              <input type="text" name="albumId" value={formData.albumId || ''} onChange={handleChange} style={inputStyle} required placeholder="e.g. album-frequency-shift" />
+              <label style={labelStyle}>Artist Name</label>
+              <input type="text" name="artist" value={formData.artist || ''} onChange={handleChange} style={inputStyle} required placeholder="e.g. Aetheria" />
+            </div>
+            <div>
+              <label style={labelStyle}>Album Name</label>
+              <input type="text" name="album" value={formData.album || ''} onChange={handleChange} style={inputStyle} placeholder="e.g. Echoes of Tomorrow (or Single)" />
             </div>
             <div>
               <label style={labelStyle}>Audio File (MP3/WAV/FLAC)</label>
@@ -203,12 +202,12 @@ export function AdminDashboard() {
             </div>
             <div style={{ display: 'flex', gap: '16px' }}>
               <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Category</label>
-                <input type="text" name="category" value={formData.category || ''} onChange={handleChange} style={inputStyle} />
+                <label style={labelStyle}>Genre / Category</label>
+                <input type="text" name="genre" value={formData.genre || ''} onChange={handleChange} style={inputStyle} placeholder="e.g. Synthwave" />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Quality</label>
-                <input type="text" name="quality" value={formData.quality || ''} onChange={handleChange} style={inputStyle} placeholder="Hi-Res" />
+                <label style={labelStyle}>Audio Quality</label>
+                <input type="text" name="quality" value={formData.quality || ''} onChange={handleChange} style={inputStyle} placeholder="e.g. Hi-Res, Lossless" />
               </div>
             </div>
           </>
@@ -217,12 +216,12 @@ export function AdminDashboard() {
         {activeTab === 'albums' && (
           <>
             <div>
-              <label style={labelStyle}>Title</label>
+              <label style={labelStyle}>Album Title</label>
               <input type="text" name="title" value={formData.title || ''} onChange={handleChange} style={inputStyle} required />
             </div>
             <div>
-              <label style={labelStyle}>Artist ID</label>
-              <input type="text" name="artistId" value={formData.artistId || ''} onChange={handleChange} style={inputStyle} required />
+              <label style={labelStyle}>Artist Name</label>
+              <input type="text" name="artist" value={formData.artist || ''} onChange={handleChange} style={inputStyle} required placeholder="e.g. Aetheria" />
             </div>
             <div>
               <label style={labelStyle}>Cover Image</label>
