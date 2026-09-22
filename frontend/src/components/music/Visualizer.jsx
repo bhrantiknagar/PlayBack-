@@ -1,7 +1,7 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, memo } from 'react';
 import { usePlayer } from '../../context/PlayerContext';
 
-export function Visualizer({ height = 28, width = 120, isFull = false }) {
+function VisualizerComponent({ height = 28, width = 120, isFull = false }) {
   const { isPlaying, currentTrack, analyserNode } = usePlayer();
   const canvasRef = useRef(null);
 
@@ -179,7 +179,6 @@ export function Visualizer({ height = 28, width = 120, isFull = false }) {
         for (let i = 0; i <= points; i++) {
           const x = i * sliceWidth;
           const norm = i / points;
-          // Pinned smooth envelope (0 at borders, 1 at center)
           const envelope = Math.pow(Math.sin(norm * Math.PI), 1.15);
 
           let freqMod = 0;
@@ -191,7 +190,6 @@ export function Visualizer({ height = 28, width = 120, isFull = false }) {
             timeMod = ((timeArray[timeIdx] - 128) / 128) * 0.45;
           }
 
-          // Harmonic wave formula modulated by real frequencies, time domain and bass
           const w1 = Math.sin(state.phase + norm * Math.PI * 2.8 + timeMod) * (0.65 + freqMod);
           const w2 = Math.sin(state.phase * 1.45 + norm * Math.PI * 4.6) * (0.35 + state.smoothMid * 0.45);
           const w3 = Math.cos(state.phase * 0.75 + norm * Math.PI * 1.6) * (0.15 + state.smoothBass * 0.35);
@@ -218,13 +216,18 @@ export function Visualizer({ height = 28, width = 120, isFull = false }) {
         : (0.004 * (state.currentAmp > 0.01 ? 1 : 0));
       state.phase += speed;
 
-      animationFrameId = requestAnimationFrame(render);
+      // STOP animationFrame render loop completely when paused and amplitude is decayed to zero
+      if (isPlaying || state.currentAmp > 0.001) {
+        animationFrameId = requestAnimationFrame(render);
+      }
     };
 
     render();
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
     };
   }, [isPlaying, isFull, analyserNode, width, height, currentTrack?.ambientColor]);
 
@@ -241,3 +244,5 @@ export function Visualizer({ height = 28, width = 120, isFull = false }) {
     />
   );
 }
+
+export const Visualizer = memo(VisualizerComponent);

@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Disc } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
 import { PlayPauseButton } from '../player/PlayPauseButton';
 import { getAlbumTracks } from '../../data/albums';
+import { optimizeImageUrl } from '../../utils/audioUtils';
 
-export function AlbumCard({ album }) {
+function AlbumCardComponent({ album }) {
   const navigate = useNavigate();
   const { playTrack, currentTrack, isPlaying, togglePlay } = usePlayer();
 
   const albumTracks = getAlbumTracks(album);
   const isCurrentAlbum = currentTrack?.album === album.title;
+  const artworkSrc = optimizeImageUrl(album.artwork, 400);
 
   const handlePlayAlbum = (e) => {
     e.stopPropagation();
@@ -31,7 +32,7 @@ export function AlbumCard({ album }) {
     >
       <div className="music-card-cover-box">
         <img
-          src={album.artwork}
+          src={artworkSrc}
           alt={album.title}
           className="music-card-cover"
           loading="lazy"
@@ -88,3 +89,5 @@ export function AlbumCard({ album }) {
     </div>
   );
 }
+
+export const AlbumCard = memo(AlbumCardComponent);

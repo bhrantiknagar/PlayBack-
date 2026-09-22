@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
 import { PlayPauseButton } from '../player/PlayPauseButton';
+import { optimizeImageUrl } from '../../utils/audioUtils';
 
-export function ArtistCard({ artist }) {
+function ArtistCardComponent({ artist }) {
   const navigate = useNavigate();
   const { playTrack, currentTrack, isPlaying, togglePlay } = usePlayer();
 
   const isCurrentArtistPlaying = isPlaying && currentTrack?.artist === artist.name;
+  const avatarSrc = optimizeImageUrl(artist.avatar, 300);
 
   const handlePlayArtist = (e) => {
     e.stopPropagation();
@@ -43,7 +44,7 @@ export function ArtistCard({ artist }) {
         marginBottom: '12px'
       }}>
         <img
-          src={artist.avatar}
+          src={avatarSrc}
           alt={artist.name}
           className="music-card-cover"
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -107,3 +108,5 @@ export function ArtistCard({ artist }) {
     </div>
   );
 }
+
+export const ArtistCard = memo(ArtistCardComponent);

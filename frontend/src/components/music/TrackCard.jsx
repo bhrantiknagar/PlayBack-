@@ -1,20 +1,22 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Heart } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
 import { PlayPauseButton } from '../player/PlayPauseButton';
 import { IconButton } from '../ui/IconButton';
 import { TrackContextMenuButton } from './TrackContextMenuButton';
+import { optimizeImageUrl } from '../../utils/audioUtils';
 
 const DEFAULT_ARTWORK = '/images/albums/album-01.jpg';
 
-export function TrackCard({ track, trackList }) {
+function TrackCardComponent({ track, trackList }) {
   const { currentTrack, isPlaying, togglePlay, playTrack, favorites, toggleFavorite } = usePlayer();
   
   if (!track) return null;
 
   const isCurrent = currentTrack?.id === track.id;
   const isLiked = favorites.includes(track.id);
-  const artworkSrc = track.artwork || track.coverUrl || DEFAULT_ARTWORK;
+  const rawArtworkSrc = track.artwork || track.coverUrl || DEFAULT_ARTWORK;
+  const artworkSrc = optimizeImageUrl(rawArtworkSrc, 400);
   const title = track.title || 'Untitled Track';
   const artist = track.artist || 'Unknown Artist';
   const quality = track.quality || 'Standard';
@@ -113,3 +115,5 @@ export function TrackCard({ track, trackList }) {
     </div>
   );
 }
+
+export const TrackCard = memo(TrackCardComponent);

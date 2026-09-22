@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Play, Flame, Radio, Zap, Clock, Heart, Disc } from 'lucide-react';
 import { mockPlaylists } from '../data/mockData';
 import { TrackCard } from '../components/music/TrackCard';
@@ -57,46 +57,32 @@ export function Home() {
   } = usePlayer();
   const { user } = useAuth();
 
-  if (isLibraryLoading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh', color: 'var(--text-secondary)' }}>
-        Loading library...
-      </div>
-    );
-  }
-
-  if (libraryError) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh', color: 'var(--accent-primary)' }}>
-        Error loading library: {libraryError}
-      </div>
-    );
-  }
-
   const energyFilters = ['All', 'Focus', 'Drive', 'Euphoria', 'Chill', 'Late Night'];
   const normalizedQuery = (searchQuery || '').trim().toLowerCase();
-  const isFiltered = normalizedQuery || selectedEnergy !== 'All';
+  const isFiltered = Boolean(normalizedQuery || selectedEnergy !== 'All');
 
-  // ── Search / Energy filtered tracks ──────────────────────────────────────
-  const filteredTracks = tracks.filter(track => {
-    const matchesCategory =
-      selectedEnergy === 'All' ||
-      track.category === selectedEnergy ||
-      track.energy === selectedEnergy;
-    if (!matchesCategory) return false;
-    if (normalizedQuery) {
-      return (
-        track.title?.toLowerCase().includes(normalizedQuery) ||
-        track.artist?.toLowerCase().includes(normalizedQuery) ||
-        track.album?.toLowerCase().includes(normalizedQuery) ||
-        track.genre?.toLowerCase().includes(normalizedQuery)
-      );
-    }
-    return true;
-  });
+  // ── Search / Energy filtered tracks (Memoized) ──────────────────────
+  const filteredTracks = useMemo(() => {
+    return tracks.filter(track => {
+      const matchesCategory =
+        selectedEnergy === 'All' ||
+        track.category === selectedEnergy ||
+        track.energy === selectedEnergy;
+      if (!matchesCategory) return false;
+      if (normalizedQuery) {
+        return (
+          track.title?.toLowerCase().includes(normalizedQuery) ||
+          track.artist?.toLowerCase().includes(normalizedQuery) ||
+          track.album?.toLowerCase().includes(normalizedQuery) ||
+          track.genre?.toLowerCase().includes(normalizedQuery)
+        );
+      }
+      return true;
+    });
+  }, [tracks, selectedEnergy, normalizedQuery]);
 
-  // ── Personalized sections (only on unfiltered home) ────────────────────
-  const trackById = Object.fromEntries(tracks.map(t => [t.id, t]));
+  // ── Personalized sections (Memoized) ────────────────────
+  const trackById = useMemo(() => Object.fromEntries(tracks.map(t => [t.id, t])), [tracks]);
 
   // Helper format time
   const formatTime = (secs) => {
@@ -107,47 +93,55 @@ export function Home() {
   };
 
   // Continue Listening - tracks with position > 5s
-  const continueListeningTracks = recentlyPlayed
-    .filter(item => item.position > 5)
-    .map(item => {
-       const track = trackById[item.id];
-       if (track) {
-         return {
-           ...track,
-           artwork: track.artwork || track.coverUrl || track.cover || '/images/albums/album-01.jpg',
-           savedPosition: item.position
-         };
-       }
-       return null;
-    })
-    .filter(Boolean)
-    .slice(0, 6);
+  const continueListeningTracks = useMemo(() => {
+    return recentlyPlayed
+      .filter(item => item.position > 5)
+      .map(item => {
+         const track = trackById[item.id];
+         if (track) {
+           return {
+             ...track,
+             artwork: track.artwork || track.coverUrl || track.cover || '/images/albums/album-01.jpg',
+             savedPosition: item.position
+           };
+         }
+         return null;
+      })
+      .filter(Boolean)
+      .slice(0, 6);
+  }, [recentlyPlayed, trackById]);
 
   // Recently Played — ordered by most recent play, limit 6
-  const recentTracks = recentlyPlayed
-    .map(item => {
-      const track = trackById[item.id];
-      if (track) {
-        return {
-          ...track,
-          artwork: track.artwork || track.coverUrl || track.cover || '/images/albums/album-01.jpg'
-        };
-      }
-      return null;
-    })
-    .filter(Boolean)
-    .slice(0, 6);
+  const recentTracks = useMemo(() => {
+    return recentlyPlayed
+      .map(item => {
+        const track = trackById[item.id];
+        if (track) {
+          return {
+            ...track,
+            artwork: track.artwork || track.coverUrl || track.cover || '/images/albums/album-01.jpg'
+          };
+        }
+        return null;
+      })
+      .filter(Boolean)
+      .slice(0, 6);
+  }, [recentlyPlayed, trackById]);
 
   // Your Favorites — tracks that are liked
-  const favoriteTracks = tracks.filter(t => favorites.includes(t.id));
+  const favoriteTracks = useMemo(() => {
+    return tracks.filter(t => favorites.includes(t.id));
+  }, [tracks, favorites]);
 
   // Recently Added — sorted by addedDate if present, otherwise first 6 tracks
-  const recentlyAdded = [...tracks]
-    .sort((a, b) => {
-      if (a.addedDate && b.addedDate) return new Date(b.addedDate) - new Date(a.addedDate);
-      return 0;
-    })
-    .slice(0, 6);
+  const recentlyAdded = useMemo(() => {
+    return [...tracks]
+      .sort((a, b) => {
+        if (a.addedDate && b.addedDate) return new Date(b.addedDate) - new Date(a.addedDate);
+        return 0;
+      })
+      .slice(0, 6);
+  }, [tracks]);
 
   const featuredTrack = tracks[0];
 

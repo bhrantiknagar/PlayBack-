@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Heart, Clock, Trash2 } from 'lucide-react';
 import { usePlayer } from '../../context/PlayerContext';
 import { formatTime } from '../../utils/formatTime';
 import { IconButton } from '../ui/IconButton';
 import { TrackContextMenuButton } from './TrackContextMenuButton';
+import { optimizeImageUrl } from '../../utils/audioUtils';
 
 const DEFAULT_ARTWORK = '/images/albums/album-01.jpg';
 
-export function TrackList({ tracks = [], showHeader = true, onRemoveTrack = null }) {
+function TrackListComponent({ tracks = [], showHeader = true, onRemoveTrack = null }) {
   const { currentTrack, isPlaying, playTrack, favorites, toggleFavorite } = usePlayer();
 
   return (
@@ -40,7 +41,8 @@ export function TrackList({ tracks = [], showHeader = true, onRemoveTrack = null
           const isCurrent = currentTrack?.id === track.id;
           const isLiked = favorites.includes(track.id);
           const isHighQuality = track.quality === 'Hi-Res' || track.quality === 'Lossless';
-          const artworkSrc = track.artwork || track.coverUrl || DEFAULT_ARTWORK;
+          const rawArtworkSrc = track.artwork || track.coverUrl || DEFAULT_ARTWORK;
+          const artworkSrc = optimizeImageUrl(rawArtworkSrc, 150);
           const title = track.title || 'Untitled Track';
           const artist = track.artist || 'Unknown Artist';
           const album = track.album || 'Single';
@@ -65,7 +67,6 @@ export function TrackList({ tracks = [], showHeader = true, onRemoveTrack = null
               {/* Index or Soft Mini-Wave Indicator */}
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {isCurrent && isPlaying ? (
-                  // Soft 3-bar sinusoidal mini-wave
                   <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', height: '14px' }}>
                     <span style={{ width: '2.5px', borderRadius: '1px', background: '#06b6d4', animation: 'softWave1 0.9s ease-in-out infinite' }} />
                     <span style={{ width: '2.5px', borderRadius: '1px', background: '#6366f1', animation: 'softWave2 0.7s ease-in-out infinite 0.15s' }} />
@@ -87,6 +88,7 @@ export function TrackList({ tracks = [], showHeader = true, onRemoveTrack = null
                 <img
                   src={artworkSrc}
                   alt={title}
+                  loading="lazy"
                   style={{ width: '38px', height: '38px', borderRadius: 'var(--radius-xs)', objectFit: 'cover', flexShrink: 0 }}
                   onError={(e) => {
                     e.currentTarget.onerror = null;
@@ -163,7 +165,7 @@ export function TrackList({ tracks = [], showHeader = true, onRemoveTrack = null
                     size="sm"
                     aria-label="Remove from Playlist"
                     title="Remove from Vault"
-                    style={{ color: '#ef4444' }} // Red icon for removal
+                    style={{ color: '#ef4444' }}
                   />
                 )}
               </div>
@@ -174,3 +176,5 @@ export function TrackList({ tracks = [], showHeader = true, onRemoveTrack = null
     </div>
   );
 }
+
+export const TrackList = memo(TrackListComponent);
