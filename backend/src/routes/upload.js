@@ -103,7 +103,7 @@ router.post('/', protect, admin, handleUpload, (req, res) => {
 // @desc    Delete file from Cloudinary
 // @route   DELETE /api/upload/:publicId
 // @access  Private/Admin
-router.delete('/:publicId(*)', protect, admin, async (req, res) => {
+router.delete('/{*publicId}', protect, admin, async (req, res) => {
   try {
     const publicId = req.params.publicId;
     if (!publicId) {
