@@ -9,4 +9,7 @@ const albumSchema = new mongoose.Schema({
   genre: { type: String }
 });
 
+// Indexes for query performance
+albumSchema.index({ artistId: 1 });
+
 module.exports = mongoose.model('Album', albumSchema);

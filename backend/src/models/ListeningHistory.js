@@ -16,4 +16,7 @@ const listeningHistorySchema = new mongoose.Schema({
   },
 });
 
+// Index for sorted history lookups per user
+listeningHistorySchema.index({ userId: 1, playedAt: -1 });
+
 module.exports = mongoose.model('ListeningHistory', listeningHistorySchema);

@@ -21,7 +21,7 @@ exports.getUserData = async (req, res) => {
         songs: p.songs,
       })),
       history: history,
-      settings: user.settings || {},
+      settings: user ? (user.settings || {}) : {},
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error fetching user data' });

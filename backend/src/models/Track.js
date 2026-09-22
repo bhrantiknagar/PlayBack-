@@ -22,6 +22,11 @@ const trackSchema = new mongoose.Schema({
   }]
 });
 
+// Indexes for query performance
+trackSchema.index({ artistId: 1 });
+trackSchema.index({ albumId: 1 });
+trackSchema.index({ genre: 1 });
+
 // To ensure frontend compatibility, we override toJSON to map _id to id
 trackSchema.set('toJSON', {
   virtuals: true,

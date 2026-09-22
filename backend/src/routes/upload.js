@@ -100,4 +100,37 @@ router.post('/', protect, admin, handleUpload, (req, res) => {
   uploadStream.end(req.file.buffer);
 });
 
+// @desc    Delete file from Cloudinary
+// @route   DELETE /api/upload/:publicId
+// @access  Private/Admin
+router.delete('/:publicId(*)', protect, admin, async (req, res) => {
+  try {
+    const publicId = req.params.publicId;
+    if (!publicId) {
+      return res.status(400).json({ message: 'Public ID is required' });
+    }
+
+    const resourceType = req.query.resource_type || (req.body && req.body.resource_type);
+    let result;
+    if (resourceType) {
+      result = await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
+    } else {
+      // Try image first, if not found try video (audio files are stored as resource_type: 'video' in Cloudinary)
+      result = await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+      if (result.result === 'not found') {
+        result = await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
+      }
+    }
+
+    res.json({
+      message: 'File deleted from Cloudinary',
+      result: result.result,
+      details: result
+    });
+  } catch (error) {
+    console.error('Cloudinary delete error:', error);
+    res.status(500).json({ message: 'Error deleting file from Cloudinary', error: error.message });
+  }
+});
+
 module.exports = router;

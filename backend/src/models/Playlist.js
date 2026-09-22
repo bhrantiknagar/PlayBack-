@@ -24,4 +24,7 @@ const playlistSchema = new mongoose.Schema({
   },
 });
 
+// Index for user playlist lookups
+playlistSchema.index({ userId: 1 });
+
 module.exports = mongoose.model('Playlist', playlistSchema);

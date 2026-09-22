@@ -16,4 +16,8 @@ const favoriteSchema = new mongoose.Schema({
   },
 });
 
+// Indexes for fast lookup and duplicate prevention
+favoriteSchema.index({ userId: 1, songId: 1 }, { unique: true });
+favoriteSchema.index({ userId: 1 });
+
 module.exports = mongoose.model('Favorite', favoriteSchema);
