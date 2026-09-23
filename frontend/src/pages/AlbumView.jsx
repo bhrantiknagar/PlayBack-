@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Play, Clock, ArrowLeft, Shuffle, Disc, Sparkles } from 'lucide-react';
 import { fetchAlbum } from '../api/library';
+import { albums as fallbackAlbums } from '../data/albums';
+import { tracks as fallbackTracks } from '../data/tracks';
 import { TrackList } from '../components/music/TrackList';
 import { PrimaryButton, SecondaryButton } from '../components/ui/Button';
 import { usePlayer } from '../context/PlayerContext';
@@ -20,11 +22,26 @@ export function AlbumView() {
     setIsLoading(true);
     fetchAlbum(id)
       .then(data => {
-        setAlbum(data);
+        if (data && data.title) {
+          setAlbum(data);
+        } else {
+          throw new Error('Album not found in backend');
+        }
         setIsLoading(false);
       })
       .catch(err => {
-        setError('Failed to load album data.');
+        // Search fallback static albums
+        const foundFallback = fallbackAlbums.find(a => a.id === id || a.title.toLowerCase() === decodeURIComponent(id || '').toLowerCase());
+        if (foundFallback) {
+          const albumTracks = fallbackTracks.filter(t => foundFallback.trackIds?.includes(t.id) || t.album === foundFallback.title);
+          setAlbum({ ...foundFallback, tracks: albumTracks });
+        } else if (fallbackAlbums.length > 0) {
+          const first = fallbackAlbums[0];
+          const albumTracks = fallbackTracks.filter(t => first.trackIds?.includes(t.id) || t.album === first.title);
+          setAlbum({ ...first, tracks: albumTracks });
+        } else {
+          setError('Failed to load album data.');
+        }
         setIsLoading(false);
       });
   }, [id]);

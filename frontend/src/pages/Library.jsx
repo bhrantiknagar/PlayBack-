@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { Library as LibraryIcon, Disc, Users, Music2, Radio, Plus, ArrowUpDown, Play } from 'lucide-react';
 import { mockPlaylists } from '../data/mockData';
 import { fetchAlbums, fetchArtists } from '../api/library';
+import { albums as fallbackAlbums } from '../data/albums';
+import { getArtists } from '../data/artists';
 import { AlbumCard } from '../components/music/AlbumCard';
 import { ArtistCard } from '../components/music/ArtistCard';
 import { PlaylistCard } from '../components/music/PlaylistCard';
@@ -20,18 +22,25 @@ export function Library() {
 
   const { globalTracks: tracks, isLibraryLoading, playTrack, playlists, createPlaylist } = usePlayer();
   
-  const [albums, setAlbums] = useState([]);
-  const [artistsList, setArtistsList] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [albums, setAlbums] = useState(fallbackAlbums);
+  const [artistsList, setArtistsList] = useState(getArtists());
+  const [isLoading, setIsLoading] = useState(false);
 
   React.useEffect(() => {
     Promise.all([fetchAlbums(), fetchArtists()])
       .then(([albumsData, artistsData]) => {
-        setAlbums(albumsData);
-        setArtistsList(artistsData);
+        if (Array.isArray(albumsData) && albumsData.length > 0) {
+          setAlbums(albumsData);
+        }
+        if (Array.isArray(artistsData) && artistsData.length > 0) {
+          setArtistsList(artistsData);
+        }
         setIsLoading(false);
       })
-      .catch(console.error);
+      .catch(err => {
+        console.warn('Backend albums/artists fetch failed, using static fallbacks:', err);
+        setIsLoading(false);
+      });
   }, []);
 
   // Sorted Albums

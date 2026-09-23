@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { fetchTracks } from '../api/library';
+import { tracks as fallbackTracks } from '../data/tracks';
 import {
   loadPlaybackState,
   savePlaybackState,
@@ -25,7 +26,8 @@ export function PlayerProvider({ children }) {
 
   // Load persisted player settings from localStorage (safe with fallbacks)
   const initialSavedState = useRef(loadPlaybackState()).current;
-  const [globalTracks, setGlobalTracks] = useState([]);
+  const [globalTracks, setGlobalTracks] = useState(fallbackTracks);
+  const [playlist, setPlaylist] = useState(fallbackTracks);
   const [isLibraryLoading, setIsLibraryLoading] = useState(true);
   const [libraryError, setLibraryError] = useState('');
 
@@ -33,17 +35,24 @@ export function PlayerProvider({ children }) {
   useEffect(() => {
     fetchTracks()
       .then(data => {
-        setGlobalTracks(data);
-        setPlaylist(data);
+        if (Array.isArray(data) && data.length > 0) {
+          setGlobalTracks(data);
+          setPlaylist(data);
+        } else {
+          setGlobalTracks(fallbackTracks);
+          setPlaylist(fallbackTracks);
+        }
         setIsLibraryLoading(false);
       })
       .catch(err => {
+        console.warn('Backend tracks fetch failed, using fallback tracks:', err);
+        setGlobalTracks(fallbackTracks);
+        setPlaylist(fallbackTracks);
         setLibraryError(err.message);
         setIsLibraryLoading(false);
       });
   }, []);
 
-  const [playlist, setPlaylist] = useState([]);
   const [queue, setQueue] = useState([]);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);

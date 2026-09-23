@@ -1,66 +1,58 @@
 const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 const API_URL = `${BASE_URL}/api/auth`;
 
+const safeFetchJson = async (url, options, defaultErrorMsg) => {
+  try {
+    const response = await fetch(url, options);
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.message || defaultErrorMsg);
+    }
+    return data;
+  } catch (error) {
+    if (error.name === 'TypeError' || error.message.includes('fetch')) {
+      throw new Error('Unable to connect to backend server. Please make sure the backend server is running on port 5000.');
+    }
+    throw error;
+  }
+};
+
 export const register = async (userData) => {
-  const response = await fetch(`${API_URL}/register`, {
+  return safeFetchJson(`${API_URL}/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(userData),
-  });
-  
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || 'Registration failed');
-  }
-  return data;
+  }, 'Registration failed');
 };
 
 export const login = async (userData) => {
-  const response = await fetch(`${API_URL}/login`, {
+  return safeFetchJson(`${API_URL}/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(userData),
-  });
-  
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || 'Login failed');
-  }
-  return data;
+  }, 'Login failed');
 };
 
 export const getMe = async (token) => {
-  const response = await fetch(`${API_URL}/me`, {
+  return safeFetchJson(`${API_URL}/me`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
     },
-  });
-  
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || 'Failed to fetch user');
-  }
-  return data;
+  }, 'Failed to fetch user');
 };
 
 export const updateProfile = async (token, profileData) => {
-  const response = await fetch(`${API_URL}/profile`, {
+  return safeFetchJson(`${API_URL}/profile`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(profileData),
-  });
-  
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || 'Failed to update profile');
-  }
-  return data;
+  }, 'Failed to update profile');
 };

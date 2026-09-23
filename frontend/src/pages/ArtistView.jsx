@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Play, ArrowLeft, Shuffle, Flame, Disc, CheckCircle2 } from 'lucide-react';
 import { fetchArtist } from '../api/library';
+import { getArtistByIdOrName } from '../data/artists';
 import { TrackList } from '../components/music/TrackList';
 import { AlbumCard } from '../components/music/AlbumCard';
 import { PrimaryButton, SecondaryButton } from '../components/ui/Button';
@@ -20,11 +21,20 @@ export function ArtistView() {
     setIsLoading(true);
     fetchArtist(id)
       .then(data => {
-        setArtist(data);
+        if (data && data.name) {
+          setArtist(data);
+        } else {
+          throw new Error('Artist not found in backend');
+        }
         setIsLoading(false);
       })
       .catch(err => {
-        setError('Failed to load artist data.');
+        const fallbackArtist = getArtistByIdOrName(id);
+        if (fallbackArtist) {
+          setArtist(fallbackArtist);
+        } else {
+          setError('Failed to load artist data.');
+        }
         setIsLoading(false);
       });
   }, [id]);

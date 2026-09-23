@@ -1,0 +1,11 @@
+{
+  "name": "playback-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:backend": "npm --prefix backend dev",
+    "dev:frontend": "npm --prefix frontend dev",
+    "seed": "npm --prefix backend run seed",
+    "start": "node backend/src/server.js"
+  }
+}

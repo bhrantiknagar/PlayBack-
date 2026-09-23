@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+require('./Artist');
+require('./Album');
 
 const trackSchema = new mongoose.Schema({
   _id: { type: String, required: true },

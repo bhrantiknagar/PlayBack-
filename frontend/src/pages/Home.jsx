@@ -63,11 +63,13 @@ export function Home() {
 
   // ── Search / Energy filtered tracks (Memoized) ──────────────────────
   const filteredTracks = useMemo(() => {
+    if (!Array.isArray(tracks)) return [];
     return tracks.filter(track => {
+      if (!track) return false;
       const matchesCategory =
         selectedEnergy === 'All' ||
-        track.category === selectedEnergy ||
-        track.energy === selectedEnergy;
+        (track.category && track.category.toLowerCase() === selectedEnergy.toLowerCase()) ||
+        (track.energy && track.energy.toLowerCase() === selectedEnergy.toLowerCase());
       if (!matchesCategory) return false;
       if (normalizedQuery) {
         return (
