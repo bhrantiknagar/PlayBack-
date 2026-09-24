@@ -216,7 +216,7 @@ export function PlayerProvider({ children }) {
       if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
         audioContextRef.current.resume().catch(() => {});
       }
-
+ 
       return analyserRef.current;
     } catch (e) {
       console.warn('AudioContext initialization note:', e);
