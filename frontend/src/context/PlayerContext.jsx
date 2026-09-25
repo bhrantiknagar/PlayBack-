@@ -212,7 +212,7 @@ export function PlayerProvider({ children }) {
         analyserRef.current = analyser;
         setAnalyserNode(analyser);
       }
-
+ 
       if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
         audioContextRef.current.resume().catch(() => {});
       }
