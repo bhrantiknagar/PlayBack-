@@ -33,8 +33,13 @@ export function AudioPlayer() {
       className="player-dock-floating"
       aria-label="Now playing bar"
     >
+      {/* Top Edge Progress Bar for Mobile */}
+      <div className="mobile-mini-player-progress">
+        <ProgressBar isMiniPlayer={true} />
+      </div>
+
       {/* Left: Track Artwork & Metadata */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', width: '300px' }}>
+      <div className="player-dock-left">
         <div
           onClick={() => setIsNowPlayingOpen(true)}
           style={{ cursor: 'pointer', position: 'relative' }}
@@ -56,8 +61,8 @@ export function AudioPlayer() {
 
           <div style={{
             position: 'relative',
-            width: '52px',
-            height: '52px',
+            width: '46px',
+            height: '46px',
             borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
             flexShrink: 0,
@@ -76,7 +81,7 @@ export function AudioPlayer() {
           </div>
         </div>
 
-        <div style={{ minWidth: 0, overflow: 'hidden' }}>
+        <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span
               onClick={() => setIsNowPlayingOpen(true)}
@@ -93,7 +98,7 @@ export function AudioPlayer() {
               {title}
             </span>
             {(quality === 'Hi-Res' || quality === 'Lossless') && (
-              <span className="flac-hi-res-tag">{quality}</span>
+              <span className="flac-hi-res-tag desktop-only-widget">{quality}</span>
             )}
           </div>
 
@@ -113,7 +118,7 @@ export function AudioPlayer() {
           icon={Heart}
           onClick={() => toggleFavorite(currentTrack.id)}
           variant={isLiked ? 'danger' : 'default'}
-          className={isLiked ? 'animate-heart-pop is-liked' : ''}
+          className={`desktop-only-widget ${isLiked ? 'animate-heart-pop is-liked' : ''}`}
           iconProps={{ fill: isLiked ? 'currentColor' : 'none' }}
           aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
           style={{ color: isLiked ? '#ec4899' : 'var(--text-muted)' }}
@@ -122,24 +127,19 @@ export function AudioPlayer() {
       </div>
 
       {/* Center: Playback Controls & Wave Timeline */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '4px',
-        flex: 1,
-        maxWidth: '560px',
-        padding: '0 16px'
-      }}>
+      <div className="player-dock-center">
         <TrackControls />
-        <ProgressBar />
+        <div className="desktop-only-widget" style={{ width: '100%' }}>
+          <ProgressBar />
+        </div>
       </div>
 
       {/* Right: Soft Wave Visualizer, Volume & Utility Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px', width: '300px' }}>
+      <div className="player-dock-right">
         {/* Soft Wave Visualizer */}
         <div
           onClick={() => setIsNowPlayingOpen(true)}
+          className="desktop-only-widget"
           style={{
             cursor: 'pointer',
             padding: '2px 8px',
@@ -154,7 +154,9 @@ export function AudioPlayer() {
           <Visualizer width={100} height={24} />
         </div>
 
-        <VolumeControl />
+        <div className="desktop-only-widget">
+          <VolumeControl />
+        </div>
 
         <IconButton
           icon={ListMusic}
