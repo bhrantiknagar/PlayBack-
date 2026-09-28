@@ -27,11 +27,18 @@ export function AudioPlayer() {
   const title = currentTrack.title || 'Untitled Track';
   const artist = currentTrack.artist || 'Unknown Artist';
   const quality = currentTrack.quality || 'Standard';
+  const activeColor = currentTrack.ambientColor || '#6366f1';
 
   return (
     <aside
-      className="player-dock-floating"
+      className={`player-dock-floating ${isPlaying ? 'is-playing' : ''}`}
       aria-label="Now playing bar"
+      style={{
+        boxShadow: isPlaying
+          ? `0 16px 45px rgba(0, 0, 0, 0.85), 0 0 35px ${activeColor}35`
+          : '0 16px 45px rgba(0, 0, 0, 0.75), 0 0 20px rgba(99, 102, 241, 0.08)',
+        borderColor: isPlaying ? `${activeColor}44` : 'rgba(255, 255, 255, 0.1)'
+      }}
     >
       {/* Top Edge Progress Bar for Mobile */}
       <div className="mobile-mini-player-progress">
@@ -45,16 +52,16 @@ export function AudioPlayer() {
           style={{ cursor: 'pointer', position: 'relative' }}
           title="Open Listening Space"
         >
-          {/* Subtle Ambient Backlight under Artwork */}
+          {/* Dynamic Ambient Backlight under Artwork */}
           <div
             style={{
               position: 'absolute',
               inset: '-4px',
               borderRadius: 'var(--radius-sm)',
-              background: 'var(--accent-glow-primary)',
-              filter: 'blur(8px)',
-              opacity: isPlaying ? 0.7 : 0.2,
-              transition: 'opacity 0.4s ease',
+              background: activeColor,
+              filter: 'blur(10px)',
+              opacity: isPlaying ? 0.75 : 0.2,
+              transition: 'all 0.6s ease',
               zIndex: 0
             }}
           />
@@ -66,18 +73,39 @@ export function AudioPlayer() {
             borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
             flexShrink: 0,
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
             zIndex: 1
           }}>
             <img
               src={artworkSrc}
               alt={title}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                transition: 'transform 0.4s ease'
+              }}
               onError={(e) => {
                 e.currentTarget.onerror = null;
                 e.currentTarget.src = DEFAULT_ARTWORK;
               }}
             />
+            {isPlaying && (
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'rgba(0,0,0,0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <div className="playing-equalizer-bars">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -151,7 +179,7 @@ export function AudioPlayer() {
           }}
           title="PlayBack Soft Wave (Click to expand)"
         >
-          <Visualizer width={100} height={24} />
+          <Visualizer width={100} height={24} color={activeColor} />
         </div>
 
         <div className="desktop-only-widget">

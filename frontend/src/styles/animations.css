@@ -39,6 +39,33 @@
   50% { height: 16px; }
 }
 
+/* Playing Equalizer Overlay Bars */
+.playing-equalizer-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.playing-equalizer-bars span {
+  width: 3px;
+  background: #ffffff;
+  border-radius: 1px;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+.playing-equalizer-bars span:nth-child(1) {
+  animation: softWave1 0.8s ease-in-out infinite alternate;
+}
+
+.playing-equalizer-bars span:nth-child(2) {
+  animation: softWave2 0.7s ease-in-out infinite alternate;
+}
+
+.playing-equalizer-bars span:nth-child(3) {
+  animation: softWave3 0.9s ease-in-out infinite alternate;
+}
+
 /* Atmospheric Ambient Pulse */
 @keyframes ambientPulse {
   0%, 100% {
