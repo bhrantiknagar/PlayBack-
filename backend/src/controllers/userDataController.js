@@ -10,8 +10,18 @@ exports.getUserData = async (req, res) => {
   try {
     const favorites = await Favorite.find({ userId: req.user._id });
     const playlists = await Playlist.find({ userId: req.user._id });
-    const history = await ListeningHistory.find({ userId: req.user._id }).sort('-playedAt').limit(50);
+    const rawHistory = await ListeningHistory.find({ userId: req.user._id }).sort('-playedAt').limit(100);
     const user = await User.findById(req.user._id).select('settings');
+
+    // Deduplicate history by songId so only the latest played instance is returned
+    const seenSongs = new Set();
+    const history = [];
+    for (const item of rawHistory) {
+      if (item.songId && !seenSongs.has(item.songId)) {
+        seenSongs.add(item.songId);
+        history.push(item);
+      }
+    }
 
     res.json({
       favorites: favorites.map(f => f.songId),
@@ -20,7 +30,7 @@ exports.getUserData = async (req, res) => {
         title: p.name,
         songs: p.songs,
       })),
-      history: history,
+      history: history.slice(0, 20),
       settings: user ? (user.settings || {}) : {},
     });
   } catch (error) {
@@ -174,6 +184,9 @@ exports.addToHistory = async (req, res) => {
     if (!songId) {
       return res.status(400).json({ message: 'Song ID is required' });
     }
+    // Delete previous entries for this song to keep history clean & unique
+    await ListeningHistory.deleteMany({ userId: req.user._id, songId });
+
     const history = await ListeningHistory.create({ userId: req.user._id, songId });
     res.json(history);
   } catch (error) {

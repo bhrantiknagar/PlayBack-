@@ -113,11 +113,18 @@ export function PlayerProvider({ children }) {
               savePlaylists(mapped);
             }
             if (data.history) {
-              const mappedHistory = data.history.map(h => ({
-                id: h.songId,
-                position: h.position || 0,
-                playedAt: h.playedAt || Date.now()
-              }));
+              const seen = new Set();
+              const mappedHistory = [];
+              for (const h of data.history) {
+                if (h.songId && !seen.has(h.songId)) {
+                  seen.add(h.songId);
+                  mappedHistory.push({
+                    id: h.songId,
+                    position: h.position || 0,
+                    playedAt: h.playedAt || Date.now()
+                  });
+                }
+              }
               setRecentlyPlayed(mappedHistory);
             }
           })
@@ -132,7 +139,16 @@ export function PlayerProvider({ children }) {
       const saved = window.localStorage.getItem('playback_recently_played');
       if (!saved) return [];
       const parsed = JSON.parse(saved);
-      return parsed.map(item => typeof item === 'string' ? { id: item, position: 0, playedAt: Date.now() } : item);
+      const items = parsed.map(item => typeof item === 'string' ? { id: item, position: 0, playedAt: Date.now() } : item);
+      const seen = new Set();
+      const deduped = [];
+      for (const item of items) {
+        if (item && item.id && !seen.has(item.id)) {
+          seen.add(item.id);
+          deduped.push(item);
+        }
+      }
+      return deduped;
     } catch { return []; }
   });
 
