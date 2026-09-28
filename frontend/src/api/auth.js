@@ -4,6 +4,16 @@ const API_URL = `${BASE_URL}/api/auth`;
 const safeFetchJson = async (url, options, defaultErrorMsg) => {
   try {
     const response = await fetch(url, options);
+    const contentType = response.headers.get('content-type') || '';
+    
+    if (!contentType.includes('application/json')) {
+      throw new Error(
+        import.meta.env.PROD
+          ? 'Backend API server is unreachable. Please make sure VITE_API_URL is set in Vercel to your deployed backend URL.'
+          : 'Unable to connect to backend server. Please make sure the backend server is running on port 5000.'
+      );
+    }
+
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       throw new Error(data.message || defaultErrorMsg);
@@ -11,7 +21,11 @@ const safeFetchJson = async (url, options, defaultErrorMsg) => {
     return data;
   } catch (error) {
     if (error.name === 'TypeError' || error.message.includes('fetch')) {
-      throw new Error('Unable to connect to backend server. Please make sure the backend server is running on port 5000.');
+      throw new Error(
+        import.meta.env.PROD
+          ? 'Unable to connect to backend server. Please make sure your backend is deployed and VITE_API_URL is configured in Vercel.'
+          : 'Unable to connect to backend server. Please make sure the backend server is running on port 5000.'
+      );
     }
     throw error;
   }

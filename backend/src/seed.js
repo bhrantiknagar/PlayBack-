@@ -151,7 +151,7 @@ const tracks = [
     energy: 'Euphoria',
     ambientColor: '#8b5cf6',
     plays: '7,450,000',
-    lyrics: []
+    lyrics: [] 
   },
   {
     id: 'track-10',
