@@ -30,14 +30,24 @@ function SectionHeader({ icon: Icon, iconColor, title, count }) {
 
 // Track card grid
 function TrackGrid({ tracks: trackList }) {
+  const uniqueTracks = useMemo(() => {
+    if (!Array.isArray(trackList)) return [];
+    const seen = new Set();
+    return trackList.filter(t => {
+      if (!t || !t.id || seen.has(t.id)) return false;
+      seen.add(t.id);
+      return true;
+    });
+  }, [trackList]);
+
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(195px, 1fr))',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(175px, 1fr))',
       gap: '18px'
     }}>
-      {trackList.map(track => (
-        <TrackCard key={track.id} track={track} trackList={trackList} />
+      {uniqueTracks.map(track => (
+        <TrackCard key={track.id} track={track} trackList={uniqueTracks} />
       ))}
     </div>
   );
@@ -94,40 +104,43 @@ export function Home() {
     return `${mins}:${remainingSecs < 10 ? '0' : ''}${remainingSecs}`;
   };
 
-  // Continue Listening - tracks with position > 5s
+  // Continue Listening - tracks with position > 5s (Unique)
   const continueListeningTracks = useMemo(() => {
-    return recentlyPlayed
-      .filter(item => item.position > 5)
-      .map(item => {
-         const track = trackById[item.id];
-         if (track) {
-           return {
-             ...track,
-             artwork: track.artwork || track.coverUrl || track.cover || '/images/albums/album-01.jpg',
-             savedPosition: item.position
-           };
-         }
-         return null;
-      })
-      .filter(Boolean)
-      .slice(0, 6);
-  }, [recentlyPlayed, trackById]);
-
-  // Recently Played — ordered by most recent play, limit 6
-  const recentTracks = useMemo(() => {
-    return recentlyPlayed
-      .map(item => {
+    const seen = new Set();
+    const result = [];
+    for (const item of recentlyPlayed) {
+      if (item && item.id && item.position > 5 && !seen.has(item.id)) {
+        seen.add(item.id);
         const track = trackById[item.id];
         if (track) {
-          return {
+          result.push({
+            ...track,
+            artwork: track.artwork || track.coverUrl || track.cover || '/images/albums/album-01.jpg',
+            savedPosition: item.position
+          });
+        }
+      }
+    }
+    return result.slice(0, 6);
+  }, [recentlyPlayed, trackById]);
+
+  // Recently Played — ordered by most recent play, limit 6 (Unique)
+  const recentTracks = useMemo(() => {
+    const seen = new Set();
+    const result = [];
+    for (const item of recentlyPlayed) {
+      if (item && item.id && !seen.has(item.id)) {
+        seen.add(item.id);
+        const track = trackById[item.id];
+        if (track) {
+          result.push({
             ...track,
             artwork: track.artwork || track.coverUrl || track.cover || '/images/albums/album-01.jpg'
-          };
+          });
         }
-        return null;
-      })
-      .filter(Boolean)
-      .slice(0, 6);
+      }
+    }
+    return result.slice(0, 6);
   }, [recentlyPlayed, trackById]);
 
   // Your Favorites — tracks that are liked

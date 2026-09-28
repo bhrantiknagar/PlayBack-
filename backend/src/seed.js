@@ -181,7 +181,7 @@ const seedData = async () => {
     await Album.deleteMany({});
     await Artist.deleteMany({});
     console.log('Cleared existing library data');
-
+ 
     // Extract unique artists
     const artistNames = [...new Set(tracks.map(t => t.artist))];
     const artistDocs = artistNames.map(name => {

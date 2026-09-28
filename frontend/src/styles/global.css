@@ -608,3 +608,30 @@ input, textarea, select {
     padding: 0 12px;
   }
 }
+
+/* Mobile Small Devices (<= 600px) */
+@media (max-width: 600px) {
+  .main-content {
+    padding: 14px 12px 190px 12px !important;
+  }
+  .app-header {
+    padding: 0 12px !important;
+    gap: 8px;
+  }
+  .search-bar-wrap {
+    width: 100% !important;
+    max-width: 180px;
+    height: 34px !important;
+  }
+  .music-card-root {
+    padding: 10px !important;
+    gap: 8px !important;
+  }
+  .music-card-cover-box {
+    border-radius: var(--radius-xs) !important;
+  }
+  .flac-hi-res-tag {
+    font-size: 8px !important;
+    padding: 1px 4px !important;
+  }
+}

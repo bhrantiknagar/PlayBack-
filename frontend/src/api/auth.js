@@ -13,7 +13,7 @@ const safeFetchJson = async (url, options, defaultErrorMsg) => {
           : 'Unable to connect to backend server. Please make sure the backend server is running on port 5000.'
       );
     }
-
+ 
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       throw new Error(data.message || defaultErrorMsg);
