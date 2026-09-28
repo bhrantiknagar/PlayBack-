@@ -73,7 +73,7 @@ const tracks = [
     plays: '2,150,000',
     lyrics: []
   },
-  {
+  { 
     id: 'track-05',
     title: 'Glory (Super Slowed)',
     artist: 'Ogryzek',
