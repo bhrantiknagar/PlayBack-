@@ -2,23 +2,17 @@
 
 A sleek, high-performance music streaming web application.
 
-## 🚀 Quick Start
+## Quick Start
 
-### 1. Install Dependencies
-```bash
-npm install
+### URL
+```
+URL = https://playback-theta.vercel.app
 ```
 
-### 2. Run Application
-```bash
-npm run dev
-```
-- **Frontend**: `http://localhost:5173`
-- **Backend API**: `http://localhost:5000`
-
-## 🛠️ Tech Stack
+### Tech Stack
 - **Frontend**: React + Vite
 - **Backend**: Node.js + Express
 - **Database**: MongoDB Atlas
 - **Storage**: Cloudinary
 - **Deployment**: Vercel (Frontend), Render (Backend)
+
