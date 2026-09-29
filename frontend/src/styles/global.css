@@ -617,6 +617,19 @@ input, textarea, select {
   display: initial;
 }
 
+/* Responsive Track Card & General Card Grids */
+.responsive-track-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 20px;
+}
+
+.responsive-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 20px;
+}
+
 /* Tablet Responsive Design (769px - 1024px) */
 @media (max-width: 1024px) and (min-width: 769px) {
   :root {
@@ -646,6 +659,14 @@ input, textarea, select {
   .track-list-grid {
     grid-template-columns: 36px 2.2fr 1.4fr 55px 75px;
   }
+  .responsive-track-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
+  .responsive-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
 }
 
 /* Mobile Responsive Design (<= 768px) */
@@ -665,6 +686,15 @@ input, textarea, select {
   }
   .main-content {
     padding: 16px 14px 170px 14px !important;
+  }
+
+  .responsive-track-grid {
+    grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)) !important;
+    gap: 12px !important;
+  }
+  .responsive-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    gap: 12px !important;
   }
 
   /* Track List Mobile Adjustments */
@@ -768,6 +798,11 @@ input, textarea, select {
 @media (max-width: 480px) {
   .main-content {
     padding: 12px 10px 175px 10px !important;
+  }
+  .responsive-track-grid,
+  .responsive-card-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
   }
 }
 
