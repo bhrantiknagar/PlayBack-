@@ -6,7 +6,7 @@ A sleek, high-performance music streaming web application.
 
 ### URL
 ```
-URL = https://playback-theta.vercel.app
+https://playback-theta.vercel.app
 ```
 
 ### Tech Stack
