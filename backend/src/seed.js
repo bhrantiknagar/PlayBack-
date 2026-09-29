@@ -21,7 +21,7 @@ const tracks = [
     genre: 'Dance / Electronic',
     category: 'Drive',
     energy: 'Drive',
-    ambientColor: '#e11d48',
+    ambientColor: '#1f68c1ff',
     plays: '1,240,500',
     lyrics: []
   },
@@ -37,7 +37,7 @@ const tracks = [
     genre: 'Electronic / Trap',
     category: 'Euphoria',
     energy: 'Euphoria',
-    ambientColor: '#4f46e5',
+    ambientColor: '#e636f986',
     plays: '2,890,100',
     lyrics: []
   },
@@ -53,7 +53,7 @@ const tracks = [
     genre: 'Phonk / Funk',
     category: 'Drive',
     energy: 'Drive',
-    ambientColor: '#9333ea',
+    ambientColor: '#efecf26f',
     plays: '1,840,200',
     lyrics: []
   },
@@ -64,13 +64,13 @@ const tracks = [
     album: 'Funk Universo',
     audio: 'https://res.cloudinary.com/dcmuyht9n/video/upload/v1790023244/playback/ax8qqm4clwery8jxvwzl.mp3',
     artwork: 'https://res.cloudinary.com/dcmuyht9n/image/upload/v1790023250/playback/vidvqixcx31shnmatc4z.jpg',
-    duration: 0,
+    duration: 162,
     quality: 'Lossless',
     genre: 'Phonk / Funk',
     category: 'Drive',
     energy: 'Drive',
-    ambientColor: '#0284c7',
-    plays: '2,150,000',
+    ambientColor: '#08b422ff',
+    plays: '25,150,000',
     lyrics: []
   },
   { 
@@ -85,7 +85,7 @@ const tracks = [
     genre: 'Slowed & Reverb',
     category: 'Chill',
     energy: 'Chill',
-    ambientColor: '#d97706',
+    ambientColor: '#730000ff',
     plays: '3,410,800',
     lyrics: []
   },
@@ -101,7 +101,7 @@ const tracks = [
     genre: 'Progressive House',
     category: 'Euphoria',
     energy: 'Euphoria',
-    ambientColor: '#10b981',
+    ambientColor: '#07033dff',
     plays: '5,120,400',
     lyrics: []
   },
@@ -149,7 +149,7 @@ const tracks = [
     genre: 'Electronic / Pop',
     category: 'Euphoria',
     energy: 'Euphoria',
-    ambientColor: '#8b5cf6',
+    ambientColor: '#ff7926ff',
     plays: '7,450,000',
     lyrics: [] 
   },
