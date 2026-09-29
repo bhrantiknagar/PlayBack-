@@ -104,7 +104,7 @@ export function Header() {
             }}>
               {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
             </div>
-            <span style={{ fontSize: '12.5px', fontWeight: '600', color: 'var(--text-primary)' }}>{user.name}</span>
+            <span className="desktop-only-widget" style={{ fontSize: '12.5px', fontWeight: '600', color: 'var(--text-primary)' }}>{user.name}</span>
           </div>
           </>
         ) : (

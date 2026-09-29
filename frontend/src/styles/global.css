@@ -669,32 +669,41 @@ input, textarea, select {
   }
 }
 
+.mobile-only-widget {
+  display: none !important;
+}
+
 /* Mobile Responsive Design (<= 768px) */
 @media (max-width: 768px) {
   .app-sidebar {
     display: none !important;
   }
   .app-header {
-    padding: 0 14px !important;
-    gap: 10px;
+    padding: 0 12px !important;
+    gap: 8px;
   }
   .search-bar-wrap {
     flex: 1;
-    width: 100% !important;
+    min-width: 0 !important;
+    width: auto !important;
     max-width: none;
     height: 36px;
   }
   .main-content {
-    padding: 16px 14px 170px 14px !important;
+    padding: 14px 12px 165px 12px !important;
+    overflow-x: hidden !important;
   }
 
-  .responsive-track-grid {
-    grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)) !important;
-    gap: 12px !important;
-  }
+  .responsive-track-grid,
   .responsive-card-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
-    gap: 12px !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .music-card-root {
+    padding: 8px !important;
+    gap: 8px !important;
   }
 
   /* Track List Mobile Adjustments */
@@ -711,8 +720,8 @@ input, textarea, select {
     left: 8px !important;
     right: 8px !important;
     bottom: calc(var(--mobile-nav-height) + 8px) !important;
-    height: 62px !important;
-    padding: 0 10px !important;
+    height: 60px !important;
+    padding: 0 12px !important;
     border-radius: var(--radius-md) !important;
     background: rgba(14, 18, 26, 0.96) !important;
     backdrop-filter: blur(24px) !important;
@@ -726,23 +735,28 @@ input, textarea, select {
 
   .player-dock-left {
     flex: 1 !important;
+    min-width: 0 !important;
     width: auto !important;
     gap: 10px !important;
+    margin-right: 8px !important;
   }
 
   .player-dock-center {
-    flex: none !important;
-    max-width: none !important;
-    padding: 0 !important;
+    display: none !important;
   }
 
   .player-dock-right {
     width: auto !important;
-    gap: 6px !important;
+    flex-shrink: 0 !important;
+    gap: 8px !important;
   }
 
   .desktop-only-widget {
     display: none !important;
+  }
+
+  .mobile-only-widget {
+    display: flex !important;
   }
 
   .mobile-mini-player-progress {

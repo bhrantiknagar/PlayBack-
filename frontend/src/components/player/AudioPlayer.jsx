@@ -109,10 +109,9 @@ export function AudioPlayer() {
           </div>
         </div>
 
-        <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+        <div onClick={() => setIsNowPlayingOpen(true)} style={{ minWidth: 0, flex: 1, overflow: 'hidden', cursor: 'pointer' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span
-              onClick={() => setIsNowPlayingOpen(true)}
               style={{
                 fontSize: '13.5px',
                 fontWeight: '600',
@@ -154,16 +153,25 @@ export function AudioPlayer() {
         />
       </div>
 
-      {/* Center: Playback Controls & Wave Timeline */}
-      <div className="player-dock-center">
+      {/* Center: Playback Controls & Wave Timeline (Desktop Only) */}
+      <div className="player-dock-center desktop-only-widget">
         <TrackControls />
-        <div className="desktop-only-widget" style={{ width: '100%' }}>
+        <div style={{ width: '100%' }}>
           <ProgressBar />
         </div>
       </div>
 
-      {/* Right: Soft Wave Visualizer, Volume & Utility Controls */}
+      {/* Right: Controls & Mobile Compact Play Button */}
       <div className="player-dock-right">
+        {/* Mobile Mini-Player Play/Pause */}
+        <div className="mobile-only-widget">
+          <PlayPauseButton
+            isPlaying={isPlaying}
+            onClick={togglePlay}
+            size={38}
+          />
+        </div>
+
         {/* Soft Wave Visualizer */}
         <div
           onClick={() => setIsNowPlayingOpen(true)}
@@ -190,6 +198,7 @@ export function AudioPlayer() {
           icon={ListMusic}
           onClick={() => setIsQueueOpen(!isQueueOpen)}
           variant={isQueueOpen ? 'active' : 'default'}
+          className="desktop-only-widget"
           aria-label="Toggle playback queue"
           title="Playback Queue"
           size="sm"
