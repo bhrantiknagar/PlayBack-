@@ -11,6 +11,13 @@ export function ProgressBar({ isMiniPlayer = false }) {
   const [dragTime, setDragTime] = useState(null);
   const barRef = useRef(null);
 
+  const calculateTimeFromPointer = useCallback((e) => {
+    if (!barRef.current || !duration) return 0;
+    const rect = barRef.current.getBoundingClientRect();
+    const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    return pos * duration;
+  }, [duration]);
+
   const displayTime = isDragging && dragTime !== null ? dragTime : currentTime;
   const percentage = duration > 0 ? Math.min(100, Math.max(0, (displayTime / duration) * 100)) : 0;
 
@@ -36,13 +43,6 @@ export function ProgressBar({ isMiniPlayer = false }) {
       </div>
     );
   }
-
-  const calculateTimeFromPointer = useCallback((e) => {
-    if (!barRef.current || !duration) return 0;
-    const rect = barRef.current.getBoundingClientRect();
-    const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    return pos * duration;
-  }, [duration]);
 
   const handlePointerDown = (e) => {
     if (!duration) return;
