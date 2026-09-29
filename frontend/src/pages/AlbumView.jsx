@@ -110,24 +110,25 @@ export function AlbumView() {
       </button>
 
       {/* Album Hero Header Banner */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'flex-end',
-        gap: '32px',
-        padding: '36px',
-        background: `linear-gradient(180deg, ${ambientColor}33 0%, rgba(14, 18, 26, 0.85) 100%)`,
-        borderRadius: 'var(--radius-lg)',
-        border: `1px solid ${ambientColor}44`,
-        boxShadow: `0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px ${ambientColor}15`
-      }}>
+      <div
+        className="hero-header-banner"
+        style={{
+          background: `linear-gradient(180deg, ${ambientColor}33 0%, rgba(14, 18, 26, 0.85) 100%)`,
+          border: `1px solid ${ambientColor}44`,
+          boxShadow: `0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px ${ambientColor}15`
+        }}
+      >
         {/* Album Cover */}
-        <div style={{
-          position: 'relative',
-          width: '180px',
-          height: '180px',
-          flexShrink: 0,
-          boxShadow: '0 16px 36px rgba(0, 0, 0, 0.8)'
-        }}>
+        <div
+          className="hero-cover-box"
+          style={{
+            position: 'relative',
+            width: '180px',
+            height: '180px',
+            flexShrink: 0,
+            boxShadow: '0 16px 36px rgba(0, 0, 0, 0.8)'
+          }}
+        >
           <img
             src={album.artwork}
             alt={album.title}
@@ -146,7 +147,7 @@ export function AlbumView() {
         </div>
 
         {/* Album Details */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, minWidth: 0 }}>
+        <div className="hero-header-details" style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span className="flac-hi-res-tag">STUDIO MASTER</span>
             <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#a5b4fc' }}>
@@ -155,7 +156,6 @@ export function AlbumView() {
           </div>
 
           <h1 style={{
-            fontSize: '38px',
             fontWeight: '900',
             letterSpacing: '-1px',
             lineHeight: '1.15',
@@ -189,7 +189,8 @@ export function AlbumView() {
             fontSize: '12px',
             fontFamily: 'var(--font-mono)',
             color: 'var(--text-muted)',
-            marginTop: '4px'
+            marginTop: '4px',
+            flexWrap: 'wrap'
           }}>
             <span>{albumTracks.length} {albumTracks.length === 1 ? 'TRACK' : 'TRACKS'}</span>
             <span>•</span>

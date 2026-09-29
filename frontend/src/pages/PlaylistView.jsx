@@ -69,17 +69,16 @@ export function PlaylistView() {
       </button>
 
       {/* Playlist Hero Header */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'flex-end',
-        gap: '32px',
-        padding: '36px',
-        background: 'linear-gradient(180deg, rgba(99, 102, 241, 0.22) 0%, rgba(14, 18, 26, 0.8) 100%)',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-subtle)',
-        boxShadow: 'var(--shadow-lg)'
-      }}>
-        <div style={{ position: 'relative', width: '180px', height: '180px', flexShrink: 0 }}>
+      <div
+        className="hero-header-banner"
+        style={{
+          background: 'linear-gradient(180deg, rgba(99, 102, 241, 0.22) 0%, rgba(14, 18, 26, 0.8) 100%)',
+          borderRadius: 'var(--radius-lg)',
+          border: '1px solid var(--border-subtle)',
+          boxShadow: 'var(--shadow-lg)'
+        }}
+      >
+        <div className="hero-cover-box" style={{ position: 'relative', width: '180px', height: '180px', flexShrink: 0 }}>
           <img
             src={playlist.coverUrl}
             alt={playlist.title}
@@ -87,13 +86,13 @@ export function PlaylistView() {
           />
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="hero-header-details" style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span className="flac-hi-res-tag">CURATED VAULT</span>
             <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#a5b4fc' }}>USER COLLECTION</span>
           </div>
 
-          <h1 style={{ fontSize: '36px', fontWeight: '900', letterSpacing: '-1px', lineHeight: '1.1' }}>
+          <h1 style={{ fontWeight: '900', letterSpacing: '-1px', lineHeight: '1.1' }}>
             {playlist.title}
           </h1>
 
@@ -101,7 +100,7 @@ export function PlaylistView() {
             {playlist.description}
           </p>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
             <span>CURATOR: <strong style={{ color: '#fff' }}>{playlist.creator}</strong></span>
             <span>•</span>
             <span>{playlistTracks.length} TRACKS</span>

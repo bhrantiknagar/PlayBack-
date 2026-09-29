@@ -41,11 +41,7 @@ function TrackGrid({ tracks: trackList }) {
   }, [trackList]);
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(175px, 1fr))',
-      gap: '18px'
-    }}>
+    <div className="responsive-track-grid">
       {uniqueTracks.map(track => (
         <TrackCard key={track.id} track={track} trackList={uniqueTracks} />
       ))}
@@ -414,11 +410,7 @@ export function Home() {
                 <Radio size={18} color="var(--accent-secondary)" />
                 <h2 style={{ fontSize: '19px', fontWeight: '700' }}>Your Playlists</h2>
               </div>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-                gap: '18px'
-              }}>
+              <div className="responsive-card-grid">
                 {playlists.map(pl => (
                   <PlaylistCard key={pl.id} playlist={pl} />
                 ))}
@@ -449,11 +441,7 @@ export function Home() {
                 <Radio size={18} color="var(--accent-secondary)" />
                 <h2 style={{ fontSize: '19px', fontWeight: '700' }}>Curated Sound Vaults</h2>
               </div>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-                gap: '18px'
-              }}>
+              <div className="responsive-card-grid">
                 {mockPlaylists.map(pl => (
                   <PlaylistCard key={pl.id} playlist={pl} />
                 ))}

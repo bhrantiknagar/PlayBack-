@@ -40,6 +40,7 @@ export function QueueDrawer() {
 
   return (
     <div
+      className="queue-drawer-container"
       style={{
         position: 'fixed',
         top: 0,

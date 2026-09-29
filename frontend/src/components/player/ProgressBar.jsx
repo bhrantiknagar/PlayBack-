@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { usePlayer } from '../../context/PlayerContext';
 import { formatTime } from '../../utils/formatTime';
 
-export function ProgressBar() {
+export function ProgressBar({ isMiniPlayer = false }) {
   const { currentTime, duration, seek } = usePlayer();
   const [hoverTime, setHoverTime] = useState(null);
   const [hoverPos, setHoverPos] = useState(0);
@@ -13,6 +13,29 @@ export function ProgressBar() {
 
   const displayTime = isDragging && dragTime !== null ? dragTime : currentTime;
   const percentage = duration > 0 ? Math.min(100, Math.max(0, (displayTime / duration) * 100)) : 0;
+
+  if (isMiniPlayer) {
+    return (
+      <div
+        style={{
+          width: '100%',
+          height: '3px',
+          background: 'rgba(255, 255, 255, 0.12)',
+          position: 'relative'
+        }}
+      >
+        <div
+          style={{
+            width: `${percentage}%`,
+            height: '100%',
+            background: 'var(--accent-primary)',
+            borderRadius: '2px',
+            transition: isDragging ? 'none' : 'width 0.2s linear'
+          }}
+        />
+      </div>
+    );
+  }
 
   const calculateTimeFromPointer = useCallback((e) => {
     if (!barRef.current || !duration) return 0;

@@ -99,28 +99,29 @@ export function ArtistView() {
       </button>
 
       {/* Artist Hero Header Banner */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '32px',
-        padding: '36px',
-        background: `linear-gradient(135deg, ${ambientColor}28 0%, rgba(14, 18, 26, 0.9) 65%, #08090d 100%)`,
-        borderRadius: 'var(--radius-lg)',
-        border: `1px solid ${ambientColor}44`,
-        boxShadow: `0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px ${ambientColor}15`,
-        flexWrap: 'wrap'
-      }}>
+      <div
+        className="hero-header-banner"
+        style={{
+          background: `linear-gradient(135deg, ${ambientColor}28 0%, rgba(14, 18, 26, 0.9) 65%, #08090d 100%)`,
+          borderRadius: 'var(--radius-lg)',
+          border: `1px solid ${ambientColor}44`,
+          boxShadow: `0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px ${ambientColor}15`
+        }}
+      >
         {/* Artist Portrait */}
-        <div style={{
-          position: 'relative',
-          width: '160px',
-          height: '160px',
-          borderRadius: '50%',
-          overflow: 'hidden',
-          flexShrink: 0,
-          boxShadow: '0 16px 36px rgba(0, 0, 0, 0.8)',
-          border: `3px solid ${ambientColor}`
-        }}>
+        <div
+          className="hero-cover-box"
+          style={{
+            position: 'relative',
+            width: '160px',
+            height: '160px',
+            borderRadius: '50%',
+            overflow: 'hidden',
+            flexShrink: 0,
+            boxShadow: '0 16px 36px rgba(0, 0, 0, 0.8)',
+            border: `3px solid ${ambientColor}`
+          }}
+        >
           <img
             src={artist.avatar}
             alt={artist.name}
@@ -137,7 +138,7 @@ export function ArtistView() {
         </div>
 
         {/* Artist Details */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, minWidth: '240px' }}>
+        <div className="hero-header-details" style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <CheckCircle2 size={15} color="#34d399" />
             <span className="flac-hi-res-tag">VERIFIED ARTIST</span>
@@ -147,7 +148,6 @@ export function ArtistView() {
           </div>
 
           <h1 style={{
-            fontSize: '40px',
             fontWeight: '900',
             letterSpacing: '-1.2px',
             lineHeight: '1.1',
@@ -173,7 +173,8 @@ export function ArtistView() {
             fontSize: '12px',
             fontFamily: 'var(--font-mono)',
             color: 'var(--text-muted)',
-            marginTop: '4px'
+            marginTop: '4px',
+            flexWrap: 'wrap'
           }}>
             <span>{artist.tracks.length} {artist.tracks.length === 1 ? 'TRACK' : 'TRACKS'}</span>
             <span>•</span>

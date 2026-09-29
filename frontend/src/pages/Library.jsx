@@ -226,11 +226,7 @@ export function Library() {
       {/* 1. Albums Tab View */}
       {activeTab === 'albums' && (
         <div>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-            gap: '20px'
-          }}>
+          <div className="responsive-card-grid">
             {sortedAlbums.map(album => (
               <AlbumCard key={album.id} album={album} />
             ))}
@@ -240,11 +236,7 @@ export function Library() {
 
       {/* 2. Artists Tab View */}
       {activeTab === 'artists' && (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))',
-          gap: '20px'
-        }}>
+        <div className="responsive-card-grid">
           {sortedArtists.map(artist => (
             <ArtistCard key={artist.id} artist={artist} />
           ))}
@@ -267,11 +259,7 @@ export function Library() {
       {/* 4. Vaults (Playlists) Tab View */}
       {activeTab === 'vaults' && (
         <div>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))',
-            gap: '20px'
-          }}>
+          <div className="responsive-card-grid">
             {playlists.map(pl => (
               <PlaylistCard key={pl.id} playlist={pl} />
             ))}

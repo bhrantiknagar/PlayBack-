@@ -36,11 +36,7 @@ export function Explore() {
         <h2 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '16px', color: 'var(--text-secondary)' }}>
           Sonic Domains
         </h2>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-          gap: '18px'
-        }}>
+        <div className="responsive-card-grid">
           {mockGenres.map(genre => (
             <div
               key={genre.id}
@@ -79,11 +75,7 @@ export function Explore() {
           <Sparkles size={20} color="var(--accent-primary)" />
           <h2 style={{ fontSize: '20px', fontWeight: '700' }}>Fresh Audiophile Masters</h2>
         </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
-          gap: '24px'
-        }}>
+        <div className="responsive-track-grid">
           {tracks.map(track => (
             <TrackCard key={track.id} track={track} trackList={tracks} />
           ))}

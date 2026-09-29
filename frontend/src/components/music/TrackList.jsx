@@ -14,22 +14,10 @@ function TrackListComponent({ tracks = [], showHeader = true, onRemoveTrack = nu
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
       {showHeader && (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: onRemoveTrack ? '44px 2.5fr 1.8fr 70px 80px' : '44px 2.5fr 1.8fr 70px 80px',
-          padding: '8px 16px',
-          color: 'var(--text-muted)',
-          fontSize: '11px',
-          fontWeight: '600',
-          fontFamily: 'var(--font-mono)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.6px',
-          borderBottom: '1px solid var(--border-subtle)',
-          marginBottom: '6px'
-        }}>
-          <span>#</span>
+        <div className="track-list-grid track-list-header">
+          <span className="desktop-tablet-only-widget">#</span>
           <span>Title / Artist</span>
-          <span>Album</span>
+          <span className="desktop-tablet-only-widget">Album</span>
           <span style={{ textAlign: 'right' }}><Clock size={12} /></span>
           <span style={{ textAlign: 'right' }}>Actions</span>
         </div>
@@ -52,20 +40,14 @@ function TrackListComponent({ tracks = [], showHeader = true, onRemoveTrack = nu
               key={track.id || idx}
               onClick={() => playTrack(track, tracks)}
               style={{
-                display: 'grid',
-                gridTemplateColumns: onRemoveTrack ? '44px 2.5fr 1.8fr 70px 80px' : '44px 2.5fr 1.8fr 70px 80px',
-                alignItems: 'center',
-                padding: '9px 16px',
                 borderRadius: 'var(--radius-sm)',
                 background: isCurrent ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
                 border: isCurrent ? '1px solid rgba(99, 102, 241, 0.25)' : '1px solid transparent',
-                cursor: 'pointer',
-                transition: 'background var(--transition-fast), border-color var(--transition-fast)'
               }}
-              className="track-row-hover"
+              className="track-list-grid track-list-row track-row-hover"
             >
               {/* Index or Soft Mini-Wave Indicator */}
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div className="desktop-tablet-only-widget" style={{ display: 'flex', alignItems: 'center' }}>
                 {isCurrent && isPlaying ? (
                   <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', height: '14px' }}>
                     <span style={{ width: '2.5px', borderRadius: '1px', background: '#06b6d4', animation: 'softWave1 0.9s ease-in-out infinite' }} />
@@ -84,7 +66,7 @@ function TrackListComponent({ tracks = [], showHeader = true, onRemoveTrack = nu
               </div>
 
               {/* Title & Artist with Artwork */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, paddingRight: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, paddingRight: '6px' }}>
                 <img
                   src={artworkSrc}
                   alt={title}
@@ -108,7 +90,7 @@ function TrackListComponent({ tracks = [], showHeader = true, onRemoveTrack = nu
                       {title}
                     </span>
                     {isHighQuality && (
-                      <span className="flac-hi-res-tag" style={{ fontSize: '8.5px', padding: '1px 4px' }}>
+                      <span className="flac-hi-res-tag desktop-tablet-only-widget" style={{ fontSize: '8.5px', padding: '1px 4px' }}>
                         {track.quality}
                       </span>
                     )}
@@ -127,7 +109,7 @@ function TrackListComponent({ tracks = [], showHeader = true, onRemoveTrack = nu
               </div>
 
               {/* Album */}
-              <span style={{ fontSize: '13px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: '12px' }}>
+              <span className="desktop-tablet-only-widget" style={{ fontSize: '13px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: '12px' }}>
                 {album}
               </span>
 

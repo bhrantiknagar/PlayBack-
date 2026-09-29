@@ -586,6 +586,37 @@ input, textarea, select {
   display: none;
 }
 
+/* Responsive Track List Grid & Elements */
+.track-list-grid {
+  display: grid;
+  grid-template-columns: 44px 2.5fr 1.8fr 70px 80px;
+  align-items: center;
+  gap: 8px;
+}
+
+.track-list-header {
+  padding: 8px 16px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 6px;
+}
+
+.track-list-row {
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.desktop-tablet-only-widget {
+  display: initial;
+}
+
 /* Tablet Responsive Design (769px - 1024px) */
 @media (max-width: 1024px) and (min-width: 769px) {
   :root {
@@ -612,6 +643,9 @@ input, textarea, select {
   .player-dock-right {
     width: 220px;
   }
+  .track-list-grid {
+    grid-template-columns: 36px 2.2fr 1.4fr 55px 75px;
+  }
 }
 
 /* Mobile Responsive Design (<= 768px) */
@@ -631,6 +665,15 @@ input, textarea, select {
   }
   .main-content {
     padding: 16px 14px 170px 14px !important;
+  }
+
+  /* Track List Mobile Adjustments */
+  .track-list-grid {
+    grid-template-columns: 1fr 55px 70px !important;
+    padding: 8px 10px !important;
+  }
+  .desktop-tablet-only-widget {
+    display: none !important;
   }
 
   /* Sleek Modern Mobile Player Bar */
@@ -699,6 +742,26 @@ input, textarea, select {
     justify-content: space-around;
     padding: 0 8px;
   }
+
+  /* Responsive Hero Header Container */
+  .hero-header-banner {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 20px 16px !important;
+    gap: 18px !important;
+  }
+  .hero-header-banner .hero-cover-box {
+    width: 140px !important;
+    height: 140px !important;
+  }
+  .hero-header-banner .hero-header-details {
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .hero-header-banner h1 {
+    font-size: 24px !important;
+  }
 }
 
 /* Small Devices (<= 480px) */
@@ -707,3 +770,4 @@ input, textarea, select {
     padding: 12px 10px 175px 10px !important;
   }
 }
+

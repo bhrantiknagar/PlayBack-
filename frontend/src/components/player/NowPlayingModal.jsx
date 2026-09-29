@@ -6,6 +6,7 @@ import { ProgressBar } from './ProgressBar';
 import { VolumeControl } from './VolumeControl';
 import { Visualizer } from '../music/Visualizer';
 import { IconButton } from '../ui/IconButton';
+import './NowPlayingModal.css';
 
 const DEFAULT_ARTWORK = '/images/albums/album-01.jpg';
 
@@ -36,31 +37,18 @@ export function NowPlayingModal() {
 
   return (
     <div
+      className="now-playing-overlay"
       style={{
-        position: 'fixed',
-        inset: 0,
-        background: `radial-gradient(circle at 50% 35%, ${activeColor}22 0%, rgba(14, 18, 26, 0.98) 65%, #06070a 100%)`,
-        backdropFilter: 'blur(36px)',
-        zIndex: 1000,
-        overflowY: 'auto',
-        color: '#fff',
-        animation: 'fadeInScale 0.28s cubic-bezier(0.16, 1, 0.3, 1)'
+        '--active-ambient-color': activeColor
       }}
       role="dialog"
       aria-modal="true"
       aria-label="Now playing listening space"
     >
-      {/* 100vh wrapper for main player to preserve existing layout */}
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        padding: '36px 48px',
-      }}>
+      <div className="now-playing-container">
         {/* Top Header Bar */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: '1080px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="now-playing-header">
+          <div className="now-playing-header-tag">
             <span className="flac-hi-res-tag">
               {quality}
             </span>
@@ -79,64 +67,17 @@ export function NowPlayingModal() {
           />
         </div>
 
-        {/* Main Listening Space Area (Balanced 2-column composition) */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          alignItems: 'center',
-          gap: '64px',
-          maxWidth: '1080px',
-          margin: 'auto',
-          width: '100%',
-          padding: '24px 0',
-          flex: 1
-        }}>
+        {/* Main Listening Space Area */}
+        <div className="now-playing-main-grid">
           {/* Left Column: 3D Artwork with Live Spinning Vinyl */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{
-              position: 'relative',
-              width: '320px',
-              height: '320px',
-              borderRadius: 'var(--radius-md)',
-              boxShadow: `0 24px 60px rgba(0, 0, 0, 0.85), 0 0 35px ${activeColor}33`
-            }}>
+          <div className="now-playing-artwork-col">
+            <div className="now-playing-cover-wrapper" style={{ boxShadow: `0 24px 60px rgba(0, 0, 0, 0.85), 0 0 35px ${activeColor}33` }}>
               {/* Realistic Spinning Vinyl Disc */}
               <div
-                className={`animate-spin-slow ${!isPlaying ? 'animate-spin-paused' : ''}`}
-                style={{
-                  position: 'absolute',
-                  top: '5px',
-                  right: '-46%',
-                  width: '310px',
-                  height: '310px',
-                  borderRadius: '50%',
-                  background: `
-                    conic-gradient(from 45deg, rgba(255,255,255,0.08) 0deg, transparent 40deg, rgba(255,255,255,0.15) 90deg, transparent 140deg, rgba(255,255,255,0.08) 180deg, transparent 220deg, rgba(255,255,255,0.15) 270deg, transparent 320deg),
-                    repeating-radial-gradient(circle, #1a1a1a 0px, #1a1a1a 2px, #0e0e0e 3px, #080808 5px, #1e1e1e 6px)
-                  `,
-                  border: '2px solid rgba(255, 255, 255, 0.12)',
-                  boxShadow: '0 16px 40px rgba(0, 0, 0, 0.9), 0 0 15px rgba(0, 0, 0, 0.8)',
-                  zIndex: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'none'
-                }}
+                className={`now-playing-vinyl-disc animate-spin-slow ${!isPlaying ? 'animate-spin-paused' : ''}`}
               >
                 {/* Circular Vinyl Center Label */}
-                <div style={{
-                  position: 'relative',
-                  width: '108px',
-                  height: '108px',
-                  borderRadius: '50%',
-                  background: '#151922',
-                  border: '3px solid #111',
-                  boxShadow: 'inset 0 0 12px rgba(0, 0, 0, 0.8)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  overflow: 'hidden'
-                }}>
+                <div className="now-playing-vinyl-label">
                   <img
                     src={artworkSrc}
                     alt=""
@@ -152,15 +93,7 @@ export function NowPlayingModal() {
                     }}
                   />
                   {/* Center Spindle Hole */}
-                  <div style={{
-                    position: 'absolute',
-                    width: '16px',
-                    height: '16px',
-                    borderRadius: '50%',
-                    background: '#08090d',
-                    border: '2px solid rgba(255, 255, 255, 0.4)',
-                    boxShadow: 'inset 0 0 4px rgba(0,0,0,0.9)'
-                  }} />
+                  <div className="now-playing-spindle-hole" />
                 </div>
               </div>
 
@@ -168,16 +101,7 @@ export function NowPlayingModal() {
               <img
                 src={artworkSrc}
                 alt={title}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  borderRadius: 'var(--radius-md)',
-                  position: 'relative',
-                  zIndex: 2,
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  boxShadow: '0 8px 30px rgba(0, 0, 0, 0.6)'
-                }}
+                className="now-playing-cover-img"
                 onError={(e) => {
                   e.currentTarget.onerror = null;
                   e.currentTarget.src = DEFAULT_ARTWORK;
@@ -186,31 +110,18 @@ export function NowPlayingModal() {
             </div>
 
             {/* Synchronized Real-time Lyric / Subtitle preview */}
-            <div style={{
-              marginTop: '28px',
-              textAlign: 'center',
-              maxWidth: '420px',
-              padding: '10px 20px',
-              background: 'rgba(255, 255, 255, 0.04)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border-subtle)'
-            }}>
-              <p style={{
-                fontSize: '14.5px',
-                fontStyle: 'italic',
-                color: '#f1f5f9',
-                lineHeight: '1.45'
-              }}>
+            <div className="now-playing-lyric-box">
+              <p className="now-playing-lyric-text">
                 "{currentLyric}"
               </p>
             </div>
           </div>
 
           {/* Right Column: Track Information, Soft Wave Visualizer & Metadata */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div className="now-playing-info-col">
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '11.5px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.2px', color: '#a5b4fc', fontFamily: 'var(--font-mono)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                <span className="now-playing-genre-tag">
                   {currentTrack.genre || 'Acoustic Space'}
                 </span>
                 <IconButton
@@ -226,104 +137,70 @@ export function NowPlayingModal() {
               </div>
 
               {/* Track Title */}
-              <h1 style={{ fontSize: '34px', fontWeight: '800', marginTop: '6px', letterSpacing: '-0.8px', lineHeight: '1.15' }}>
+              <h1 className="now-playing-title">
                 {title}
               </h1>
               {/* Artist & Album */}
-              <h3 style={{ fontSize: '16px', color: 'var(--text-secondary)', fontWeight: '500', marginTop: '4px' }}>
+              <h3 className="now-playing-artist">
                 {artist} — <span style={{ color: 'var(--text-muted)' }}>{album}</span>
               </h3>
             </div>
 
             {/* Soft Waveform Canvas Visualizer */}
-            <div style={{
-              padding: '16px 20px',
-              background: 'rgba(0, 0, 0, 0.3)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border-subtle)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
+            <div className="now-playing-visualizer-box">
               <Visualizer width={360} height={54} isFull={true} />
             </div>
 
             {/* Track Metrics Card */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '12px',
-              fontFamily: 'var(--font-mono)'
-            }}>
-              <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>QUALITY</div>
-                <div style={{ fontSize: '13px', fontWeight: '700', color: '#34d399', marginTop: '2px' }}>{quality}</div>
+            <div className="now-playing-metrics-grid">
+              <div className="now-playing-metric-card">
+                <div className="now-playing-metric-label">QUALITY</div>
+                <div className="now-playing-metric-value" style={{ color: '#34d399' }}>{quality}</div>
               </div>
-              <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>MOOD</div>
-                <div style={{ fontSize: '13px', fontWeight: '700', color: '#a855f7', marginTop: '2px' }}>{currentTrack.energy || 'Drive'}</div>
+              <div className="now-playing-metric-card">
+                <div className="now-playing-metric-label">MOOD</div>
+                <div className="now-playing-metric-value" style={{ color: '#a855f7' }}>{currentTrack.energy || 'Drive'}</div>
               </div>
-              <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>PLAYS</div>
-                <div style={{ fontSize: '13px', fontWeight: '700', color: '#38bdf8', marginTop: '2px' }}>{currentTrack.plays || '1.2M'}</div>
+              <div className="now-playing-metric-card">
+                <div className="now-playing-metric-label">PLAYS</div>
+                <div className="now-playing-metric-value" style={{ color: '#38bdf8' }}>{currentTrack.plays || '1.2M'}</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Bottom Transport Controls */}
-        <div style={{
-          maxWidth: '780px',
-          margin: '0 auto',
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '12px',
-          paddingTop: '12px'
-        }}>
+        <div className="now-playing-controls-section">
           <ProgressBar />
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-            <div style={{ width: '130px' }} />
+          <div className="now-playing-transport-row">
+            <div className="now-playing-transport-spacer" />
             <TrackControls />
-            <VolumeControl />
+            <div className="desktop-only-widget">
+              <VolumeControl />
+            </div>
           </div>
         </div>
 
         {/* Lyrics Section */}
-        <div style={{
-          padding: '36px 48px 96px',
-          maxWidth: '800px',
-          margin: '0 auto',
-          textAlign: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '24px'
-        }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '800', color: activeColor, textTransform: 'uppercase', letterSpacing: '2px' }}>
+        <div className="now-playing-lyrics-container">
+          <h2 className="now-playing-lyrics-title" style={{ color: activeColor }}>
             Lyrics
           </h2>
 
           {currentTrack.lyrics && currentTrack.lyrics.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {currentTrack.lyrics.map((lyric, idx) => (
-                <p key={idx} style={{
-                  fontSize: '24px',
-                  lineHeight: '1.8',
-                  color: 'var(--text-primary)',
-                  fontWeight: '500',
-                  textShadow: '0 2px 10px rgba(0,0,0,0.5)'
-                }}>
+                <p key={idx} className="now-playing-lyric-line">
                   {lyric.text}
                 </p>
               ))}
             </div>
           ) : (
             <p style={{
-              fontSize: '18px',
+              fontSize: '16px',
               color: 'var(--text-muted)',
               fontStyle: 'italic',
-              marginTop: '32px'
+              marginTop: '16px'
             }}>
               No lyrics available for this track.
             </p>
