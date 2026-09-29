@@ -49,8 +49,13 @@ export class ErrorBoundary extends React.Component {
           <p style={{ color: 'var(--text-muted)', fontSize: '13.5px', maxWidth: '380px' }}>
             We encountered a temporary issue while loading this view.
           </p>
+          {this.state.error && (
+            <p style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#f43f5e', background: 'rgba(244,63,94,0.1)', padding: '6px 12px', borderRadius: '4px', maxWidth: '100%', wordBreak: 'break-word' }}>
+              {this.state.error.toString()}
+            </p>
+          )}
           <PrimaryButton
-            onClick={() => this.setState({ hasError: false })}
+            onClick={() => window.location.reload()}
             style={{ marginTop: '8px' }}
           >
             Reload Audio Space
