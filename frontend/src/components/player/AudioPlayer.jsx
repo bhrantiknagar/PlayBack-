@@ -4,6 +4,7 @@ import { usePlayer } from '../../context/PlayerContext';
 import { TrackControls } from './TrackControls';
 import { ProgressBar } from './ProgressBar';
 import { VolumeControl } from './VolumeControl';
+import { PlayPauseButton } from './PlayPauseButton';
 import { Visualizer } from '../music/Visualizer';
 import { IconButton } from '../ui/IconButton';
 
@@ -13,6 +14,7 @@ export function AudioPlayer() {
   const {
     currentTrack,
     isPlaying,
+    togglePlay,
     favorites,
     toggleFavorite,
     setIsNowPlayingOpen,
