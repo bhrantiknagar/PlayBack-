@@ -15,7 +15,7 @@ export function Sidebar() {
     { to: '/library', label: 'Sound Vaults', icon: Library },
     { to: '/favorites', label: 'Liked Frequencies', icon: Heart }
   ];
-
+ 
   return (
     <aside className="app-sidebar" aria-label="Sidebar navigation">
       {/* Brand Header */}
