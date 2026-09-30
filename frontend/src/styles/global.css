@@ -709,7 +709,7 @@ input, textarea, select {
     margin-right: 8px !important;
     color: #94a3b8 !important;
     flex-shrink: 0 !important;
-  }
+  } 
   .search-input-field {
     font-size: 13px !important;
     color: #ffffff !important;

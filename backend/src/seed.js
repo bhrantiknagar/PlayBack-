@@ -72,7 +72,7 @@ const tracks = [
     ambientColor: '#08b422ff',
     plays: '25,150,000',
     lyrics: []
-  },
+  }, 
   { 
     id: 'track-05',
     title: 'Glory (Super Slowed)',
